@@ -51,7 +51,8 @@ public class ImprimirSuma extends HttpServlet {
             for(int i=0; i<10000; i++)
             {
                 suma=suma+a+b+i;
-                out.println(suma);
+				if ( (suma % 20) == 0 )
+					out.println(suma);
             }
             
             //Tipo de contenido de la respuesta
