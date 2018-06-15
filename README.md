@@ -11,7 +11,7 @@ Instalar Mediante el uso de NVM
 https://www.digitalocean.com/community/tutorials/como-instalar-node-js-en-ubuntu-16-04-es
 ```
 
-###Nota:
+Nota:
 Escoger la versión 8.9.4
 
 Instalar express a nivel global (no usar ‘npm install express’):
