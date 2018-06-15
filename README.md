@@ -1,6 +1,6 @@
 # Performance-MW
 
-#INSTALACIÓN NodeJS con UBUNTU 16.04 LTS
+INSTALACIÓN NodeJS con UBUNTU 16.04 LTS
 Instalar Mediante el uso de NVM
 https://www.digitalocean.com/community/tutorials/como-instalar-node-js-en-ubuntu-16-04-es
 
