@@ -1,0 +1,3 @@
+edu/uis/Consulta/JDBCVerticle.class
+edu/uis/Consulta/MainVerticle.class
+edu/uis/Consulta/HttpServerVerticle.class
