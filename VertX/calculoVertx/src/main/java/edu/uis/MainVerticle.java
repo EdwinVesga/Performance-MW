@@ -11,9 +11,9 @@ public class MainVerticle extends AbstractVerticle {
 	@Override
     public void start(Future<Void> fut) {
         WorkerExecutor executor=vertx.createSharedWorkerExecutor("my-worker-pool");
-        ArrayList<Integer> array = new ArrayList<>();      
+        
         vertx.createHttpServer().requestHandler(r -> {
-        	
+        	      
         	r.response().setChunked(true);
 			r.response().putHeader("content-type", "text/html;charset=UTF-8");
 			r.response().write("<!DOCTYPE html>");
@@ -24,6 +24,7 @@ public class MainVerticle extends AbstractVerticle {
 			r.response().write("<body>");
 			r.response().write("<h1>Imprime lista de primos.</h1>");
             executor.executeBlocking(future -> {
+			ArrayList<Integer> array = new ArrayList<>();
             int suma = 1;
             for (int i = 0; i < 100000; i++) {
                 suma = suma + 1;
@@ -35,15 +36,22 @@ public class MainVerticle extends AbstractVerticle {
                   contador++;
                 }
                 
-			if(primo == true) array.add(suma);
+				if(primo) array.add(suma);
             }
-			future.complete();
+			System.out.println(Thread.currentThread().getName() + ": " + array.size());
+			future.complete(array);
 			}, false, res -> {
 			
 				if(res.succeeded()){
-				for(Integer e : array) {
+					
+				ArrayList<Integer> array = (ArrayList<Integer>)res.result();
+				
+				/*for(Integer e : array) {
 					r.response().write(""+e+"</br>");
-				}
+				}*/
+				
+				r.response().write(""+Thread.currentThread().getName()+"</br>");
+				r.response().write(""+array.size()+"</br>");
 				r.response().write("</body>");
 				r.response().write("</html>");
 				r.response().end();}
