@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%=title%></title>
+        <script type="text/javascript" src="/../js/jquery-1.10.2.min.js"></script>
+        <link rel="stylesheet" href="/../css/style.css">
+    </head>
+<body>
+<h1>Consulta de estudiantes:</h1>
+<div class="tabla-datos">
+    <table border="1" cellpadding="7" cellspacing="7">
+        <tr>
+
+            <th>Código</th>
+            <th>Primer nombre</th>
+            <th>Segundo nombre</th>
+	    <th>Primer apellido</th>
+            <th>Segundo apellido</th>
+	    <th>Semestre</th>
+            <th>Fecha de ingreso</th>
+        </tr>
+
+        <% if(data.length){
+
+         for(var i = 0; i < data.length; i++) { %>
+
+        <tr>
+
+            <td><%=data[i].id_est%></td>
+            <td><%=data[i].primer_nombre_est%></td>
+            <td><%=data[i].segundo_nombre_est%></td>
+	          <td><%=data[i].primer_apellido_est%></td>
+            <td><%=data[i].segundo_apellido_est%></td>
+	          <td><%=data[i].semestre_est%></td>
+            <td><%=data[i].fecha_ingreso_est.getDate()%>/<%=data[i].fecha_ingreso_est.getMonth()+1%>/<%=data[i].fecha_ingreso_est.getFullYear()%></td>
+        </tr>
+    <% }
+
+     }else{ %>
+         <tr>
+            <td colspan="5">No Data</td>
+         </tr>
+    <% } %>
+
+    </table>
+</div>
+
+<div class="page-data">
+     <ul class="err-area"></ul>
+</div>
+
+
+</body>
+</html>
