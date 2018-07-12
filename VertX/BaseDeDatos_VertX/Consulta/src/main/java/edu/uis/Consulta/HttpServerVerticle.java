@@ -3,25 +3,28 @@ package edu.uis.Consulta;
 
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
+import io.vertx.core.WorkerExecutor;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import java.util.Random;
+import java.util.ArrayList;
 import java.util.List;
 /**
  *
  * @author Edwin_Vesga
  */
 public class HttpServerVerticle extends AbstractVerticle {
-
+	private WorkerExecutor executor;
 	@Override
 	public void start(Future<Void> startFuture){
 
 		HttpServer server = vertx.createHttpServer();
+	    executor=vertx.createSharedWorkerExecutor("my-worker-pool");
 		Router router = Router.router(vertx);
 		router.get("/").handler(this::indexHandler);
 		router.get("/ConsultaEstudiante").handler(this::consultaEstudianteHandler);
@@ -30,8 +33,8 @@ public class HttpServerVerticle extends AbstractVerticle {
 		router.get("/ConsultaEstudianteSemestre").handler(this::consultaEstudianteSemestreHandler);
 		router.post().handler(BodyHandler.create());
 		router.post("/ConsultaProfesorEscuela").handler(this::consultaProfesorEscuelaHandler);
-		router.post("/EliminarEstudianteNombre").handler(this::eliminarEstudianteNombreHandler);
 		router.get("/Insertar").handler(this::insertarHandler);
+		router.post("/ContarPrimos").handler(this::contarPrimosHandler);
 		server.requestHandler(router::accept).listen(4000, ar -> {
 			if (ar.succeeded()) {
 				startFuture.complete();
@@ -89,30 +92,28 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("</form>");
 		rc.response().write("</br>");
 
-		//temporal
-		rc.response().write("<b>Eliminar estudiante por nombre:</b>");
-		rc.response().write("</br>");
-		rc.response().write("Ingrese el nombre de la escuela: </br>");
-		rc.response().write("<form action='/EliminarEstudianteNombre' method='POST'>");
-		rc.response().write("<input type='text' name='nombre' />");
-		rc.response().write("</br>");
-		rc.response().write("<input type='submit' value='Eliminar' />");
-		rc.response().write("</form>");
-		rc.response().write("</br>");
-
 		rc.response().write("<h1>Insertar Estudiante:</h1>");
 		rc.response().write("<form action='/Insertar' method='GET'>");
+		rc.response().write("<input type='text' name='id' />");
+		rc.response().write("</br>");
 		rc.response().write("<input type='submit' value='Insertar Estudiante:' />");
 		rc.response().write("</form>");
 		rc.response().write("</br>");
 
+		rc.response().write("<h1>Contar Primos:</h1>");
+		rc.response().write("<form action='/ContarPrimos' method='POST'>");
+		rc.response().write("<input type='submit' value='ContarPrimos' />");
+		rc.response().write("</form>");
+		rc.response().write("</br>");
+		
 		rc.response().write("</body>");
 		rc.response().write("</html>");
 		rc.response().end();
 	}
 	private void insertarHandler(RoutingContext rc) {
-
-
+		
+		Random aleatorio = new Random(System.currentTimeMillis());
+		int intAleatorio = aleatorio.nextInt(100);
 		rc.response().setChunked(true);
 		rc.response().putHeader("content-type", "text/html;charset=UTF-8");
 		rc.response().write("<!DOCTYPE html>");
@@ -124,44 +125,26 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("<h1>Se inserta y elimina un conjunto de datos.</h1>");
 
 		Future<Void> insert1 = Future.future();
-		insert1 = eventBus("INSERT INTO estudiante VALUES (2142613,'Edwin','Alfonso','Vesga','Arias',10,'2014-04-04')").
-				compose(v -> eventBus("INSERT INTO profesor VALUES (2000112,'Carlos','Alfredo','Perez','Robledo','Ingenieria quimica','2014-04-04')"))
-				.compose(v -> eventBus("INSERT INTO materia VALUES (123459,'Discretas','LabPesados','M-V 10:00 a.m')"));
+		insert1 = eventBus("INSERT INTO estudiante VALUES ("+rc.request().getParam("id")+",'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"',"+intAleatorio+",'2014-04-04')").
+				compose(v -> eventBus("INSERT INTO profesor VALUES ("+rc.request().getParam("id")+",'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','2014-04-04')"))
+				.compose(v -> eventBus("INSERT INTO materia VALUES ("+rc.request().getParam("id")+",'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"')"));
 		insert1.setHandler(ar ->{
 			if(ar.succeeded()) {
-				rc.response().write("<b>Se inserto un Estudiante.</b>");
-				rc.response().write("</br>");
-				rc.response().write("<b>Se inserto un Profesor.</b>");
-				rc.response().write("</br>");
-				rc.response().write("<b>Se inserto una Materia.</b>");
-				rc.response().write("</br>");
 				Future<Void> delete1 = Future.future();
-				delete1 = eventBus("DELETE FROM estudiante WHERE id_est=2142613")
-						.compose(v -> eventBus("DELETE FROM profesor WHERE id_prof=2000112"))
-						.compose(v -> eventBus("DELETE FROM materia WHERE id_materia=123459"));
+				delete1 = eventBus("DELETE FROM estudiante WHERE id_est ="+rc.request().getParam("id"))
+						.compose(v -> eventBus("DELETE FROM profesor WHERE id_prof ="+rc.request().getParam("id")))
+						.compose(v -> eventBus("DELETE FROM materia WHERE id_materia ="+rc.request().getParam("id")));
 				delete1.setHandler(arg ->{
 					if(arg.succeeded()) {
-						rc.response().write("<b>Se elimino un Estudiante.</b>");
+			
 						rc.response().write("</br>");
-						rc.response().write("<b>Se elimino un Profesor.</b>");
-						rc.response().write("</br>");
-						rc.response().write("<b>Se elimino una Materia.</b>");	
+						rc.response().write("<b>El proceso termino correctamente.</b>");	
 						rc.response().write("</br>");
 						rc.response().end();
 					}else {arg.cause();}
 				});
 			}
 			else {ar.cause();}
-		});
-	}
-	private void eliminarEstudianteNombreHandler(RoutingContext rc) {
-		vertx.eventBus().send("consulta","DELETE FROM estudiante WHERE primer_nombre_est ="+"'"+rc.request().getParam("nombre")+"'", reply -> {
-			if (reply.succeeded()) {
-				rc.response().end("Se elimino correctamente.");
-			} else {
-				// No reply or failure
-				reply.cause().printStackTrace();
-			}
 		});
 	}
 	private void consultaEstudianteHandler(RoutingContext rc){
@@ -361,6 +344,45 @@ public class HttpServerVerticle extends AbstractVerticle {
 			}
 		});
 		return future;
+	}
+	private void contarPrimosHandler(RoutingContext rc) {
+		rc.response().setChunked(true);
+		rc.response().putHeader("content-type", "text/html;charset=UTF-8");
+		rc.response().write("<!DOCTYPE html>");
+		rc.response().write("<html>");
+		rc.response().write("<head>");
+		rc.response().write("<title>Vertx</title>");            
+		rc.response().write("</head>");
+		rc.response().write("<body>");
+		rc.response().write("<h1>Imprime la cantidad de primos entre 0 y 100000.</h1>");
+        executor.executeBlocking(future -> {
+		ArrayList<Integer> array = new ArrayList<>();
+        int suma = 1;
+        for (int i = 0; i < 100000; i++) {
+            suma = suma + 1;
+            int contador = 2;
+            boolean primo=true;
+            while ((primo) && (contador!=suma)){
+              if (suma % contador == 0)
+                primo = false;
+              contador++;
+            }
+            
+			if(primo) array.add(suma);
+        }
+		future.complete(array);
+		}, false, res -> {
+		
+			if(res.succeeded()){
+				
+			ArrayList<Integer> array = (ArrayList<Integer>)res.result();	
+			rc.response().write(""+array.size()+"</br>");
+			rc.response().write("</body>");
+			rc.response().write("</html>");
+			rc.response().end();}
+			else{res.cause();}				
+		});
+	
 	}
 
 }
