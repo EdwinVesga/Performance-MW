@@ -1,0 +1,8 @@
+controller/AdminEstudiante.class
+model/Estudiante.class
+dao/EstudianteDAO.class
+model/Profesor.class
+dao/MateriaDAO.class
+model/Conexion.class
+dao/ProfesorDAO.class
+model/Materia.class
