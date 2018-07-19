@@ -28,6 +28,7 @@ public class AdminEstudiante extends HttpServlet {
 	private EstudianteDAO estudianteDAO;
 	private ProfesorDAO profesorDAO;
 	private MateriaDAO materiaDAO;
+	
 	public void init() {
 		String jdbcURL = getServletContext().getInitParameter("jdbcURL");
 		String jdbcUsername = getServletContext().getInitParameter("jdbcUsername");
@@ -36,7 +37,7 @@ public class AdminEstudiante extends HttpServlet {
 
 			estudianteDAO = new EstudianteDAO(jdbcURL, jdbcUsername, jdbcPassword);
 			profesorDAO = new ProfesorDAO(jdbcURL, jdbcUsername, jdbcPassword);
-			materiaDAO = new MateriaDAO(jdbcURL, jdbcUsername, jdbcPassword); 
+			materiaDAO = new MateriaDAO(jdbcURL, jdbcUsername, jdbcPassword);
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -130,20 +131,20 @@ public class AdminEstudiante extends HttpServlet {
 				String.valueOf(intAleatorio));
 		materiaDAO.insertar(materia);
 	}
-	
-	
-	private void consultaEstudiante(HttpServletRequest request, HttpServletResponse response) 
+
+
+	private void consultaEstudiante(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/ConsultaEstudiante.jsp");
 		try {
 		List<Estudiante> listaEstudiantes = estudianteDAO.listarEstudiantes();
 		request.setAttribute("lista", listaEstudiantes);
 		dispatcher.forward(request, response);
-		}catch(SQLException e) 
+		}catch(SQLException e)
 		{
-		 e.printStackTrace();	
+		 e.printStackTrace();
 		}
-		
+
 	}
 	private void consultaProfesor(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -152,12 +153,12 @@ public class AdminEstudiante extends HttpServlet {
 		List<Profesor> listaProfesores = profesorDAO.listarProfesores();
 		request.setAttribute("lista", listaProfesores);
 		dispatcher.forward(request, response);
-		} catch(SQLException e) 
+		} catch(SQLException e)
 		{
 			e.printStackTrace();
 		}
 	}
-	private void consultaMateria(HttpServletRequest request, HttpServletResponse response) 
+	private void consultaMateria(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException{
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/ConsultaMateria.jsp");
 		try {
@@ -169,7 +170,7 @@ public class AdminEstudiante extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-	private void consultaEstudianteSemestre(HttpServletRequest request, HttpServletResponse response) 
+	private void consultaEstudianteSemestre(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException{
 		try {
 		Integer count = estudianteDAO.contarSemestre(request.getParameter("semestre"));
@@ -181,12 +182,13 @@ public class AdminEstudiante extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-	private void consultaProfesorEscuela(HttpServletRequest request, HttpServletResponse response) 
+	private void consultaProfesorEscuela(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException{
 		try {
 			Integer count = profesorDAO.contarEscuela(request.getParameter("escuela"));
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/ConsultaProfesorEscuela.jsp");
 			request.setAttribute("count", count);
+			System.out.println("Count: "+count);
 			request.setAttribute("escuela", request.getParameter("escuela"));
 			dispatcher.forward(request, response);
 			}catch(SQLException e) {
@@ -214,8 +216,8 @@ public class AdminEstudiante extends HttpServlet {
     		}catch(Exception e) {
     			e.printStackTrace();
     		}
-       
-		
+
+
 	}
 	private void insertar(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -259,12 +261,12 @@ public class AdminEstudiante extends HttpServlet {
 			e.printStackTrace();
 		}
 		if(count==6) {
-			request.setAttribute("insertresult", "El proceso termino correctamente.");
+			request.setAttribute("insertresult", "El proceso terminó correctamente.");
 			dispatcher.forward(request, response);
 		}else {
-			request.setAttribute("insertresult", "El proceso no se completo.");
+			request.setAttribute("insertresult", "El proceso no se completó.");
 			dispatcher.forward(request, response);
 		}
 	}
-	
+
 }

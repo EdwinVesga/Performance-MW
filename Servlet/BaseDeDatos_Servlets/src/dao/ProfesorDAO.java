@@ -14,11 +14,11 @@ import model.Conexion;
 public class ProfesorDAO {
 	private Conexion con;
 	private Connection connection;
-	
+
 	public ProfesorDAO(String jdbcURL, String jdbcUsername, String jdbcPassword) throws SQLException {
 		con = new Conexion(jdbcURL, jdbcUsername, jdbcPassword);
 	}
-	
+
 	public void insertar(Profesor profesor) throws SQLException {
 
 		String query = "INSERT INTO profesor (id_prof, primer_nombre_prof, segundo_nombre_prof, primer_apellido_prof, segundo_apellido_prof, escuela_prof, fecha_incorporacion_prof) VALUES (?,?,?,?,?,?,?)";
@@ -92,8 +92,8 @@ public class ProfesorDAO {
 		statement.setString(3, profesor.getPrimer_apellido_prof());
 		statement.setString(4, profesor.getSegundo_apellido_prof());
 		statement.setInt(5, profesor.getId_prof());
-		
-		
+
+
 		// Execute Query
 		try {
 			statement.executeUpdate();
@@ -115,21 +115,21 @@ public class ProfesorDAO {
 
 	}
     public void eliminar(Integer id) throws SQLException {
-		
+
 		PreparedStatement statement = null;
-		
+
 		// Execute Query
 		try {
-			String sql = "DELETE FROM profesor WHERE id_est = ?";
+			String sql = "DELETE FROM profesor WHERE id_prof = ?";
 			con.conectar();
 			connection = con.getJdbcConnection();
 			statement = connection.prepareStatement(sql);
 			statement.setInt(1, id);
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		// Execute Query
 		try {
 			statement.executeUpdate();
@@ -185,5 +185,5 @@ public class ProfesorDAO {
 			return numberOfRows;
 
 	}
-	
+
 }

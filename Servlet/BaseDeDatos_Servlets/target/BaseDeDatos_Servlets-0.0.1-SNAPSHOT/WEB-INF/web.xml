@@ -11,7 +11,7 @@
   </context-param>
   <context-param>
     <param-name>jdbcPassword</param-name>
-    <param-value>fairy157943</param-value>
+    <param-value>123456</param-value>
   </context-param>
 </web-app>
 
