@@ -44,3 +44,10 @@ npm install
 ```bash
 node server.js
 ```
+## Ejecutar proyecto Vert.x
+
+Ingresar a la carpeta "Consulta" del proyecto VertX y escribir el siguiente comando:
+
+```bash
+mvn compile exec:java
+```
