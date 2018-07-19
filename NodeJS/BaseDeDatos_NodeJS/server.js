@@ -5,11 +5,6 @@ var express  = require('express'),
     app = express(),
     expressValidator = require('express-validator');
 
-var format = require('pg-format');
-var arraylist = require('array-list')
-var crypto = require('crypto'),
-    biguint = require('biguint-format');
-
 /*Configura el motor de plantillas EJS y la ruta de las vistas*/
 app.set('views','./views');
 app.set('view engine','ejs');
