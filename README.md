@@ -2,7 +2,7 @@
 
 # Performance-MW
 
-# **Instalación de NodeJS con UBUNTU 16.04 LTS
+## Instalación de NodeJS con UBUNTU 16.04 LTS
 
 
 Instalar Mediante el uso de NVM
@@ -33,7 +33,7 @@ sudo apt-get install npm
 ```bash
 npm install -g express
 ```
-# **Ejecutar proyecto NodeJS
+## Ejecutar proyecto NodeJS
 
 Una vez instalado NodeJS, ingresar a la carpeta "BaseDeDatos_NodeJS" y escribir los siguientes comandos:
 
