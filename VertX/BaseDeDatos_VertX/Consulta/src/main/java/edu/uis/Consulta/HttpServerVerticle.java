@@ -17,6 +17,7 @@ import java.util.List;
 
 
 public class HttpServerVerticle extends AbstractVerticle {
+
 	private WorkerExecutor executor;
 	@Override
 	public void start(Future<Void> startFuture){
@@ -122,28 +123,20 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("<body>");
 		rc.response().write("<h1>Se inserta y elimina un conjunto de datos.</h1>");
 
-		Future<Void> insert1 = Future.future();
-		insert1 = eventBus("INSERT INTO estudiante VALUES ("+rc.request().getParam("id")+",'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"',"+intAleatorio+",'2014-04-04')").
+		eventBus("INSERT INTO estudiante VALUES ("+rc.request().getParam("id")+",'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"',"+intAleatorio+",'2014-04-04')").
 				compose(v -> eventBus("INSERT INTO profesor VALUES ("+rc.request().getParam("id")+",'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','2014-04-04')"))
-				.compose(v -> eventBus("INSERT INTO materia VALUES ("+rc.request().getParam("id")+",'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"')"));
-		insert1.setHandler(ar ->{
-			if(ar.succeeded()) {
-				Future<Void> delete1 = Future.future();
-				delete1 = eventBus("DELETE FROM estudiante WHERE id_est ="+rc.request().getParam("id"))
+				.compose(v -> eventBus("INSERT INTO materia VALUES ("+rc.request().getParam("id")+",'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"')")).
+		compose(ar -> eventBus("DELETE FROM estudiante WHERE id_est ="+rc.request().getParam("id")))
 						.compose(v -> eventBus("DELETE FROM profesor WHERE id_prof ="+rc.request().getParam("id")))
-						.compose(v -> eventBus("DELETE FROM materia WHERE id_materia ="+rc.request().getParam("id")));
-				delete1.setHandler(arg ->{
+						.compose(v -> eventBus("DELETE FROM materia WHERE id_materia ="+rc.request().getParam("id"))).
+				setHandler(arg ->{
 					if(arg.succeeded()) {
-
 						rc.response().write("</br>");
 						rc.response().write("<b>El proceso terminó correctamente.</b>");
 						rc.response().write("</br>");
 						rc.response().end();
 					}else {arg.cause();}
 				});
-			}
-			else {ar.cause();}
-		});
 	}
 	private void consultaEstudianteHandler(RoutingContext rc){
 		// Sender
@@ -349,7 +342,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 
 	private Future<Void> eventBus(String query){
 		Future<Void> future = Future.future();
-		vertx.eventBus().send("consulta", query, reply -> {
+		vertx.eventBus().send("update", query, reply -> {
 			if (reply.succeeded()) {
 				future.complete();
 			} else {
