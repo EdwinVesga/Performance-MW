@@ -11,7 +11,7 @@ import model.Estudiante;
 import model.Conexion;
 
 public class EstudianteDAO {
-	
+
 	private Conexion con;
 	private Connection connection;
 
@@ -55,7 +55,7 @@ public class EstudianteDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	// listar todos los productos
@@ -86,12 +86,12 @@ public class EstudianteDAO {
 
 	// eliminar
 	public void eliminar(Integer id) throws SQLException {
-		
+
 		PreparedStatement statement = null;
-		
+
 		// Execute Query
 		try {
-			String sql = "DELETE FROM estudiante WHERE id_est=?";
+			String sql = "DELETE FROM estudiante WHERE id_est = ?";
 			con.conectar();
 			connection = con.getJdbcConnection();
 			statement = connection.prepareStatement(sql);
@@ -99,7 +99,7 @@ public class EstudianteDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		// Execute Query
 		try {
 			statement.executeUpdate();

@@ -28,7 +28,7 @@ public class AdminEstudiante extends HttpServlet {
 	private EstudianteDAO estudianteDAO;
 	private ProfesorDAO profesorDAO;
 	private MateriaDAO materiaDAO;
-	
+
 	public void init() {
 		String jdbcURL = getServletContext().getInitParameter("jdbcURL");
 		String jdbcUsername = getServletContext().getInitParameter("jdbcUsername");
@@ -79,8 +79,8 @@ public class AdminEstudiante extends HttpServlet {
 			case "consultaProfesorEscuela":
 				consultaProfesorEscuela(request, response);
 				break;
-			case "insertar":
-				insertar(request, response);
+			case "insertaryeliminar":
+				insertaryeliminar(request, response);
 				break;
 			case "contarprimos":
 				contarprimos(request,response);
@@ -102,36 +102,6 @@ public class AdminEstudiante extends HttpServlet {
 		RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
 		dispatcher.forward(request, response);
 	}
-	private void registrarEstudiante(Integer id)
-			throws ServletException, IOException, SQLException {
-		Random aleatorio = new Random(System.currentTimeMillis());
-		int intAleatorio = aleatorio.nextInt(100);
-		Estudiante estudiante = new Estudiante(id,
-				String.valueOf(intAleatorio), String.valueOf(intAleatorio),
-				String.valueOf(intAleatorio), String.valueOf(intAleatorio),
-				Integer.valueOf(intAleatorio), "2014-04-04");
-		estudianteDAO.insertar(estudiante);
-	}
-	private void registrarProfesor(Integer id)
-			throws ServletException, IOException, SQLException {
-		Random aleatorio = new Random(System.currentTimeMillis());
-		int intAleatorio = aleatorio.nextInt(100);
-		Profesor profesor = new Profesor(id,
-				String.valueOf(intAleatorio), String.valueOf(intAleatorio),
-				String.valueOf(intAleatorio), String.valueOf(intAleatorio),
-				String.valueOf(intAleatorio), "2014-04-04");
-		profesorDAO.insertar(profesor);
-	}
-	private void registrarMateria(Integer id)
-			throws ServletException, IOException, SQLException {
-		Random aleatorio = new Random(System.currentTimeMillis());
-		int intAleatorio = aleatorio.nextInt(100);
-		Materia materia = new Materia(id,
-				String.valueOf(intAleatorio), String.valueOf(intAleatorio),
-				String.valueOf(intAleatorio));
-		materiaDAO.insertar(materia);
-	}
-
 
 	private void consultaEstudiante(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -219,54 +189,51 @@ public class AdminEstudiante extends HttpServlet {
 
 
 	}
-	private void insertar(HttpServletRequest request, HttpServletResponse response)
+	private void insertaryeliminar(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		Integer id = Integer.parseInt(request.getParameter("id"));
-		int count=0;
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/Insertar.jsp");
-		try{
-			registrarEstudiante(id);
-			count=count+1;
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		try{
-			registrarProfesor(id);
-			count=count+1;
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		try{
-			registrarMateria(id);
-			count=count+1;
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		try{
-			estudianteDAO.eliminar(id);
-			count=count+1;
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		try{
-			profesorDAO.eliminar(id);
-			count=count+1;
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		try{
-			materiaDAO.eliminar(id);
-			count=count+1;
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		if(count==6) {
-			request.setAttribute("insertresult", "El proceso terminó correctamente.");
-			dispatcher.forward(request, response);
-		}else {
-			request.setAttribute("insertresult", "El proceso no se completó.");
-			dispatcher.forward(request, response);
-		}
+
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/Insertar.jsp");
+
+				int id = Integer.parseInt(request.getParameter("id"));
+
+				Random aleatorio = new Random();
+				int intAleatorio = aleatorio.nextInt(1000);
+
+				Estudiante estudiante = new Estudiante(id,
+						String.valueOf(intAleatorio), String.valueOf(intAleatorio),
+						String.valueOf(intAleatorio), String.valueOf(intAleatorio),
+						intAleatorio, "2014-04-04");
+
+
+				Profesor profesor = new Profesor(id,
+						String.valueOf(intAleatorio), String.valueOf(intAleatorio),
+						String.valueOf(intAleatorio), String.valueOf(intAleatorio),
+						String.valueOf(intAleatorio), "2014-04-04");
+
+
+				Materia materia = new Materia(id,
+						String.valueOf(intAleatorio), String.valueOf(intAleatorio),
+						String.valueOf(intAleatorio));
+
+
+				try{
+					estudianteDAO.insertar(estudiante);
+					profesorDAO.insertar(profesor);
+					materiaDAO.insertar(materia);
+					estudianteDAO.eliminar(id);
+					profesorDAO.eliminar(id);
+					materiaDAO.eliminar(id);
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+
+
+				try {
+				dispatcher.forward(request, response);
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+
 	}
 
 }

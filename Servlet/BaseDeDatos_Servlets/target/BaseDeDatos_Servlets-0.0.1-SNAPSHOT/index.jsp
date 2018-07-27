@@ -47,7 +47,7 @@ Ingrese el nombre de la escuela: </br>
 <h1>Insertar y eliminar registros:</h1>
 Ingrese el id:<br>
 <form action='adminEstudiante' method='GET'>
-<input type="hidden" name ='action' value='insertar' />
+<input type="hidden" name ='action' value='insertaryeliminar' />
 <input type= 'text' name='id' />
 <br><br>
 <input type='submit' value='Insertar y eliminar' />

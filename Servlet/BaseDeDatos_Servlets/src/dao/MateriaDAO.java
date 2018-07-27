@@ -14,11 +14,11 @@ import model.Conexion;
 public class MateriaDAO {
 	private Conexion con;
 	private Connection connection;
-	
+
 	public MateriaDAO(String jdbcURL, String jdbcUsername, String jdbcPassword) throws SQLException {
 		con = new Conexion(jdbcURL, jdbcUsername, jdbcPassword);
 	}
-	
+
 	public void insertar(Materia materia) throws SQLException {
 
 		String query = "INSERT INTO materia (id_materia, nombre_materia, salon_materia, horario_materia) VALUES (?,?,?,?)";
@@ -31,7 +31,7 @@ public class MateriaDAO {
 			statement.setString(2, materia.getNombre_materia());
 			statement.setString(3, materia.getSalon_materia());
 			statement.setString(4, materia.getHorario_materia());
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -85,7 +85,7 @@ public class MateriaDAO {
 		statement.setString(2, materia.getSalon_materia());
 		statement.setString(3, materia.getHorario_materia());
 		statement.setInt(4, materia.getId_materia());
-		
+
 		// Execute Query
 		try {
 			statement.executeUpdate();
@@ -107,9 +107,9 @@ public class MateriaDAO {
 
 	}
 	public void eliminar(Integer id) throws SQLException {
-		
+
 		PreparedStatement statement = null;
-		
+
 		// Execute Query
 		try {
 			String sql = "DELETE FROM materia WHERE id_materia = ?";
@@ -117,11 +117,10 @@ public class MateriaDAO {
 			connection = con.getJdbcConnection();
 			statement = connection.prepareStatement(sql);
 			statement.setInt(1, id);
-		
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		// Execute Query
 		try {
 			statement.executeUpdate();
@@ -141,5 +140,5 @@ public class MateriaDAO {
 		}
 
 	}
-	
+
 }
