@@ -197,60 +197,51 @@ ie.get(function(req,res,next){
                 console.log(err);
                 return next("Mysql error, revise el query1");
             }
+        });
 
-            var query2 = conn.query('INSERT INTO profesor VALUES (?,?,?,?,?,?,"2014-04-04")',[id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio],function(err,row2){
+        var query2 = conn.query('INSERT INTO profesor VALUES (?,?,?,?,?,?,"2014-04-04")',[id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio],function(err,row2){
 
-                if(err){
-                    console.log(err);
-                    return next("Mysql error, revise el query2");
-                }
+            if(err){
+                console.log(err);
+                return next("Mysql error, revise el query2");
+            }
+        });
 
-                var query3 = conn.query('INSERT INTO materia VALUES (?,?,?,?)',[id, intAleatorio, intAleatorio, intAleatorio],function(err,row3){
+        var query3 = conn.query('INSERT INTO materia VALUES (?,?,?,?)',[id, intAleatorio, intAleatorio, intAleatorio],function(err,row3){
 
-                    if(err){
-                        console.log(err);
-                        return next("Mysql error, revise el query3");
-                    }
+            if(err){
+                  console.log(err);
+                  return next("Mysql error, revise el query3");
+            }
+        });
 
-                    //DELETE
-                    var query4 = conn.query('DELETE FROM estudiante WHERE id_est = ?',[id],function(err,row4){
+        //DELETE
+        var query4 = conn.query('DELETE FROM estudiante WHERE id_est = ?',[id],function(err,row4){
 
-                        if(err){
-                            console.log(err);
-                            return next("Mysql error, revise el query4");
-                        }
+            if(err){
+                  console.log(err);
+                  return next("Mysql error, revise el query4");
+            }
+        });
 
-                            var query5 = conn.query('DELETE FROM profesor WHERE id_prof = ?',[id],function(err,row5){
+        var query5 = conn.query('DELETE FROM profesor WHERE id_prof = ?',[id],function(err,row5){
 
-                                if(err){
-                                    console.log(err);
-                                    return next("Mysql error, revise el query5");
-                                }
+            if(err){
+                  console.log(err);
+                  return next("Mysql error, revise el query5");
+            }
+        });
 
-                                      var query6 = conn.query('DELETE FROM materia WHERE id_materia = ?',[id],function(err,row6){
+        var query6 = conn.query('DELETE FROM materia WHERE id_materia = ?',[id],function(err,row6){
 
-                                          if(err){
-                                              console.log(err);
-                                              return next("Mysql error, revise el query6");
-                                          }
+            if(err){
+                  console.log(err);
+                  return next("Mysql error, revise el query6");
+            }
+        });
 
-                                          res.render('InsertarEliminar',{title:"NodeJS",id:id,row1,row2,row3, row4, row5, row6});
-
-                                          });
-
-                                });
-
-                        });
-
-                    });
-
-                });
-
-         });
-
-    });
-
-
+  res.render('InsertarEliminar',{title:"NodeJS"});
+  });
 });
 
 
@@ -258,11 +249,6 @@ var cpri = router.route('/ContarPrimos');
 
 //Realiza operaciones de números primos.
 cpri.get(function(req,res,next){
-
-
-    req.getConnection(function(err,conn){
-
-        if (err) return next("No se puede conectar.");
 
             var array = [];
             var suma = 1;
@@ -281,17 +267,12 @@ cpri.get(function(req,res,next){
 
             res.render('ContarPrimos',{title:"NodeJS",size:array.length});
 
-    });
-
-
 });
 
 
-
-//Se aplica el router aquí
 app.use('/', router);
 
-//Empezar servidor
+
 var server = app.listen(3000,function(){
 
    console.log("Escuchando por el puerto %s",server.address().port);
