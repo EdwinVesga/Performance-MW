@@ -15,8 +15,8 @@ public class MainVerticle extends AbstractVerticle{
 	@Override
 	public void start(Future<Void> startFuture) {
 		Future<String> dbVerticleDeployment = Future.future(); 
-		DeploymentOptions options = new DeploymentOptions().setWorker(true);
-		vertx.deployVerticle(new JDBCVerticle(), options, dbVerticleDeployment.completer()); 
+		
+		vertx.deployVerticle(new JDBCVerticle(), dbVerticleDeployment.completer()); 
 		dbVerticleDeployment.compose(id -> { 
 			Future<String> httpVerticleDeployment = Future.future();
 			vertx.deployVerticle(

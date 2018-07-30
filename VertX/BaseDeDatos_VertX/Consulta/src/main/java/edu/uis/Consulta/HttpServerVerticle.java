@@ -5,13 +5,13 @@ package edu.uis.Consulta;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.WorkerExecutor;
+import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,7 +89,6 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("<input type='submit' value='Consultar' />");
 		rc.response().write("</form>");
 
-
 		rc.response().write("<h1>Insertar y eliminar registros:</h1>");
 		rc.response().write("Ingrese el id:<br>");
 		rc.response().write("<form action='/InsertarEliminar' method='GET'>");
@@ -111,8 +110,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 	}
 	private void insertarHandler(RoutingContext rc) {
 
-		Random aleatorio = new Random(System.currentTimeMillis());
-		int intAleatorio = aleatorio.nextInt(100);
+		
 		rc.response().setChunked(true);
 		rc.response().putHeader("content-type", "text/html;charset=UTF-8");
 		rc.response().write("<!DOCTYPE html>");
@@ -122,13 +120,12 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("</head>");
 		rc.response().write("<body>");
 		rc.response().write("<h1>Se inserta y elimina un conjunto de datos.</h1>");
-
-		eventBus("INSERT INTO estudiante VALUES ("+rc.request().getParam("id")+",'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"',"+intAleatorio+",'2014-04-04')").
-				compose(v -> eventBus("INSERT INTO profesor VALUES ("+rc.request().getParam("id")+",'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','2014-04-04')"))
-				.compose(v -> eventBus("INSERT INTO materia VALUES ("+rc.request().getParam("id")+",'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"')")).
-		compose(ar -> eventBus("DELETE FROM estudiante WHERE id_est ="+rc.request().getParam("id")))
-						.compose(v -> eventBus("DELETE FROM profesor WHERE id_prof ="+rc.request().getParam("id")))
-						.compose(v -> eventBus("DELETE FROM materia WHERE id_materia ="+rc.request().getParam("id"))).
+		eventBus(rc.request().getParam("id"),"insertarEstudiante")
+				.compose(v ->  eventBus(rc.request().getParam("id"),"insertarProfesor"))
+				.compose(v -> eventBus(rc.request().getParam("id"),"insertarMateria"))
+				.compose(v -> eventBus(rc.request().getParam("id"),"eliminarEstudiante"))
+						.compose(v -> eventBus(rc.request().getParam("id"),"eliminarProfesor"))
+						.compose(v -> eventBus(rc.request().getParam("id"),"eliminarMateria")).
 				setHandler(arg ->{
 					if(arg.succeeded()) {
 						rc.response().write("</br>");
@@ -149,8 +146,8 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("</head>");
 		rc.response().write("<body>");
 		rc.response().write("<h1>La tabla Estudiante:</h1>");
-
-		vertx.eventBus().send("consulta", "SELECT * FROM estudiante", reply -> {
+		DeliveryOptions options = new DeliveryOptions().addHeader("action", "consultarEstudiante");
+		vertx.eventBus().send("puente", new JsonObject(), options, reply -> {
 			if (reply.succeeded()) {
 
 				JsonObject rs = (JsonObject)reply.result().body();
@@ -196,8 +193,8 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("</head>");
 		rc.response().write("<body>");
 		rc.response().write("<h1>La tabla Profesor:</h1>");
-
-		vertx.eventBus().send("consulta", "SELECT * FROM profesor", reply -> {
+		DeliveryOptions options = new DeliveryOptions().addHeader("action", "consultarProfesor");
+		vertx.eventBus().send("puente", new JsonObject(), options, reply -> {
 			if (reply.succeeded()) {
 
 				JsonObject rs = (JsonObject)reply.result().body();
@@ -244,8 +241,8 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("</head>");
 		rc.response().write("<body>");
 		rc.response().write("<h1>La tabla Materia:</h1>");
-
-		vertx.eventBus().send("consulta", "SELECT * FROM materia", reply -> {
+		DeliveryOptions options = new DeliveryOptions().addHeader("action", "consultarMateria");
+		vertx.eventBus().send("puente", new JsonObject(), options, reply -> {
 			if (reply.succeeded()) {
 
 				JsonObject rs = (JsonObject)reply.result().body();
@@ -289,12 +286,11 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("</head>");
 		rc.response().write("<body>");
 		rc.response().write("<h1>La cantidad de estudiantes que pertenecen al semestre "+rc.request().getParam("semestre")+" son:</h1>");
-
-		vertx.eventBus().send("consulta", "select count(*)  from estudiante where semestre_est="+rc.request().getParam("semestre"), reply -> {
+		DeliveryOptions options = new DeliveryOptions().addHeader("action", "consultarSemestre" );
+		JsonObject request = new JsonObject().put("semestre",Integer.parseInt(rc.request().getParam("semestre")));
+		vertx.eventBus().send("puente", request, options, reply -> {
 			if (reply.succeeded()) {
-
 				JsonObject rs = (JsonObject)reply.result().body();
-
 				rc.response().write("<font color='blue'>");
 				rc.response().write("<h1>"+rs.getJsonArray("results").getJsonArray(0).getLong(0)+"</h1>");
 				rc.response().write("</font>");
@@ -320,8 +316,9 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("</head>");
 		rc.response().write("<body>");
 		rc.response().write("<h1>La cantidad de profesores que pertenecen a la escuela de "+rc.request().getParam("escuela")+" son:</h1>");
-
-		vertx.eventBus().send("consulta","SELECT COUNT(*)  FROM profesor WHERE escuela_prof ="+"'"+rc.request().getParam("escuela")+"'", reply -> {
+		DeliveryOptions options = new DeliveryOptions().addHeader("action", "consultarEscuela" );
+		JsonObject request = new JsonObject().put("escuela", rc.request().getParam("escuela"));
+		vertx.eventBus().send("puente", request, options, reply -> {
 			if (reply.succeeded()) {
 
 				JsonObject rs = (JsonObject)reply.result().body();
@@ -340,9 +337,11 @@ public class HttpServerVerticle extends AbstractVerticle {
 
 	}
 
-	private Future<Void> eventBus(String query){
+	private Future<Void> eventBus(String param, String option){
 		Future<Void> future = Future.future();
-		vertx.eventBus().send("update", query, reply -> {
+		DeliveryOptions options = new DeliveryOptions().addHeader("action", option );
+		JsonObject request = new JsonObject().put("id",Integer.parseInt(param));
+		vertx.eventBus().send("puente", request, options,reply -> {
 			if (reply.succeeded()) {
 				future.complete();
 			} else {
