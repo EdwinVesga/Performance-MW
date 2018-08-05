@@ -7,49 +7,38 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import model.Materia;
-import model.Conexion;
+
 
 
 public class MateriaDAO {
-	private Conexion con;
-	private Connection connection;
+	
+	private DataSource ds;
 
-	public MateriaDAO(String jdbcURL, String jdbcUsername, String jdbcPassword) throws SQLException {
-		con = new Conexion(jdbcURL, jdbcUsername, jdbcPassword);
+	public MateriaDAO() throws SQLException {
+		try {
+			Context envContext = new InitialContext();
+		    this.ds = (DataSource)envContext.lookup("java:/comp/env/jdbc/ConexionDB");
+		}catch(NamingException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void insertar(Materia materia) throws SQLException {
 
-		String query = "INSERT INTO materia (id_materia, nombre_materia, salon_materia, horario_materia) VALUES (?,?,?,?)";
-		PreparedStatement statement = null;
-		try {
-			con.conectar();
-			connection = con.getJdbcConnection();
-			statement = connection.prepareStatement(query);
-			statement.setInt(1, materia.getId_materia());
-			statement.setString(2, materia.getNombre_materia());
-			statement.setString(3, materia.getSalon_materia());
-			statement.setString(4, materia.getHorario_materia());
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		// Execute Query
-		try {
-			statement.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		// close connection
-		try {
-			statement.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		try {
-			connection.close();
+		try(Connection conn = ds.getConnection()) {
+			String query = "INSERT INTO materia (id_materia, nombre_materia, salon_materia, horario_materia) VALUES (?,?,?,?)";
+			try(PreparedStatement statement = conn.prepareStatement(query)){
+				statement.setInt(1, materia.getId_materia());
+				statement.setString(2, materia.getNombre_materia());
+				statement.setString(3, materia.getSalon_materia());
+				statement.setString(4, materia.getHorario_materia());
+				statement.executeUpdate();
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -58,87 +47,38 @@ public class MateriaDAO {
 	public List<Materia> listarMaterias() throws SQLException {
 
 		List<Materia> listaMaterias = new ArrayList<Materia>();
-		String sql = "SELECT * FROM materia";
-		con.conectar();
-		connection = con.getJdbcConnection();
-		Statement statement = connection.createStatement();
-		ResultSet resulSet = statement.executeQuery(sql);
-
-		while (resulSet.next()) {
-			int id_materia = resulSet.getInt("id_materia");
-			String nombre_materia = resulSet.getString("nombre_materia");
-			String salon_materia = resulSet.getString("salon_materia");
-			String horario_materia = resulSet.getString("horario_materia");
-			Materia materia = new Materia(id_materia, nombre_materia, salon_materia, horario_materia);
-			listaMaterias.add(materia);
+		try(Connection conn = ds.getConnection()){
+			String sql = "SELECT * FROM materia";
+			Statement statement = conn.createStatement();
+			ResultSet resulSet = statement.executeQuery(sql);
+			while (resulSet.next()) {
+				int id_materia = resulSet.getInt("id_materia");
+				String nombre_materia = resulSet.getString("nombre_materia");
+				String salon_materia = resulSet.getString("salon_materia");
+				String horario_materia = resulSet.getString("horario_materia");
+				Materia materia = new Materia(id_materia, nombre_materia, salon_materia, horario_materia);
+				listaMaterias.add(materia);
+			}
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
 		}
-		con.desconectar();
 		return listaMaterias;
 	}
 
-	public void actualizar(Materia materia) throws SQLException {
-		String sql = "UPDATE materia SET nombre_materia = ?, salon_materia = ?, horario_materia = ? WHERE id_materia = ?";
-		con.conectar();
-		connection = con.getJdbcConnection();
-		PreparedStatement statement = connection.prepareStatement(sql);
-		statement.setString(1, materia.getNombre_materia());
-		statement.setString(2, materia.getSalon_materia());
-		statement.setString(3, materia.getHorario_materia());
-		statement.setInt(4, materia.getId_materia());
-
-		// Execute Query
-		try {
-			statement.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		// close connection
-		try {
-			statement.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		try {
-			connection.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-	}
-	public void eliminar(Integer id) throws SQLException {
-
-		PreparedStatement statement = null;
-
-		// Execute Query
-		try {
+	
+	public Integer eliminar(Integer id) throws SQLException {
+		int result = 0;
+		try(Connection conn = ds.getConnection()) {
 			String sql = "DELETE FROM materia WHERE id_materia = ?";
-			con.conectar();
-			connection = con.getJdbcConnection();
-			statement = connection.prepareStatement(sql);
-			statement.setInt(1, id);
+			try(PreparedStatement statement = conn.prepareStatement(sql)){
+				statement.setInt(1, id);
+				result = statement.executeUpdate();
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-		// Execute Query
-		try {
-			statement.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		// close connection
-		try {
-			statement.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		try {
-			connection.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
+		return result;
 	}
 
 }

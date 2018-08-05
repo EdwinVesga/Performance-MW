@@ -30,14 +30,11 @@ public class AdminEstudiante extends HttpServlet {
 	private MateriaDAO materiaDAO;
 
 	public void init() {
-		String jdbcURL = getServletContext().getInitParameter("jdbcURL");
-		String jdbcUsername = getServletContext().getInitParameter("jdbcUsername");
-		String jdbcPassword = getServletContext().getInitParameter("jdbcPassword");
 		try {
 
-			estudianteDAO = new EstudianteDAO(jdbcURL, jdbcUsername, jdbcPassword);
-			profesorDAO = new ProfesorDAO(jdbcURL, jdbcUsername, jdbcPassword);
-			materiaDAO = new MateriaDAO(jdbcURL, jdbcUsername, jdbcPassword);
+			estudianteDAO = new EstudianteDAO();
+			profesorDAO = new ProfesorDAO();
+			materiaDAO = new MateriaDAO();
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -192,10 +189,7 @@ public class AdminEstudiante extends HttpServlet {
 	private void insertaryeliminar(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-				RequestDispatcher dispatcher = request.getRequestDispatcher("/Insertar.jsp");
-
 				int id = Integer.parseInt(request.getParameter("id"));
-
 				Random aleatorio = new Random();
 				int intAleatorio = aleatorio.nextInt(1000);
 
@@ -217,23 +211,26 @@ public class AdminEstudiante extends HttpServlet {
 
 
 				try{
+					
 					estudianteDAO.insertar(estudiante);
 					profesorDAO.insertar(profesor);
 					materiaDAO.insertar(materia);
-					estudianteDAO.eliminar(id);
-					profesorDAO.eliminar(id);
-					materiaDAO.eliminar(id);
+					
 				}catch(Exception e){
 					e.printStackTrace();
 				}
-
-
-				try {
-				dispatcher.forward(request, response);
-				}catch(Exception e) {
-					e.printStackTrace();
+				finally {
+					try{
+						int count = 0;
+						RequestDispatcher dispatcher = request.getRequestDispatcher("/Insertar.jsp");
+						count = count + estudianteDAO.eliminar(id) + profesorDAO.eliminar(id)+ materiaDAO.eliminar(id);
+						if(count == 3) {
+						dispatcher.forward(request, response);
+						}
+						}catch(Exception e) {
+							e.printStackTrace();
+						}
 				}
-
 	}
 
 }
