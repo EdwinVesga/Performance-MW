@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%=title%></title>
+    </head>
+<body>
+<h1>La tabla Materia:</h1>
+    <table border="1">
+        <tr>
+            <th>Código</th>
+            <th>Materia</th>
+            <th>Salón</th>
+	          <th>Horario</th>
+        </tr>
+
+        <% if(data.length){
+
+         for(var i = 0; i < data.length; i++) { %>
+
+        <tr>
+
+            <td><%=data[i].id_materia%></td>
+            <td><%=data[i].nombre_materia%></td>
+            <td><%=data[i].salon_materia%></td>
+	    <td><%=data[i].horario_materia%></td>
+
+        </tr>
+    <% }
+
+     }else{ %>
+    <% } %>
+
+    </table>
+
+
+</body>
+</html>
