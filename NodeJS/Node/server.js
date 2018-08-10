@@ -23,7 +23,7 @@ app.use(
     connection(mysql,{
         host     : 'db',
         user     : 'performance',
-        password : '12345678',
+        password : '123456',
         database : 'universidad',
         debug    : true
     },'request')
