@@ -17,4 +17,4 @@ services:
       - MYSQL_PASSWORD=123456
       - MYSQL_ROOT_PASSWORD=123456
     volumes:
-      - /home/viviana/Documentos/NodeJS/db/dbcreacion:/docker-entrypoint-initdb.d
+      - /tmp/Performance-MW/NodeJS/db/dbcreacion:/docker-entrypoint-initdb.d
