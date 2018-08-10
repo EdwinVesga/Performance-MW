@@ -22,8 +22,8 @@ app.use(
 
     connection(mysql,{
         host     : 'db',
-        user     : 'root',
-        password : '123456',
+        user     : 'performance',
+        password : '12345678',
         database : 'universidad',
         debug    : true
     },'request')
