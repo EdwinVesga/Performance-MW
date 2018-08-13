@@ -25,7 +25,7 @@ app.use(
         user     : 'performance',
         password : '123456',
         database : 'universidad',
-        debug    : true
+        debug    : false
     },'request')
 
 );
@@ -272,7 +272,5 @@ app.use('/', router);
 
 
 var server = app.listen(4000,function(){
-
-   console.log("Escuchando por el puerto %s",server.address().port);
 
 });

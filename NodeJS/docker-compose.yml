@@ -16,5 +16,3 @@ services:
       - MYSQL_USER=performance
       - MYSQL_PASSWORD=123456
       - MYSQL_ROOT_PASSWORD=123456
-    volumes:
-      - /tmp/Performance-MW/NodeJS/db/dbcreacion:/docker-entrypoint-initdb.d
