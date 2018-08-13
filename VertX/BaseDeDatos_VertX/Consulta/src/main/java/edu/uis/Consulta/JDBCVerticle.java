@@ -10,12 +10,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.asyncsql.MySQLClient;
 import io.vertx.ext.sql.SQLClient;
 
-
-
-/**
- *
- * @author Edwin_Vesga
- */
 public class JDBCVerticle extends AbstractVerticle {
 	
 	private SQLClient mySQLClient;
@@ -23,8 +17,8 @@ public class JDBCVerticle extends AbstractVerticle {
 	@Override
 	public void start(Future<Void> startFuture){
 		
-	    mySQLClient = MySQLClient.createShared(vertx, new JsonObject().put("host","localhost").put("post","3306")
-				.put("maxPoolSize", 100).put("username", "root").put("password", "123456").put("database", "universidad").put("charset","UTF-8"));
+	    mySQLClient = MySQLClient.createShared(vertx, new JsonObject().put("host","db").put("post","3306")
+				.put("maxPoolSize", 100).put("username", "performance").put("password", "123456").put("database", "universidad").put("charset","UTF-8"));
 		
 		mySQLClient.getConnection( ar -> { 
 			if (ar.failed()) {

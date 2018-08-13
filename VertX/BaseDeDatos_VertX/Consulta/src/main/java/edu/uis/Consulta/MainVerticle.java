@@ -6,10 +6,6 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 
-/**
- *
- * @author Edwin_Vesga
- */
 public class MainVerticle extends AbstractVerticle{
 	
 	
