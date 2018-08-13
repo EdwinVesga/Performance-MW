@@ -49,8 +49,7 @@ cp.get(function(req,res,next){
 
     req.getConnection(function(err,conn){
 
-        console.log("Conn: " + conn);
-        if (err) return next("No se puede conectar. " + err);
+        if (err) return next("No se puede conectar.");
 
         var query = conn.query('SELECT * FROM profesor',function(err,rows){
 
