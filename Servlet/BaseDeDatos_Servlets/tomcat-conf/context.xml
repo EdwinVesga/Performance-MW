@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context>
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+           addConnectorPort="true"
+           invalidAuthenticationWhenDeny="true"
+           allow=".*;8080"/>
+    <Valve className="org.apache.catalina.authenticator.BasicAuthenticator" />
+</Context>
