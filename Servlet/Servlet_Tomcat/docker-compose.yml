@@ -1,0 +1,18 @@
+version: "3"
+services:
+
+  db:
+    build: ./db
+    environment:
+      - MYSQL_DATABASE=universidad
+      - MYSQL_USER=performance
+      - MYSQL_PASSWORD=123456
+      - MYSQL_ROOT_PASSWORD=123456
+    ports:
+      - "3306:3306"
+    depends_on:
+      - tomcat
+  tomcat:
+    build: .
+    ports:
+      - "4000:8080"
