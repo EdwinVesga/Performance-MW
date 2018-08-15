@@ -9,28 +9,24 @@
 
 <b>Seleccione la consulta que desea hacer:</b><br><br>
 
-<form action='adminEstudiante' method='GET'>
-<input type="hidden" name ='action' value='consultaEstudiante' />
+<form action='ConsultaEstudiante' method='GET'>
 <input type='submit' value='Estudiantes' /><br>
 </form>
 </br>
 
-<form action='adminEstudiante' method='GET'>
-<input type="hidden" name ='action' value='consultaProfesor' />
+<form action='ConsultaProfesor' method='GET'>
 <input type='submit' value='Profesores' /><br>
 </form>
 </br>
 
-<form action='adminEstudiante' method='GET'>
-<input type="hidden" name ='action' value='consultaMateria' />
+<form action='ConsultaMateria' method='GET'>
 <input type='submit' value='Materias' /><br>
 </form>
 </br>
 
 <b>Consultar cantidad de estudiantes por semestre:</b><br><br>
 Ingrese el semestre: </br>
-<form action='adminEstudiante' method='GET'>
-<input type="hidden" name ='action' value='consultaEstudianteSemestre' />
+<form action='ConsultaEstudianteSemestre' method='GET'>
 <input type='text' name='semestre' /><br><br>
 <input type='submit' value='Consultar' /><br><br>
 </form>
@@ -38,16 +34,14 @@ Ingrese el semestre: </br>
 
 <b>Consultar cantidad de profesores por escuela:</b><br><br>
 Ingrese el nombre de la escuela: </br>
-<form action='adminEstudiante' method='POST'>
-<input type="hidden" name='action' value='consultaProfesorEscuela'/>
+<form action='ConsultaProfesorEscuela' method='POST'>
 <input type='text' name='escuela' /><br><br>
 <input type='submit' value='Consultar' />
 </form>
 
 <h1>Insertar y eliminar registros:</h1>
 Ingrese el id:<br>
-<form action='adminEstudiante' method='GET'>
-<input type="hidden" name ='action' value='insertaryeliminar' />
+<form action='InsertarEliminar' method='GET'>
 <input type= 'text' name='id' />
 <br><br>
 <input type='submit' value='Insertar y eliminar' />
@@ -55,8 +49,7 @@ Ingrese el id:<br>
 <br>
 
 <h1>Contar Primos:</h1>
-<form action='adminEstudiante' method='GET'>
-<input type="hidden" name ='action' value='contarprimos' />
+<form action='ContarPrimos' method='GET'>
 <input type='submit' value='Contar Primos' />
 </form>
 </br>

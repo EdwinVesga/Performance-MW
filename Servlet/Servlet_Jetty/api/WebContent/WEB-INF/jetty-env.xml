@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <New id="DSTest" class="org.eclipse.jetty.plus.jndi.Resource">
+     <Arg></Arg>
+     <Arg>jdbc/ConexionDB</Arg>
+     <Arg>
+        <New class="com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource">
+           <Set name="Url">jdbc:mysql://db:3306/universidad</Set>
+           <Set name="User">performance</Set>
+           <Set name="Password">123456</Set>
+        </New>
+     </Arg>
+ </New>
