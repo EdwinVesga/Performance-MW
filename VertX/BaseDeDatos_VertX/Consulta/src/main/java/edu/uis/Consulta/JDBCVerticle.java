@@ -77,7 +77,7 @@ public class JDBCVerticle extends AbstractVerticle {
 	}
 	private void consultarSemestre(Message<JsonObject> message) {
 		JsonArray params = new JsonArray().add(message.body().getInteger("semestre"));
-		String query= "SELECT COUNT(*) FROM estudiante WHERE semestre_est= ?";
+		String query= "SELECT COUNT(*) FROM estudianteC WHERE semestre_est= ?";
 		mySQLClient.queryWithParams(query, params, fetch -> { 
 			if (fetch.succeeded()) {
 				message.reply(fetch.result().toJson());
@@ -88,7 +88,7 @@ public class JDBCVerticle extends AbstractVerticle {
 	}
 	private void consultarEscuela(Message<JsonObject> message) {
 		JsonArray params = new JsonArray().add(message.body().getString("escuela"));
-		String query= "SELECT COUNT(*) FROM profesor WHERE escuela_prof = ?";
+		String query= "SELECT COUNT(*) FROM profesorC WHERE escuela_prof = ?";
 		mySQLClient.queryWithParams(query, params, fetch -> { 
 			if (fetch.succeeded()) {
 				message.reply(fetch.result().toJson());
@@ -99,7 +99,7 @@ public class JDBCVerticle extends AbstractVerticle {
 	}
 	private void consultarEstudiante(Message<JsonObject> message) {
 
-		mySQLClient.query("SELECT * FROM estudiante", fetch -> { 
+		mySQLClient.query("SELECT * FROM estudianteC", fetch -> { 
 			if (fetch.succeeded()) {
 				message.reply(fetch.result().toJson());
 			} else {
@@ -109,7 +109,7 @@ public class JDBCVerticle extends AbstractVerticle {
 	}
 	private void consultarProfesor(Message<JsonObject> message) {
 	
-		mySQLClient.query("SELECT * FROM profesor", fetch -> { 
+		mySQLClient.query("SELECT * FROM profesorC", fetch -> { 
 			if (fetch.succeeded()) {
 				message.reply(fetch.result().toJson());
 			} else {
@@ -119,7 +119,7 @@ public class JDBCVerticle extends AbstractVerticle {
 	}
 	private void consultarMateria(Message<JsonObject> message) {
 		
-		mySQLClient.query("SELECT * FROM materia", fetch -> { 
+		mySQLClient.query("SELECT * FROM materiaC", fetch -> { 
 			if (fetch.succeeded()) {
 				message.reply(fetch.result().toJson());
 			} else {

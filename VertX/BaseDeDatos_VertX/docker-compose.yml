@@ -16,3 +16,4 @@ services:
       - MYSQL_USER=performance
       - MYSQL_PASSWORD=123456
       - MYSQL_ROOT_PASSWORD=123456
+    command: "mysqld --max_connections=100000"
