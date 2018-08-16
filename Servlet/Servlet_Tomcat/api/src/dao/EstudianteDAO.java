@@ -48,7 +48,7 @@ public class EstudianteDAO {
 	public List<Estudiante> listarEstudiantes() throws SQLException {
 		List<Estudiante> listaEstudiantes = new ArrayList<Estudiante>();
 		try(Connection conn = ds.getConnection()){
-			String sql = "SELECT * FROM estudiante";
+			String sql = "SELECT * FROM estudianteC";
 			Statement statement = conn.createStatement();
 			ResultSet resulSet = statement.executeQuery(sql);
 			while (resulSet.next()) {
@@ -87,7 +87,7 @@ public class EstudianteDAO {
 	public int contarSemestre(String semestre) throws SQLException {
 		int numberOfRows=0;
 			try(Connection conn = ds.getConnection()){
-				String sql = "SELECT COUNT(*)  FROM estudiante WHERE semestre_est = ?";
+				String sql = "SELECT COUNT(*)  FROM estudianteC WHERE semestre_est = ?";
 				try(PreparedStatement statement = conn.prepareStatement(sql)){
 					statement.setInt(1, Integer.parseInt(semestre));
 					try {

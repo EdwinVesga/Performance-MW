@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Consulta Profesores por Escuela</title>
+<title>Servlet</title>
 </head>
 <body>
 	<h1>La cantidad de profesores que pertenecen a la escuela de <c:out value="${escuela}"/> son:</h1>

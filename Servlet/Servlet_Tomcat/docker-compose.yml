@@ -10,6 +10,7 @@ services:
       - MYSQL_ROOT_PASSWORD=123456
     ports:
       - "3306:3306"
+    command: "mysqld --max_connections=100000"
     depends_on:
       - tomcat
   tomcat:

@@ -48,7 +48,7 @@ public class MateriaDAO {
 
 		List<Materia> listaMaterias = new ArrayList<Materia>();
 		try(Connection conn = ds.getConnection()){
-			String sql = "SELECT * FROM materia";
+			String sql = "SELECT * FROM materiaC";
 			Statement statement = conn.createStatement();
 			ResultSet resulSet = statement.executeQuery(sql);
 			while (resulSet.next()) {

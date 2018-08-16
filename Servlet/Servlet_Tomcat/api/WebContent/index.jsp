@@ -34,7 +34,7 @@ Ingrese el semestre: </br>
 
 <b>Consultar cantidad de profesores por escuela:</b><br><br>
 Ingrese el nombre de la escuela: </br>
-<form action='ConsultaProfesorEscuela' method='POST'>
+<form action='ConsultaProfesorEscuela' method='GET'>
 <input type='text' name='escuela' /><br><br>
 <input type='submit' value='Consultar' />
 </form>

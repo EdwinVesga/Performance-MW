@@ -49,7 +49,7 @@ public class ProfesorDAO {
 
 		List<Profesor> listaProfesores = new ArrayList<Profesor>();
 		try(Connection conn = ds.getConnection()){
-			String sql = "SELECT * FROM profesor";
+			String sql = "SELECT * FROM profesorC";
 			Statement statement = conn.createStatement();
 			ResultSet resulSet = statement.executeQuery(sql);
 			while (resulSet.next()) {
@@ -90,7 +90,7 @@ public class ProfesorDAO {
 
 		int numberOfRows=0;
 		try(Connection conn = ds.getConnection()){
-			String sql = "SELECT COUNT(*)  FROM profesor WHERE escuela_prof = ?";
+			String sql = "SELECT COUNT(*)  FROM profesorC WHERE escuela_prof = ?";
 			try(PreparedStatement statement = conn.prepareStatement(sql)){
 				statement.setString(1, escuela);
 				try {
