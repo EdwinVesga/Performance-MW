@@ -51,7 +51,7 @@ cp.get(function(req,res,next){
 
         if (err) return next("No se puede conectar.");
 
-        var query = conn.query('SELECT * FROM profesor',function(err,rows){
+        var query = conn.query('SELECT * FROM profesorC',function(err,rows){
 
             if(err){
                 console.log(err);
@@ -75,7 +75,7 @@ ce.get(function(req,res,next){
 
       if (err) return next("No se puede conectar.");
 
-        var query = conn.query('SELECT * FROM estudiante',function(err,rows){
+        var query = conn.query('SELECT * FROM estudianteC',function(err,rows){
 
           if(err){
               console.log(err);
@@ -100,7 +100,7 @@ cm.get(function(req,res,next){
 
         if (err) return next("No se puede conectar.");
 
-        var query = conn.query('SELECT * FROM materia',function(err,rows){
+        var query = conn.query('SELECT * FROM materiaC',function(err,rows){
 
             if(err){
                 console.log(err);
@@ -128,7 +128,7 @@ cce.get(function(req,res,next){
 
         if (err) return next("No se puede conectar.");
 
-        var query = conn.query('select count(*) AS cantidad from estudiante where semestre_est= ?',[semestre_est],function(err,rows){
+        var query = conn.query('select count(*) AS cantidad from estudianteC where semestre_est= ?',[semestre_est],function(err,rows){
 
             if(err){
                 console.log(err);
@@ -157,7 +157,7 @@ cpe.get(function(req,res,next){
 
         if (err) return next("No se puede conectar.");
 
-        var query = conn.query('select count(*) AS cantidad from profesor where escuela_prof= ?',[escuela_prof],function(err,rows){
+        var query = conn.query('select count(*) AS cantidad from profesorC where escuela_prof= ?',[escuela_prof],function(err,rows){
 
             if(err){
                 console.log(err);
