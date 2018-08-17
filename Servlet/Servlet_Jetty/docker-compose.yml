@@ -8,11 +8,10 @@ services:
       - MYSQL_USER=performance
       - MYSQL_PASSWORD=123456
       - MYSQL_ROOT_PASSWORD=123456
+    command: "mysqld --max_connections=100000"
     ports:
       - "3306:3306"
-    depends_on:
-      - tomcat
-  tomcat:
+  jetty:
     build: .
     ports:
-      - "4000:8080"
+      - "8080:8080"

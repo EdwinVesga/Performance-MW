@@ -1,12 +1,12 @@
 controller/ConsultaMateria.class
 model/Estudiante.class
-dao/MateriaDAO.class
 controller/ConsultaProfesor.class
+dao/MateriaDAO.class
 controller/ConsultaEstudiante.class
 controller/ConsultaEstudianteSemestre.class
 model/Materia.class
-dao/EstudianteDAO.class
 model/Profesor.class
+dao/EstudianteDAO.class
 controller/ContarPrimos.class
 controller/InsertarEliminar.class
 dao/ProfesorDAO.class
