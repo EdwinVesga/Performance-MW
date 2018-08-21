@@ -1,0 +1,74 @@
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" version="2.4"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http:/java.sun.com/dtd/web-app_2_3.dtd">
+  <servlet>
+    <servlet-name>ConsultaEstudiante</servlet-name>
+    <servlet-class>controller.ConsultaEstudiante</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ConsultaEstudiante</servlet-name>
+    <url-pattern>/ConsultaEstudiante</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ConsultaProfesor</servlet-name>
+    <servlet-class>controller.ConsultaProfesor</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ConsultaProfesor</servlet-name>
+    <url-pattern>/ConsultaProfesor</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ConsultaMateria</servlet-name>
+    <servlet-class>controller.ConsultaMateria</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ConsultaMateria</servlet-name>
+    <url-pattern>/ConsultaMateria</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ConsultaEstudianteSemestre</servlet-name>
+    <servlet-class>controller.ConsultaEstudianteSemestre</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ConsultaEstudianteSemestre</servlet-name>
+    <url-pattern>/ConsultaEstudianteSemestre</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ConsultaProfesorEscuela</servlet-name>
+    <servlet-class>controller.ConsultaProfesorEscuela</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ConsultaProfesorEscuela</servlet-name>
+    <url-pattern>/ConsultaProfesorEscuela</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ContarPrimos</servlet-name>
+    <servlet-class>controller.ContarPrimos</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ContarPrimos</servlet-name>
+    <url-pattern>/ContarPrimos</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>InsertarEliminar</servlet-name>
+    <servlet-class>controller.InsertarEliminar</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>InsertarEliminar</servlet-name>
+    <url-pattern>/InsertarEliminar</url-pattern>
+  </servlet-mapping>
+
+</web-app>
