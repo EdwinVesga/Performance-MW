@@ -31,7 +31,7 @@ public class ProfesorDAO {
 		try(Connection conn = ds.getConnection()) {
 			String query = "INSERT INTO profesor (id_prof, primer_nombre_prof, segundo_nombre_prof, primer_apellido_prof, segundo_apellido_prof, escuela_prof, fecha_incorporacion_prof) VALUES (?,?,?,?,?,?,?)";
 			try(PreparedStatement statement = conn.prepareStatement(query)){
-				statement.setInt(1, profesor.getId_prof());
+				statement.setString(1, profesor.getId_prof());
 				statement.setString(2, profesor.getPrimer_nombre_prof());
 				statement.setString(3, profesor.getSegundo_nombre_prof());
 				statement.setString(4, profesor.getPrimer_apellido_prof());
@@ -53,7 +53,7 @@ public class ProfesorDAO {
 			Statement statement = conn.createStatement();
 			ResultSet resulSet = statement.executeQuery(sql);
 			while (resulSet.next()) {
-				int id_prof = resulSet.getInt("id_prof");
+				String id_prof = resulSet.getString("id_prof");
 				String primer_nombre_prof = resulSet.getString("primer_nombre_prof");
 				String segundo_nombre_prof = resulSet.getString("segundo_nombre_prof");
 				String primer_apellido_prof = resulSet.getString("primer_apellido_prof");
@@ -73,12 +73,12 @@ public class ProfesorDAO {
 	}
 
 
-    public Integer eliminar(Integer id) throws SQLException {
+    public Integer eliminar(String id) throws SQLException {
     	int result = 0;
 		try(Connection conn = ds.getConnection()) {
 			String sql = "DELETE FROM profesor WHERE id_prof = ?";
 			try(PreparedStatement statement = conn.prepareStatement(sql)){
-				statement.setInt(1, id);
+				statement.setString(1, id);
 				result = statement.executeUpdate();
 			}
 		} catch (SQLException e) {

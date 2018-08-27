@@ -31,7 +31,7 @@ public class EstudianteDAO {
 		try(Connection conn = ds.getConnection()) {
 			String query = "INSERT INTO estudiante (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
 			try(PreparedStatement statement = conn.prepareStatement(query)){
-				statement.setInt(1, estudiante.getId());
+				statement.setString(1, estudiante.getId());
 				statement.setString(2, estudiante.getPrimerNombre());
 				statement.setString(3, estudiante.getSegundoNombre());
 				statement.setString(4, estudiante.getPrimerApellido());
@@ -50,7 +50,7 @@ public class EstudianteDAO {
 		try(Connection conn = ds.getConnection()) {
 			String query = "INSERT INTO estudianteA (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
 			try(PreparedStatement statement = conn.prepareStatement(query)){
-				statement.setInt(1, estudiante.getId());
+				statement.setString(1, estudiante.getId());
 				statement.setString(2, estudiante.getPrimerNombre());
 				statement.setString(3, estudiante.getSegundoNombre());
 				statement.setString(4, estudiante.getPrimerApellido());
@@ -69,7 +69,7 @@ public class EstudianteDAO {
 		try(Connection conn = ds.getConnection()) {
 			String query = "INSERT INTO estudianteB (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
 			try(PreparedStatement statement = conn.prepareStatement(query)){
-				statement.setInt(1, estudiante.getId());
+				statement.setString(1, estudiante.getId());
 				statement.setString(2, estudiante.getPrimerNombre());
 				statement.setString(3, estudiante.getSegundoNombre());
 				statement.setString(4, estudiante.getPrimerApellido());
@@ -88,7 +88,7 @@ public class EstudianteDAO {
 		try(Connection conn = ds.getConnection()) {
 			String query = "INSERT INTO estudianteC (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
 			try(PreparedStatement statement = conn.prepareStatement(query)){
-				statement.setInt(1, estudiante.getId());
+				statement.setString(1, estudiante.getId());
 				statement.setString(2, estudiante.getPrimerNombre());
 				statement.setString(3, estudiante.getSegundoNombre());
 				statement.setString(4, estudiante.getPrimerApellido());
@@ -109,7 +109,7 @@ public class EstudianteDAO {
 			Statement statement = conn.createStatement();
 			ResultSet resulSet = statement.executeQuery(sql);
 			while (resulSet.next()) {
-				int id_est = resulSet.getInt("id_est");
+				String id_est = resulSet.getString("id_est");
 				String primer_nombre_est = resulSet.getString("primer_nombre_est");
 				String segundo_nombre_est = resulSet.getString("segundo_nombre_est");
 				String primer_apellido_est = resulSet.getString("primer_apellido_est");
@@ -127,12 +127,12 @@ public class EstudianteDAO {
 		return listaEstudiantes;
 	}
 
-	public Integer eliminar(Integer id) throws SQLException {
+	public Integer eliminar(String id) throws SQLException {
 		int result=0;
 		try(Connection conn = ds.getConnection()) {
 			String sql = "DELETE FROM estudiante WHERE id_est = ?";
 			try(PreparedStatement statement = conn.prepareStatement(sql)){
-				statement.setInt(1, id);
+				statement.setString(1, id);
 				result = statement.executeUpdate();
 			}
 		} catch (SQLException e) {

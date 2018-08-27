@@ -1,12 +1,12 @@
 package model;
 
 public class Materia {
-	int id_materia;
+	String id_materia;
 	String nombre_materia;
 	String salon_materia;
 	String horario_materia;
 	
-	public Materia(int id_materia, String nombre_materia, String salon_materia, String horario_materia) {
+	public Materia(String id_materia, String nombre_materia, String salon_materia, String horario_materia) {
 		super();
 		this.id_materia = id_materia;
 		this.nombre_materia = nombre_materia;
@@ -21,10 +21,10 @@ public class Materia {
 	}
 
 
-	public int getId_materia() {
+	public String getId_materia() {
 		return id_materia;
 	}
-	public void setId_materia(int id_materia) {
+	public void setId_materia(String id_materia) {
 		this.id_materia = id_materia;
 	}
 	public String getNombre_materia() {

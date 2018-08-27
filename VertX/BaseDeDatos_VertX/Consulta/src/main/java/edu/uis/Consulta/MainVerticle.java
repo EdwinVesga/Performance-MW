@@ -7,18 +7,18 @@ import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 
 public class MainVerticle extends AbstractVerticle{
-	
-	
+
+
 	@Override
 	public void start(Future<Void> startFuture) {
-		Future<String> dbVerticleDeployment = Future.future(); 
-		vertx.deployVerticle(new JDBCVerticle(), dbVerticleDeployment.completer()); 
+		Future<String> dbVerticleDeployment = Future.future();
+		vertx.deployVerticle(new JDBCVerticle(), dbVerticleDeployment.completer());
 		Future<String> httpVerticleDeployment = Future.future();
 		vertx.deployVerticle(
-				new HttpServerVerticle(), 
-				new DeploymentOptions().setInstances(1), 
+				new HttpServerVerticle(),
+				new DeploymentOptions().setInstances(1).setWorker(true),
 				httpVerticleDeployment.completer());
-		CompositeFuture.all(httpVerticleDeployment, dbVerticleDeployment).setHandler(ar -> { 
+		CompositeFuture.all(httpVerticleDeployment, dbVerticleDeployment).setHandler(ar -> {
 			if (ar.succeeded()) {
 				startFuture.complete();
 			} else {

@@ -1,7 +1,7 @@
 package model;
 
 public class Profesor {
-	int id_prof;
+	String id_prof;
 	String primer_nombre_prof;
  	String segundo_nombre_prof;
  	String primer_apellido_prof;
@@ -10,7 +10,7 @@ public class Profesor {
  	String fecha_incorporacion_prof;
 	
 	
-	public Profesor(int id_prof, String primer_nombre_prof, String segundo_nombre_prof, String primer_apellido_prof,
+	public Profesor(String id_prof, String primer_nombre_prof, String segundo_nombre_prof, String primer_apellido_prof,
 			String segundo_apellido_prof, String escuela_prof, String fecha_incorporacion_prof) {
 		super();
 		this.id_prof = id_prof;
@@ -30,10 +30,10 @@ public class Profesor {
 				+ fecha_incorporacion_prof + "]";
 	}
 
-	public int getId_prof() {
+	public String getId_prof() {
 		return id_prof;
 	}
-	public void setId_prof(int id_prof) {
+	public void setId_prof(String id_prof) {
 		this.id_prof = id_prof;
 	}
 	public String getPrimer_nombre_prof() {

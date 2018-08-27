@@ -2,7 +2,7 @@ package model;
  
 public class Estudiante {
 	
-    int id;
+    String id;
     String primerNombre;
     String segundoNombre;
     String primerApellido;
@@ -11,7 +11,7 @@ public class Estudiante {
     String fechaIngreso;
     
     
-	public Estudiante(int id, String primerNombre, String segundoNombre, String primerApellido, String segundoApellido,
+	public Estudiante(String id, String primerNombre, String segundoNombre, String primerApellido, String segundoApellido,
 			int semestre, String fechaIngreso) {
 		super();
 		this.id = id;
@@ -28,10 +28,10 @@ public class Estudiante {
 				+ ", primerApellido=" + primerApellido + ", segundoApellido=" + segundoApellido + ", fechaNacimiento="
 				+ semestre + ", fechaIngreso=" + fechaIngreso + "]";
 	}
-	public int getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public String getPrimerNombre() {

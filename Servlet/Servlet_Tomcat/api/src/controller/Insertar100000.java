@@ -35,7 +35,7 @@ public class Insertar100000 extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		int id = Integer.parseInt(request.getParameter("id"));
+		String id = request.getParameter("id");
 		Random aleatorio = new Random();
 		int intAleatorio = aleatorio.nextInt(1000);
 

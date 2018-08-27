@@ -39,7 +39,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 		router.post().handler(BodyHandler.create());
 		router.get("/ConsultaProfesorEscuela").handler(this::consultaProfesorEscuelaHandler);
 		router.get("/InsertarEliminar").handler(this::insertarHandler);
-		router.get("/ContarPrimos").handler(this::contarPrimosHandler);
+		router.get("/ContarPrimos").blockingHandler(this::contarPrimosHandler,false);
 		server.requestHandler(router::accept).listen(4000, ar -> {
 			if (ar.succeeded()) {
 				startFuture.complete();
@@ -518,7 +518,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 	private Future<Void> eventBus(String param, String option, Integer value){
 		Future<Void> future = Future.future();
 		DeliveryOptions options = new DeliveryOptions().addHeader("action", option );
-		JsonObject request = new JsonObject().put("id",Integer.parseInt(param)).put("intAleatorio", value);
+		JsonObject request = new JsonObject().put("id", param).put("intAleatorio", value);
 		vertx.eventBus().send("puente", request, options,reply -> {
 			if (reply.succeeded()) {
 				future.complete();

@@ -107,7 +107,6 @@ select opt in "${options[@]}"
 do
 	case $opt in
 		"Consulta")
-		rm -rf ./VertX/Resultados/Consulta/*
 		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
 		read y
 		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
@@ -125,6 +124,7 @@ do
 		fi
 		for ((a=1; a <= x; a++))
 		do
+			rm -rf $p/Consulta$a/*
 			mkdir -p $p/Consulta$a
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta1.jmx -l $p/Consulta$a/Consulta100_1.csv
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta2.jmx -l $p/Consulta$a/Consulta100_2.csv
@@ -147,7 +147,6 @@ do
  		done
 		;;
 		"InsertaryEliminar")
-		rm -rf ./VertX/Resultados/InsertaryEliminar/*
 		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
 		read y
 		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
@@ -165,6 +164,7 @@ do
 		fi
 		for ((a=1; a <= x; a++))
 		do
+			rm -rf $p/InsertaryEliminar$a/*
 			mkdir -p $p/InsertaryEliminar$a
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar100.csv
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar500.csv
@@ -175,7 +175,6 @@ do
 		done
 		;;
 		"ContarPrimos")
-		rm -rf ./VertX/Resultados/ContarPrimos/*
 		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
 		read y
 		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
@@ -193,6 +192,7 @@ do
 		fi
 		for ((a=1; a <= x; a++))
 		do
+			rm -rf $p/ContarPrimos$a/*
 			mkdir -p $p/ContarPrimos$a
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos100.csv
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos500.csv
@@ -218,7 +218,6 @@ select opt in "${options[@]}"
 do
 	case $opt in
 		"Consulta")
-		rm -rf ./Servlet/ResultadosTomcat/Consulta/*
 		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
 		read y
 		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
@@ -236,6 +235,7 @@ do
 		fi
 		for ((a=1; a <= x; a++))
 		do
+			rm -rf $p/Consulta$a/*
 			mkdir -p $p/Consulta$a
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta1.jmx -l $p/Consulta$a/Consulta100_1.csv
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta2.jmx -l $p/Consulta$a/Consulta100_2.csv
@@ -258,7 +258,6 @@ do
  		done
 		;;
 		"InsertaryEliminar")
-		rm -rf ./Servlet/ResultadosTomcat/InsertaryEliminar/*
 		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
 		read y
 		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
@@ -276,6 +275,7 @@ do
 		fi
 		for ((a=1; a <= x; a++))
 		do
+			rm -rf $p/InsertaryEliminar$a/*
 			mkdir -p $p/InsertaryEliminar$a
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar100.csv
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar500.csv
@@ -286,7 +286,6 @@ do
 		done
 		;;
 		"ContarPrimos")
-		rm -rf ./Servlet/ResultadosTomcat/ContarPrimos/*
 		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
 		read y
 		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
@@ -304,6 +303,7 @@ do
 		fi
 		for ((a=1; a <= x; a++))
 		do
+			rm -rf $p/ContarPrimos$a/*
 			mkdir -p $p/ContarPrimos$a
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos100.csv
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos500.csv
@@ -329,7 +329,6 @@ select opt in "${options[@]}"
 do
 	case $opt in
 		"Consulta")
-		rm -rf ./Servlet/ResultadosJetty/Consulta/*
 		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
 		read y
 		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
@@ -347,6 +346,7 @@ do
 		fi
 		for ((a=1; a <= x; a++))
 		do
+			rm -rf $p/Consulta$a/*
 			mkdir -p $p/Consulta$a
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta1.jmx -l $p/Consulta$a/Consulta100_1.csv
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta2.jmx -l $p/Consulta$a/Consulta100_2.csv
@@ -369,7 +369,6 @@ do
  		done
 		;;
 		"InsertaryEliminar")
-		rm -rf ./Servlet/ResultadosJetty/InsertaryEliminar/*
 		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
 		read y
 		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
@@ -387,6 +386,7 @@ do
 		fi
 		for ((a=1; a <= x; a++))
 		do
+			rm -rf $p/InsertaryEliminar$a/*
 			mkdir -p $p/InsertaryEliminar$a
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar100.csv
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar500.csv
@@ -397,7 +397,6 @@ do
 		done
 		;;
 		"ContarPrimos")
-		rm -rf ./Servlet/ResultadosJetty/ContarPrimos/*
 		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
 		read y
 		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
@@ -415,6 +414,7 @@ do
 		fi
 		for ((a=1; a <= x; a++))
 		do
+			rm -rf $p/ContarPrimos$a/*
 			mkdir -p $p/ContarPrimos$a
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos100.csv
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos500.csv
@@ -440,7 +440,6 @@ select opt in "${options[@]}"
 do
 	case $opt in
 		"Consulta")
-		rm -rf ./NodeJS/Resultados/Consulta/*
 		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
 		read y
 		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
@@ -458,6 +457,7 @@ do
 		fi
 		for ((a=1; a <= x; a++))
 		do
+			rm -rf $p/Consulta$a/*
 			mkdir -p $p/Consulta$a
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta1.jmx -l $p/Consulta$a/Consulta100_1.csv
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta2.jmx -l $p/Consulta$a/Consulta100_2.csv
@@ -480,7 +480,6 @@ do
  		done
 		;;
 		"InsertaryEliminar")
-		rm -rf ./NodeJS/Resultados/InsertaryEliminar/*
 		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
 		read y
 		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
@@ -498,6 +497,7 @@ do
 		fi
 		for ((a=1; a <= x; a++))
 		do
+			rm -rf $p/InsertaryEliminar$a/*
 			mkdir -p $p/InsertaryEliminar$a
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar100.csv
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar500.csv
@@ -508,7 +508,6 @@ do
 		done
 		;;
 		"ContarPrimos")
-		rm -rf ./NodeJS/Resultados/ContarPrimos/*
 		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
 		read y
 		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
@@ -526,6 +525,7 @@ do
 		fi
 		for ((a=1; a <= x; a++))
 		do
+			rm -rf $p/ContarPrimos$a/*
 			mkdir -p $p/ContarPrimos$a
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos100.csv
 			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos500.csv
@@ -555,9 +555,13 @@ llenarTablas(){
 	else
 	menumain
 	fi
+	rm -rf $j/Insertar1000.csv
+	rm -rf $j/Insertar10000.csv
+	rm -rf $j/Insertar100000.csv
 	$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/Insertar1000.jmx -l $j/Insertar1000.csv
 	$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/Insertar10000.jmx -l $j/Insertar10000.csv
 	$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/Insertar100000.jmx -l $j/Insertar100000.csv
+	menumain
 }
 
 menumain

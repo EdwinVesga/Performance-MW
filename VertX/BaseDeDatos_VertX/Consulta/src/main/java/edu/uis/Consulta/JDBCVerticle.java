@@ -156,7 +156,7 @@ public class JDBCVerticle extends AbstractVerticle {
 		});
 	}
 	private void insertarEstudianteSemestreA(Message<JsonObject> message) {
-		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		JsonArray params = new JsonArray().add(message.body().getString("id"));
 		Integer intAleatorio = message.body().getInteger("intAleatorio");
 		String query= "INSERT INTO estudianteA VALUES (?,'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"',"+intAleatorio+",'2014-04-04')";
 		mySQLClient.updateWithParams(query, params, fetch -> {
@@ -168,7 +168,7 @@ public class JDBCVerticle extends AbstractVerticle {
 		});
 	}
 	private void insertarEstudianteSemestreB(Message<JsonObject> message) {
-		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		JsonArray params = new JsonArray().add(message.body().getString("id"));
 		Integer intAleatorio = message.body().getInteger("intAleatorio");
 		String query= "INSERT INTO estudianteB VALUES (?,'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"',"+intAleatorio+",'2014-04-04')";
 		mySQLClient.updateWithParams(query, params, fetch -> {
@@ -180,7 +180,7 @@ public class JDBCVerticle extends AbstractVerticle {
 		});
 	}
 	private void insertarEstudianteSemestreC(Message<JsonObject> message) {
-		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		JsonArray params = new JsonArray().add(message.body().getString("id"));
 		Integer intAleatorio = message.body().getInteger("intAleatorio");
 		String query= "INSERT INTO estudianteC VALUES (?,'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"',"+intAleatorio+",'2014-04-04')";
 		mySQLClient.updateWithParams(query, params, fetch -> {
@@ -192,7 +192,7 @@ public class JDBCVerticle extends AbstractVerticle {
 		});
 	}
 	private void insertarEstudiante(Message<JsonObject> message) {
-		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		JsonArray params = new JsonArray().add(message.body().getString("id"));
 		Integer intAleatorio = message.body().getInteger("intAleatorio");
 		String query= "INSERT INTO estudiante VALUES (?,'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"',"+intAleatorio+",'2014-04-04')";
 		mySQLClient.updateWithParams(query, params, fetch -> {
@@ -204,7 +204,7 @@ public class JDBCVerticle extends AbstractVerticle {
 		});
 	}
 	private void eliminarEstudiante(Message<JsonObject> message) {
-		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		JsonArray params = new JsonArray().add(message.body().getString("id"));
 		String query = "DELETE FROM estudiante WHERE id_est = ?";
 		mySQLClient.updateWithParams(query, params, fetch -> {
 			if (fetch.succeeded()) {
@@ -215,7 +215,7 @@ public class JDBCVerticle extends AbstractVerticle {
 		});
 	}
 	private void insertarProfesor(Message<JsonObject> message) {
-		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		JsonArray params = new JsonArray().add(message.body().getString("id"));
 		Integer intAleatorio = message.body().getInteger("intAleatorio");
 		String query = "INSERT INTO profesor VALUES (?,'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','2014-04-04')";
 		mySQLClient.updateWithParams(query, params, fetch -> {
@@ -227,7 +227,7 @@ public class JDBCVerticle extends AbstractVerticle {
 		});
 	}
 	private void eliminarProfesor(Message<JsonObject> message) {
-		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		JsonArray params = new JsonArray().add(message.body().getString("id"));
 		String query = "DELETE FROM profesor WHERE id_prof = ?";
 		mySQLClient.updateWithParams(query, params, fetch -> {
 			if (fetch.succeeded()) {
@@ -238,7 +238,7 @@ public class JDBCVerticle extends AbstractVerticle {
 		});
 	}
 	private void insertarMateria(Message<JsonObject> message) {
-		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		JsonArray params = new JsonArray().add(message.body().getString("id"));
 		Integer intAleatorio = message.body().getInteger("intAleatorio");
 		String query = "INSERT INTO materia VALUES (?,'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"')";
 		mySQLClient.updateWithParams(query, params, fetch -> {
@@ -250,7 +250,7 @@ public class JDBCVerticle extends AbstractVerticle {
 		});
 	}
 	private void eliminarMateria(Message<JsonObject> message) {
-		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		JsonArray params = new JsonArray().add(message.body().getString("id"));
 		String query = "DELETE FROM materia WHERE id_materia = ?";
 		mySQLClient.updateWithParams(query, params, fetch -> {
 			if (fetch.succeeded()) {
