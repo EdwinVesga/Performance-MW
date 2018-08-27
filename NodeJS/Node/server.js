@@ -17,235 +17,227 @@ app.use(expressValidator());
 /*Conexión MySQL*/
 var connection  = require('express-myconnection'),
     mysql = require('mysql');
+var router = express.Router();
 
-app.use(
-
-    connection(mysql,{
-        host     : 'db',
-        user     : 'performance',
-        password : '123456',
-        database : 'universidad',
-        debug    : false
-    },'request')
-
-);
+var async = require('async');
+var pool = require('./database')
 
 app.get('/',function(req,res){
 
 	res.render(path.join(__dirname, '/views/index'));
 });
 
-
 //RESTful route
-var router = express.Router();
 
+router.get('/ConsultaEstudiante', function(req,res,next){
 
-var cp = router.route('/ConsultaProfesor');
+  try {
 
-
-//Muestra la consulta de profesores.
-cp.get(function(req,res,next){
-
-
-    req.getConnection(function(err,conn){
-
-        if (err) return next("No se puede conectar.");
-
-        var query = conn.query('SELECT * FROM profesorC',function(err,rows){
-
-            if(err){
-                console.log(err);
-                return next("Mysql error, revise el query");
-            }
-
-            res.render('ConsultaProfesor',{title:"NodeJS",data:rows});
-
-         });
+    var query = pool.query ("SELECT * FROM estudianteC", function (err, result) {
+    if (err) throw new Error (err);
+    res.render('ConsultaEstudiante',{title:"NodeJS",data:result});
 
     });
 
-});
-
-var ce = router.route('/ConsultaEstudiante');
-
-//Muestra la consulta de estudiantes.
-ce.get(function(req,res,next){
-
-  req.getConnection(function(err,conn){
-
-      if (err) return next("No se puede conectar.");
-
-        var query = conn.query('SELECT * FROM estudianteC',function(err,rows){
-
-          if(err){
-              console.log(err);
-              return next("Mysql error, revise el query");
-          }
-
-          res.render('ConsultaEstudiante',{title:"NodeJS",data:rows});
-
-         });
-
-     });
+    } catch (err) {
+      throw new Error (err);
+    }
 
 });
 
-var cm = router.route('/ConsultaMateria');
 
-//Muestra la consulta de materias.
-cm.get(function(req,res,next){
+router.get('/ConsultaProfesor', function(req,res,next){
 
+  try {
 
-    req.getConnection(function(err,conn){
-
-        if (err) return next("No se puede conectar.");
-
-        var query = conn.query('SELECT * FROM materiaC',function(err,rows){
-
-            if(err){
-                console.log(err);
-                return next("Mysql error, revise el query");
-            }
-
-            res.render('ConsultaMateria',{title:"NodeJS",data:rows});
-
-         });
+    var query = pool.query ("SELECT * FROM profesorC", function (err, result) {
+    if (err) throw new Error (err);
+    res.render('ConsultaProfesor',{title:"NodeJS",data:result});
 
     });
 
+    } catch (err) {
+      throw new Error (err);
+    }
+
 });
 
 
+router.get('/ConsultaMateria', function(req,res,next){
 
-var cce = router.route('/ConsultaEstudianteSemestre');
+  try {
 
-//Muestra la cantidad de estudiantes por semestre.
-cce.get(function(req,res,next){
-
-    var semestre_est = req.param('semestre');
-
-    req.getConnection(function(err,conn){
-
-        if (err) return next("No se puede conectar.");
-
-        var query = conn.query('select count(*) AS cantidad from estudianteC where semestre_est= ?',[semestre_est],function(err,rows){
-
-            if(err){
-                console.log(err);
-                return next("Mysql error, revise el query");
-            }
-
-
-            res.render('ConsultaEstudianteSemestre',{title:"NodeJS",semestre:semestre_est,rows});
-
-         });
+    var query = pool.query ("SELECT * FROM materiaC", function (err, result) {
+    if (err) throw new Error (err);
+    res.render('ConsultaMateria',{title:"NodeJS",data:result});
 
     });
 
+    } catch (err) {
+
+    }
 
 });
 
 
-var cpe = router.route('/ConsultaProfesorEscuela');
+router.get('/ConsultaEstudianteSemestreA', function(req,res,next){
 
-//Muestra la cantidad de profesores por escuela.
-cpe.get(function(req,res,next){
+  let semestre_est = req.param('semestre');
+  console.log("Semestre A: "+semestre_est);
+  try {
 
-    var escuela_prof = req.param('escuela');
+    var query = pool.query ("select count(*) AS cantidad from estudianteA where semestre_est= ?", semestre_est,  function (err, result) {
+    if (err) throw new Error (err);
 
-    req.getConnection(function(err,conn){
-
-        if (err) return next("No se puede conectar.");
-
-        var query = conn.query('select count(*) AS cantidad from profesorC where escuela_prof= ?',[escuela_prof],function(err,rows){
-
-            if(err){
-                console.log(err);
-                return next("Mysql error, revise el query");
-            }
-
-
-            res.render('ConsultaProfesorEscuela',{title:"NodeJS",escuela:escuela_prof,rows});
-
-         });
+    res.render('ConsultaEstudianteSemestre',{title:"NodeJS",semestre:semestre_est, rows:result});
 
     });
 
+    } catch (err) {
+        throw new Error (err);
+    }
 
 });
 
-var ie = router.route('/InsertarEliminar');
+router.get('/ConsultaEstudianteSemestreB', function(req,res,next){
 
-//Inserta y elimina un conjunto de datos.
-ie.get(function(req,res,next){
+  let semestre_est = req.param('semestre');
 
-    var id = req.param('id');
+  try {
 
-    var intAleatorio = parseInt(Math.random()*1000);
+    var query = pool.query ("select count(*) AS cantidad from estudianteB where semestre_est= ?", semestre_est,  function (err, result) {
+    if (err) throw new Error (err);
 
-    req.getConnection(function(err,conn){
+    res.render('ConsultaEstudianteSemestre',{title:"NodeJS",semestre:semestre_est, rows:result});
 
-        if (err) return next("No se puede conectar.");
+    });
 
-        //INSERT
-        var query1 = conn.query('INSERT INTO estudiante VALUES (?,?,?,?,?,?,"2014-04-04")',[id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio],function(err,row1){
+    } catch (err) {
+        throw new Error (err);
+    }
 
-            if(err){
-                console.log(err);
-                return next("Mysql error, revise el query1");
-            }
-        });
+});
 
-        var query2 = conn.query('INSERT INTO profesor VALUES (?,?,?,?,?,?,"2014-04-04")',[id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio],function(err,row2){
+router.get('/ConsultaEstudianteSemestreC', function(req,res,next){
 
-            if(err){
-                console.log(err);
-                return next("Mysql error, revise el query2");
-            }
-        });
+  let semestre_est = req.param('semestre');
 
-        var query3 = conn.query('INSERT INTO materia VALUES (?,?,?,?)',[id, intAleatorio, intAleatorio, intAleatorio],function(err,row3){
+  try {
 
-            if(err){
-                  console.log(err);
-                  return next("Mysql error, revise el query3");
-            }
-        });
+    var query = pool.query ("select count(*) AS cantidad from estudianteC where semestre_est= ?", semestre_est,  function (err, result) {
+    if (err) throw new Error (err);
 
-        //DELETE
-        var query4 = conn.query('DELETE FROM estudiante WHERE id_est = ?',[id],function(err,row4){
+    res.render('ConsultaEstudianteSemestre',{title:"NodeJS",semestre:semestre_est, rows:result});
 
-            if(err){
-                  console.log(err);
-                  return next("Mysql error, revise el query4");
-            }
-        });
+    });
 
-        var query5 = conn.query('DELETE FROM profesor WHERE id_prof = ?',[id],function(err,row5){
+    } catch (err) {
+        throw new Error (err);
+    }
 
-            if(err){
-                  console.log(err);
-                  return next("Mysql error, revise el query5");
-            }
-        });
+});
 
-        var query6 = conn.query('DELETE FROM materia WHERE id_materia = ?',[id],function(err,row6){
+router.get('/ConsultaProfesorEscuela', function(req,res,next){
 
-            if(err){
-                  console.log(err);
-                  return next("Mysql error, revise el query6");
-            }
-        });
+  let escuela_prof = req.param('escuela');
 
-  res.render('InsertarEliminar',{title:"NodeJS"});
-  });
+  try {
+
+    var query = pool.query ("select count(*) AS cantidad from profesorC where escuela_prof= ?", escuela_prof, function(err, result) {
+    if (err) throw new Error (err);
+
+    res.render('ConsultaProfesorEscuela',{title:"NodeJS",escuela:escuela_prof, rows:result});
+
+    });
+
+    } catch (err) {
+      throw new Error (err);
+    }
+
+});
+
+router.get('/Insertar1000', async function(req,res,next){
+
+  let id = req.param('id');
+  const intAleatorio = parseInt(Math.random()*1000);
+
+  try {
+
+    var insert1 = await pool.query ("INSERT INTO estudianteA VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+    var insert2 = await pool.query ("INSERT INTO profesorA VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+    var insert3 = await pool.query ("INSERT INTO materiaA VALUES (?,?,?,?)", [id, intAleatorio, intAleatorio, intAleatorio]);
+
+    res.render('Insertar',{title:"NodeJS"});
+
+  } catch (err) {
+      throw new Error (err);
+  }
+
+});
+
+router.get('/Insertar10000', async function(req,res,next){
+
+  let id = req.param('id');
+  const intAleatorio = parseInt(Math.random()*1000);
+
+  try {
+
+    var insert1 = await pool.query ("INSERT INTO estudianteB VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+    var insert2 = await pool.query ("INSERT INTO profesorB VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+    var insert3 = await pool.query ("INSERT INTO materiaB VALUES (?,?,?,?)", [id, intAleatorio, intAleatorio, intAleatorio]);
+
+    res.render('Insertar',{title:"NodeJS"});
+
+  } catch (err) {
+      throw new Error (err);
+  }
+
+});
+
+router.get('/Insertar100000', async function(req,res,next){
+
+  let id = req.param('id');
+  const intAleatorio = parseInt(Math.random()*1000);
+
+  try {
+
+    var insert1 = await pool.query ("INSERT INTO estudianteC VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+    var insert2 = await pool.query ("INSERT INTO profesorC VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+    var insert3 = await pool.query ("INSERT INTO materiaC VALUES (?,?,?,?)", [id, intAleatorio, intAleatorio, intAleatorio]);
+
+    res.render('Insertar',{title:"NodeJS"});
+
+  } catch (err) {
+      throw new Error (err);
+  }
+
 });
 
 
-var cpri = router.route('/ContarPrimos');
+router.get('/InsertarEliminar', async function(req,res,next){
 
-//Realiza operaciones de números primos.
-cpri.get(function(req,res,next){
+  let id = req.param('id');
+  const intAleatorio = parseInt(Math.random()*1000);
+
+  try {
+
+    var insert1 = await pool.query ("INSERT INTO estudiante VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+    var insert2 = await pool.query ("INSERT INTO profesor VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+    var insert3 = await pool.query ("INSERT INTO materia VALUES (?,?,?,?)", [id, intAleatorio, intAleatorio, intAleatorio]);
+    var delete1 = await pool.query ("DELETE FROM estudiante WHERE id_est = ?", id);
+    var delete2 = await pool.query ("DELETE FROM profesor WHERE id_prof = ?", id);
+    var delete3 = await pool.query ("DELETE FROM materia WHERE id_materia = ?", id);
+
+    res.render('InsertarEliminar',{title:"NodeJS"});
+
+  } catch (err) {
+      throw new Error (err);
+  }
+
+});
+
+
+router.get('/ContarPrimos', function(req,res,next){
 
             var array = [];
             var suma = 1;
