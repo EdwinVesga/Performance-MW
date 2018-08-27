@@ -1,6 +1,5 @@
 package edu.uis.Consulta;
 
-import java.util.Random;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -38,8 +37,14 @@ public class JDBCVerticle extends AbstractVerticle {
 			case "consultarMateria":
 				consultarMateria(message);
 				break;
-			case "consultarSemestre":
-				consultarSemestre(message);
+			case "consultarSemestreA":
+				consultarSemestreA(message);
+				break;
+			case "consultarSemestreB":
+				consultarSemestreB(message);
+				break;
+			case "consultarSemestreC":
+				consultarSemestreC(message);
 				break;
 			case "consultarEscuela":
 				consultarEscuela(message);
@@ -62,12 +67,43 @@ public class JDBCVerticle extends AbstractVerticle {
 			case "insertarMateria":
 				insertarMateria(message);
 				break;
+			case "insertar1000":
+				insertarEstudianteSemestreA(message);
+				break;
+			case "insertar10000":
+				insertarEstudianteSemestreB(message);
+				break;
+			case "insertar100000":
+				insertarEstudianteSemestreC(message);
+				break;
 			default:
 				message.fail(ErrorCodes.BAD_ACTION.ordinal(),"Bad action: "+ action);
 			}
 		}
 	}
-	private void consultarSemestre(Message<JsonObject> message) {
+	private void consultarSemestreA(Message<JsonObject> message) {
+		JsonArray params = new JsonArray().add(message.body().getInteger("semestre"));
+		String query= "SELECT COUNT(*) FROM estudianteA WHERE semestre_est= ?";
+		mySQLClient.queryWithParams(query, params, fetch -> {
+			if (fetch.succeeded()) {
+				message.reply(fetch.result().toJson());
+			} else {
+				fetch.cause();
+			}
+		});
+	}
+	private void consultarSemestreB(Message<JsonObject> message) {
+		JsonArray params = new JsonArray().add(message.body().getInteger("semestre"));
+		String query= "SELECT COUNT(*) FROM estudianteB WHERE semestre_est= ?";
+		mySQLClient.queryWithParams(query, params, fetch -> {
+			if (fetch.succeeded()) {
+				message.reply(fetch.result().toJson());
+			} else {
+				fetch.cause();
+			}
+		});
+	}
+	private void consultarSemestreC(Message<JsonObject> message) {
 		JsonArray params = new JsonArray().add(message.body().getInteger("semestre"));
 		String query= "SELECT COUNT(*) FROM estudianteC WHERE semestre_est= ?";
 		mySQLClient.queryWithParams(query, params, fetch -> {
@@ -119,10 +155,45 @@ public class JDBCVerticle extends AbstractVerticle {
 			}
 		});
 	}
-	private void insertarEstudiante(Message<JsonObject> message) {
-		Random aleatorio = new Random(System.currentTimeMillis());
-		int intAleatorio = aleatorio.nextInt(100);
+	private void insertarEstudianteSemestreA(Message<JsonObject> message) {
 		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		Integer intAleatorio = message.body().getInteger("intAleatorio");
+		String query= "INSERT INTO estudianteA VALUES (?,'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"',"+intAleatorio+",'2014-04-04')";
+		mySQLClient.updateWithParams(query, params, fetch -> {
+			if (fetch.succeeded()) {
+				message.reply(new JsonObject());
+			} else {
+				fetch.cause();
+			}
+		});
+	}
+	private void insertarEstudianteSemestreB(Message<JsonObject> message) {
+		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		Integer intAleatorio = message.body().getInteger("intAleatorio");
+		String query= "INSERT INTO estudianteB VALUES (?,'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"',"+intAleatorio+",'2014-04-04')";
+		mySQLClient.updateWithParams(query, params, fetch -> {
+			if (fetch.succeeded()) {
+				message.reply(new JsonObject());
+			} else {
+				fetch.cause();
+			}
+		});
+	}
+	private void insertarEstudianteSemestreC(Message<JsonObject> message) {
+		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		Integer intAleatorio = message.body().getInteger("intAleatorio");
+		String query= "INSERT INTO estudianteC VALUES (?,'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"',"+intAleatorio+",'2014-04-04')";
+		mySQLClient.updateWithParams(query, params, fetch -> {
+			if (fetch.succeeded()) {
+				message.reply(new JsonObject());
+			} else {
+				fetch.cause();
+			}
+		});
+	}
+	private void insertarEstudiante(Message<JsonObject> message) {
+		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		Integer intAleatorio = message.body().getInteger("intAleatorio");
 		String query= "INSERT INTO estudiante VALUES (?,'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"',"+intAleatorio+",'2014-04-04')";
 		mySQLClient.updateWithParams(query, params, fetch -> {
 			if (fetch.succeeded()) {
@@ -144,9 +215,8 @@ public class JDBCVerticle extends AbstractVerticle {
 		});
 	}
 	private void insertarProfesor(Message<JsonObject> message) {
-		Random aleatorio = new Random(System.currentTimeMillis());
-		int intAleatorio = aleatorio.nextInt(100);
 		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		Integer intAleatorio = message.body().getInteger("intAleatorio");
 		String query = "INSERT INTO profesor VALUES (?,'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"','2014-04-04')";
 		mySQLClient.updateWithParams(query, params, fetch -> {
 			if (fetch.succeeded()) {
@@ -168,9 +238,8 @@ public class JDBCVerticle extends AbstractVerticle {
 		});
 	}
 	private void insertarMateria(Message<JsonObject> message) {
-		Random aleatorio = new Random(System.currentTimeMillis());
-		int intAleatorio = aleatorio.nextInt(100);
 		JsonArray params = new JsonArray().add(message.body().getInteger("id"));
+		Integer intAleatorio = message.body().getInteger("intAleatorio");
 		String query = "INSERT INTO materia VALUES (?,'"+intAleatorio+"','"+intAleatorio+"','"+intAleatorio+"')";
 		mySQLClient.updateWithParams(query, params, fetch -> {
 			if (fetch.succeeded()) {

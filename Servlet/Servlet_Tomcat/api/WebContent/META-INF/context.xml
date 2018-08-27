@@ -3,9 +3,9 @@
 <WatchedResource>WEB-INF/web.xml</WatchedResource>
  		<Resource name="jdbc/ConexionDB" auth="Container"
         type="javax.sql.DataSource"
-        maxActive="100" maxIdle="30" maxWait="10000"
-        username="performance" 
-        password="123456" 
-        driverClassName="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://db:3306/universidad"/>
+        maxTotal="10000" maxIdle="300" maxWaitMillis="30000"
+        username="performance"
+        password="123456"
+        driverClassName="com.mysql.cj.jdbc.Driver"
+        url="jdbc:mysql://db:3306/universidad?useSSL=false"/>
 </Context>

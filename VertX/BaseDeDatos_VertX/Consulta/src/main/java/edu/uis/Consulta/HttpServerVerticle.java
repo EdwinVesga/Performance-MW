@@ -14,6 +14,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 public class HttpServerVerticle extends AbstractVerticle {
@@ -29,7 +30,12 @@ public class HttpServerVerticle extends AbstractVerticle {
 		router.get("/ConsultaEstudiante").handler(this::consultaEstudianteHandler);
 		router.get("/ConsultaProfesor").handler(this::consultaProfesorHandler);
 		router.get("/ConsultaMateria").handler(this::consultaMateriaHandler);
-		router.get("/ConsultaEstudianteSemestre").handler(this::consultaEstudianteSemestreHandler);
+		router.get("/Insertar1000").handler(this::insertar1000Handler);
+		router.get("/Insertar10000").handler(this::insertar10000Handler);
+		router.get("/Insertar100000").handler(this::insertar100000Handler);
+		router.get("/ConsultaEstudianteSemestreA").handler(this::consultaEstudianteSemestreAHandler);
+		router.get("/ConsultaEstudianteSemestreB").handler(this::consultaEstudianteSemestreBHandler);
+		router.get("/ConsultaEstudianteSemestreC").handler(this::consultaEstudianteSemestreCHandler);
 		router.post().handler(BodyHandler.create());
 		router.get("/ConsultaProfesorEscuela").handler(this::consultaProfesorEscuelaHandler);
 		router.get("/InsertarEliminar").handler(this::insertarHandler);
@@ -70,10 +76,57 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("</form>");
 		rc.response().write("<br>");
 
-		rc.response().write("<b>Consultar cantidad de estudiantes por semestre:</b>");
+		rc.response().write("<b>Insertar 1000 Estudiantes:</b>");
+		rc.response().write("Ingrese el id:<br>");
+		rc.response().write("<form action='/Insertar1000' method='GET'>");
+		rc.response().write("<input type='text' name='id' />");
+		rc.response().write("<br><br>");
+		rc.response().write("<input type='submit' value='Insertar' />");
+		rc.response().write("</form>");
+		rc.response().write("<br>");
+
+		rc.response().write("<b>Insertar 10000 Estudiantes:</b>");
+		rc.response().write("Ingrese el id:<br>");
+		rc.response().write("<form action='/Insertar10000' method='GET'>");
+		rc.response().write("<input type='text' name='id' />");
+		rc.response().write("<br><br>");
+		rc.response().write("<input type='submit' value='Insertar' />");
+		rc.response().write("</form>");
+		rc.response().write("<br>");
+
+		rc.response().write("<b>Insertar 100000 Estudiantes:</b>");
+		rc.response().write("Ingrese el id:<br>");
+		rc.response().write("<form action='/Insertar100000' method='GET'>");
+		rc.response().write("<input type='text' name='id' />");
+		rc.response().write("<br><br>");
+		rc.response().write("<input type='submit' value='Insertar' />");
+		rc.response().write("</form>");
+		rc.response().write("<br>");
+
+		rc.response().write("<b>Consultar cantidad de estudiantes por semestre A:</b>");
 		rc.response().write("<br><br>");
 		rc.response().write("Ingrese el semestre: <br>");
-		rc.response().write("<form action='/ConsultaEstudianteSemestre' method='GET'>");
+		rc.response().write("<form action='/ConsultaEstudianteSemestreA' method='GET'>");
+		rc.response().write("<input type='text' name='semestre' />");
+		rc.response().write("<br><br>");
+		rc.response().write("<input type='submit' value='Consultar' />");
+		rc.response().write("</form>");
+		rc.response().write("<br><br>");
+
+		rc.response().write("<b>Consultar cantidad de estudiantes por semestre B:</b>");
+		rc.response().write("<br><br>");
+		rc.response().write("Ingrese el semestre: <br>");
+		rc.response().write("<form action='/ConsultaEstudianteSemestreB' method='GET'>");
+		rc.response().write("<input type='text' name='semestre' />");
+		rc.response().write("<br><br>");
+		rc.response().write("<input type='submit' value='Consultar' />");
+		rc.response().write("</form>");
+		rc.response().write("<br><br>");
+
+		rc.response().write("<b>Consultar cantidad de estudiantes por semestre C:</b>");
+		rc.response().write("<br><br>");
+		rc.response().write("Ingrese el semestre: <br>");
+		rc.response().write("<form action='/ConsultaEstudianteSemestreC' method='GET'>");
 		rc.response().write("<input type='text' name='semestre' />");
 		rc.response().write("<br><br>");
 		rc.response().write("<input type='submit' value='Consultar' />");
@@ -108,9 +161,73 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("</html>");
 		rc.response().end();
 	}
-	private void insertarHandler(RoutingContext rc) {
 
-		
+	private void insertar1000Handler(RoutingContext rc){
+		Random aleatorio = new Random(System.currentTimeMillis());
+		int intAleatorio = aleatorio.nextInt(100);
+		rc.response().setChunked(true);
+		rc.response().putHeader("content-type", "text/html;charset=UTF-8");
+		rc.response().write("<!DOCTYPE html>");
+		rc.response().write("<html>");
+		rc.response().write("<head>");
+		rc.response().write("<title>Vertx</title>");
+		rc.response().write("</head>");
+		rc.response().write("<body>");
+		eventBus(rc.request().getParam("id"),"insertar1000",intAleatorio).
+		setHandler(arg ->{
+			if(arg.succeeded()) {
+				rc.response().write("</br>");
+				rc.response().write("<b>El proceso terminó correctamente.</b>");
+				rc.response().write("</br>");
+				rc.response().end();
+			}else {arg.cause();}
+		});
+	}
+	private void insertar10000Handler(RoutingContext rc) {
+		Random aleatorio = new Random(System.currentTimeMillis());
+		int intAleatorio = aleatorio.nextInt(100);
+		rc.response().setChunked(true);
+		rc.response().putHeader("content-type", "text/html;charset=UTF-8");
+		rc.response().write("<!DOCTYPE html>");
+		rc.response().write("<html>");
+		rc.response().write("<head>");
+		rc.response().write("<title>Vertx</title>");
+		rc.response().write("</head>");
+		rc.response().write("<body>");
+		eventBus(rc.request().getParam("id"),"insertar10000",intAleatorio).
+		setHandler(arg ->{
+			if(arg.succeeded()) {
+				rc.response().write("</br>");
+				rc.response().write("<b>El proceso terminó correctamente.</b>");
+				rc.response().write("</br>");
+				rc.response().end();
+			}else {arg.cause();}
+		});
+	}
+	private void insertar100000Handler(RoutingContext rc) {
+		Random aleatorio = new Random(System.currentTimeMillis());
+		int intAleatorio = aleatorio.nextInt(100);
+		rc.response().setChunked(true);
+		rc.response().putHeader("content-type", "text/html;charset=UTF-8");
+		rc.response().write("<!DOCTYPE html>");
+		rc.response().write("<html>");
+		rc.response().write("<head>");
+		rc.response().write("<title>Vertx</title>");
+		rc.response().write("</head>");
+		rc.response().write("<body>");
+		eventBus(rc.request().getParam("id"),"insertar100000",intAleatorio).
+		setHandler(arg ->{
+			if(arg.succeeded()) {
+				rc.response().write("</br>");
+				rc.response().write("<b>El proceso terminó correctamente.</b>");
+				rc.response().write("</br>");
+				rc.response().end();
+			}else {arg.cause();}
+		});
+	}
+	private void insertarHandler(RoutingContext rc) {
+		Random aleatorio = new Random(System.currentTimeMillis());
+		int intAleatorio = aleatorio.nextInt(100);
 		rc.response().setChunked(true);
 		rc.response().putHeader("content-type", "text/html;charset=UTF-8");
 		rc.response().write("<!DOCTYPE html>");
@@ -120,12 +237,12 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("</head>");
 		rc.response().write("<body>");
 		rc.response().write("<h1>Se inserta y elimina un conjunto de datos.</h1>");
-		eventBus(rc.request().getParam("id"),"insertarEstudiante")
-				.compose(v ->  eventBus(rc.request().getParam("id"),"insertarProfesor"))
-				.compose(v -> eventBus(rc.request().getParam("id"),"insertarMateria"))
-				.compose(v -> eventBus(rc.request().getParam("id"),"eliminarEstudiante"))
-						.compose(v -> eventBus(rc.request().getParam("id"),"eliminarProfesor"))
-						.compose(v -> eventBus(rc.request().getParam("id"),"eliminarMateria")).
+		eventBus(rc.request().getParam("id"),"insertarEstudiante", intAleatorio)
+				.compose(v ->  eventBus(rc.request().getParam("id"),"insertarProfesor", intAleatorio))
+				.compose(v -> eventBus(rc.request().getParam("id"),"insertarMateria", intAleatorio))
+				.compose(v -> eventBus(rc.request().getParam("id"),"eliminarEstudiante", intAleatorio))
+						.compose(v -> eventBus(rc.request().getParam("id"),"eliminarProfesor", intAleatorio))
+						.compose(v -> eventBus(rc.request().getParam("id"),"eliminarMateria", intAleatorio)).
 				setHandler(arg ->{
 					if(arg.succeeded()) {
 						rc.response().write("</br>");
@@ -275,7 +392,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 		});
 
 	}
-	private void consultaEstudianteSemestreHandler(RoutingContext rc){
+	private void consultaEstudianteSemestreAHandler(RoutingContext rc){
 		// Sender
 		rc.response().setChunked(true);
 		rc.response().putHeader("content-type", "text/html;charset=UTF-8");
@@ -286,7 +403,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("</head>");
 		rc.response().write("<body>");
 		rc.response().write("<h1>La cantidad de estudiantes que pertenecen al semestre "+rc.request().getParam("semestre")+" son:</h1>");
-		DeliveryOptions options = new DeliveryOptions().addHeader("action", "consultarSemestre" );
+		DeliveryOptions options = new DeliveryOptions().addHeader("action", "consultarSemestreA" );
 		JsonObject request = new JsonObject().put("semestre",Integer.parseInt(rc.request().getParam("semestre")));
 		vertx.eventBus().send("puente", request, options, reply -> {
 			if (reply.succeeded()) {
@@ -304,6 +421,67 @@ public class HttpServerVerticle extends AbstractVerticle {
 		});
 
 	}
+
+	private void consultaEstudianteSemestreBHandler(RoutingContext rc){
+		// Sender
+		rc.response().setChunked(true);
+		rc.response().putHeader("content-type", "text/html;charset=UTF-8");
+		rc.response().write("<!DOCTYPE html>");
+		rc.response().write("<html>");
+		rc.response().write("<head>");
+		rc.response().write("<title>Vertx</title>");
+		rc.response().write("</head>");
+		rc.response().write("<body>");
+		rc.response().write("<h1>La cantidad de estudiantes que pertenecen al semestre "+rc.request().getParam("semestre")+" son:</h1>");
+		DeliveryOptions options = new DeliveryOptions().addHeader("action", "consultarSemestreB" );
+		JsonObject request = new JsonObject().put("semestre",Integer.parseInt(rc.request().getParam("semestre")));
+		vertx.eventBus().send("puente", request, options, reply -> {
+			if (reply.succeeded()) {
+				JsonObject rs = (JsonObject)reply.result().body();
+				rc.response().write("<font color='blue'>");
+				rc.response().write("<h1>"+rs.getJsonArray("results").getJsonArray(0).getLong(0)+"</h1>");
+				rc.response().write("</font>");
+				rc.response().write("</body>");
+				rc.response().write("</html>");
+				rc.response().end();
+			} else {
+				// No reply or failure
+				reply.cause().printStackTrace();
+			}
+		});
+
+	}
+
+	private void consultaEstudianteSemestreCHandler(RoutingContext rc){
+		// Sender
+		rc.response().setChunked(true);
+		rc.response().putHeader("content-type", "text/html;charset=UTF-8");
+		rc.response().write("<!DOCTYPE html>");
+		rc.response().write("<html>");
+		rc.response().write("<head>");
+		rc.response().write("<title>Vertx</title>");
+		rc.response().write("</head>");
+		rc.response().write("<body>");
+		rc.response().write("<h1>La cantidad de estudiantes que pertenecen al semestre "+rc.request().getParam("semestre")+" son:</h1>");
+		DeliveryOptions options = new DeliveryOptions().addHeader("action", "consultarSemestreC" );
+		JsonObject request = new JsonObject().put("semestre",Integer.parseInt(rc.request().getParam("semestre")));
+		vertx.eventBus().send("puente", request, options, reply -> {
+			if (reply.succeeded()) {
+				JsonObject rs = (JsonObject)reply.result().body();
+				rc.response().write("<font color='blue'>");
+				rc.response().write("<h1>"+rs.getJsonArray("results").getJsonArray(0).getLong(0)+"</h1>");
+				rc.response().write("</font>");
+				rc.response().write("</body>");
+				rc.response().write("</html>");
+				rc.response().end();
+			} else {
+				// No reply or failure
+				reply.cause().printStackTrace();
+			}
+		});
+
+	}
+
 	private void consultaProfesorEscuelaHandler(RoutingContext rc){
 
 		// Sender
@@ -337,10 +515,10 @@ public class HttpServerVerticle extends AbstractVerticle {
 
 	}
 
-	private Future<Void> eventBus(String param, String option){
+	private Future<Void> eventBus(String param, String option, Integer value){
 		Future<Void> future = Future.future();
 		DeliveryOptions options = new DeliveryOptions().addHeader("action", option );
-		JsonObject request = new JsonObject().put("id",Integer.parseInt(param));
+		JsonObject request = new JsonObject().put("id",Integer.parseInt(param)).put("intAleatorio", value);
 		vertx.eventBus().send("puente", request, options,reply -> {
 			if (reply.succeeded()) {
 				future.complete();
@@ -351,6 +529,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 		});
 		return future;
 	}
+
 	private void contarPrimosHandler(RoutingContext rc) {
 		rc.response().setChunked(true);
 		rc.response().putHeader("content-type", "text/html;charset=UTF-8");

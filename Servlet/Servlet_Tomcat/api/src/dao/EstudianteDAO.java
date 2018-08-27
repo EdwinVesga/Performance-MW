@@ -44,6 +44,63 @@ public class EstudianteDAO {
 			e.printStackTrace();
 		}
 	}
+	
+	public void insertarA(Estudiante estudiante) throws SQLException {
+
+		try(Connection conn = ds.getConnection()) {
+			String query = "INSERT INTO estudianteA (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
+			try(PreparedStatement statement = conn.prepareStatement(query)){
+				statement.setInt(1, estudiante.getId());
+				statement.setString(2, estudiante.getPrimerNombre());
+				statement.setString(3, estudiante.getSegundoNombre());
+				statement.setString(4, estudiante.getPrimerApellido());
+				statement.setString(5, estudiante.getSegundoApellido());
+				statement.setInt(6, estudiante.getSemestre());
+				statement.setString(7, estudiante.getFechaIngreso());
+				statement.executeUpdate();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void insertarB(Estudiante estudiante) throws SQLException {
+
+		try(Connection conn = ds.getConnection()) {
+			String query = "INSERT INTO estudianteB (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
+			try(PreparedStatement statement = conn.prepareStatement(query)){
+				statement.setInt(1, estudiante.getId());
+				statement.setString(2, estudiante.getPrimerNombre());
+				statement.setString(3, estudiante.getSegundoNombre());
+				statement.setString(4, estudiante.getPrimerApellido());
+				statement.setString(5, estudiante.getSegundoApellido());
+				statement.setInt(6, estudiante.getSemestre());
+				statement.setString(7, estudiante.getFechaIngreso());
+				statement.executeUpdate();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void insertarC(Estudiante estudiante) throws SQLException {
+
+		try(Connection conn = ds.getConnection()) {
+			String query = "INSERT INTO estudianteC (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
+			try(PreparedStatement statement = conn.prepareStatement(query)){
+				statement.setInt(1, estudiante.getId());
+				statement.setString(2, estudiante.getPrimerNombre());
+				statement.setString(3, estudiante.getSegundoNombre());
+				statement.setString(4, estudiante.getPrimerApellido());
+				statement.setString(5, estudiante.getSegundoApellido());
+				statement.setInt(6, estudiante.getSemestre());
+				statement.setString(7, estudiante.getFechaIngreso());
+				statement.executeUpdate();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public List<Estudiante> listarEstudiantes() throws SQLException {
 		List<Estudiante> listaEstudiantes = new ArrayList<Estudiante>();
@@ -84,7 +141,51 @@ public class EstudianteDAO {
 		return result;
 	}
 
-	public int contarSemestre(String semestre) throws SQLException {
+	public int contarSemestreA(String semestre) throws SQLException {
+		int numberOfRows=0;
+			try(Connection conn = ds.getConnection()){
+				String sql = "SELECT COUNT(*)  FROM estudianteA WHERE semestre_est = ?";
+				try(PreparedStatement statement = conn.prepareStatement(sql)){
+					statement.setInt(1, Integer.parseInt(semestre));
+					try {
+						ResultSet rs = statement.executeQuery();
+						if (rs.next()) {
+							numberOfRows = rs.getInt(1);
+					      } else {
+					        System.out.println("error: could not get the record counts");
+					      }
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}
+			return numberOfRows;
+	}
+	public int contarSemestreB(String semestre) throws SQLException {
+		int numberOfRows=0;
+			try(Connection conn = ds.getConnection()){
+				String sql = "SELECT COUNT(*)  FROM estudianteB WHERE semestre_est = ?";
+				try(PreparedStatement statement = conn.prepareStatement(sql)){
+					statement.setInt(1, Integer.parseInt(semestre));
+					try {
+						ResultSet rs = statement.executeQuery();
+						if (rs.next()) {
+							numberOfRows = rs.getInt(1);
+					      } else {
+					        System.out.println("error: could not get the record counts");
+					      }
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}
+			return numberOfRows;
+	}
+	public int contarSemestreC(String semestre) throws SQLException {
 		int numberOfRows=0;
 			try(Connection conn = ds.getConnection()){
 				String sql = "SELECT COUNT(*)  FROM estudianteC WHERE semestre_est = ?";
