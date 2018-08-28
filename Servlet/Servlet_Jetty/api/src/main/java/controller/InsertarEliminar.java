@@ -15,6 +15,8 @@ import model.Estudiante;
 import model.Materia;
 import model.Profesor;
 
+
+@WebServlet("/InsertarEliminar")
 public class InsertarEliminar extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private EstudianteDAO estudianteDAO;
@@ -40,7 +42,7 @@ public class InsertarEliminar extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		int id = Integer.parseInt(request.getParameter("id"));
+		String id = request.getParameter("id");
 		Random aleatorio = new Random();
 		int intAleatorio = aleatorio.nextInt(1000);
 

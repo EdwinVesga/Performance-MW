@@ -76,7 +76,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("</form>");
 		rc.response().write("<br>");
 
-		rc.response().write("<b>Insertar 1000 Estudiantes:</b>");
+		rc.response().write("<b>Insertar 1000 estudiantes:</b><br><br>");
 		rc.response().write("Ingrese el id:<br>");
 		rc.response().write("<form action='/Insertar1000' method='GET'>");
 		rc.response().write("<input type='text' name='id' />");
@@ -85,7 +85,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("</form>");
 		rc.response().write("<br>");
 
-		rc.response().write("<b>Insertar 10000 Estudiantes:</b>");
+		rc.response().write("<b>Insertar 10000 estudiantes:</b><br><br>");
 		rc.response().write("Ingrese el id:<br>");
 		rc.response().write("<form action='/Insertar10000' method='GET'>");
 		rc.response().write("<input type='text' name='id' />");
@@ -94,7 +94,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("</form>");
 		rc.response().write("<br>");
 
-		rc.response().write("<b>Insertar 100000 Estudiantes:</b>");
+		rc.response().write("<b>Insertar 100000 estudiantes:</b><br><br>");
 		rc.response().write("Ingrese el id:<br>");
 		rc.response().write("<form action='/Insertar100000' method='GET'>");
 		rc.response().write("<input type='text' name='id' />");
@@ -111,7 +111,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("<br><br>");
 		rc.response().write("<input type='submit' value='Consultar' />");
 		rc.response().write("</form>");
-		rc.response().write("<br><br>");
+		rc.response().write("<br>");
 
 		rc.response().write("<b>Consultar cantidad de estudiantes por semestre B:</b>");
 		rc.response().write("<br><br>");
@@ -121,7 +121,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("<br><br>");
 		rc.response().write("<input type='submit' value='Consultar' />");
 		rc.response().write("</form>");
-		rc.response().write("<br><br>");
+		rc.response().write("<br>");
 
 		rc.response().write("<b>Consultar cantidad de estudiantes por semestre C:</b>");
 		rc.response().write("<br><br>");
@@ -131,7 +131,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 		rc.response().write("<br><br>");
 		rc.response().write("<input type='submit' value='Consultar' />");
 		rc.response().write("</form>");
-		rc.response().write("<br><br>");
+		rc.response().write("<br>");
 
 		rc.response().write("<b>Consultar cantidad de profesores por escuela:</b>");
 		rc.response().write("<br><br>");

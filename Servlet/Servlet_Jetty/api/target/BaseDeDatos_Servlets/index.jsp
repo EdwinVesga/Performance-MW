@@ -24,11 +24,54 @@
 </form>
 </br>
 
-<b>Consultar cantidad de estudiantes por semestre:</b><br><br>
+<b>Insertar 1000 estudiantes:</b><br><br>
+Ingrese el id:<br>
+<form action='/Insertar1000' method='GET'>
+<input type= 'text' name='id' />
+<br><br>
+<input type='submit' value='Insertar' />
+</form>
+<br>
+
+<b>Insertar 10000 estudiantes:</b><br><br>
+Ingrese el id:<br>
+<form action='/Insertar10000' method='GET'>
+<input type= 'text' name='id' />
+<br><br>
+<input type='submit' value='Insertar' />
+</form>
+<br>
+
+<b>Insertar 100000 estudiantes:</b><br><br>
+Ingrese el id:<br>
+<form action='/Insertar100000' method='GET'>
+<input type= 'text' name='id' />
+<br><br>
+<input type='submit' value='Insertar' />
+</form>
+<br>
+
+<b>Consultar cantidad de estudiantes por semestre A:</b><br><br>
 Ingrese el semestre: </br>
-<form action='/ConsultaEstudianteSemestre' method='GET'>
+<form action='/ConsultaEstudianteSemestreA' method='GET'>
 <input type='text' name='semestre' /><br><br>
-<input type='submit' value='Consultar' /><br><br>
+<input type='submit' value='Consultar' /><br>
+</form>
+</br>
+
+<b>Consultar cantidad de estudiantes por semestre B:</b><br><br>
+Ingrese el semestre: </br>
+<form action='/ConsultaEstudianteSemestreB' method='GET'>
+<input type='text' name='semestre' /><br><br>
+<input type='submit' value='Consultar' /><br>
+</form>
+</br>
+
+<b>Consultar cantidad de estudiantes por semestre C:</b><br><br>
+Ingrese el semestre: </br>
+<form action='/ConsultaEstudianteSemestreC' method='GET'>
+<input type='text' name='semestre' /><br><br>
+<input type='submit' value='Consultar' /><br>
 </form>
 </br>
 

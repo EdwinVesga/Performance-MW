@@ -33,7 +33,6 @@ public class ConsultaProfesorEscuela extends HttpServlet {
 			Integer count = profesorDAO.contarEscuela(request.getParameter("escuela"));
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/ConsultaProfesorEscuela.jsp");
 			request.setAttribute("count", count);
-			System.out.println("Count: "+count);
 			request.setAttribute("escuela", request.getParameter("escuela"));
 			dispatcher.forward(request, response);
 			}catch(SQLException e) {

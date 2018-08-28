@@ -24,7 +24,7 @@
 </form>
 </br>
 
-<b>Insertar 1000 Estudiantes:</b>
+<b>Insertar 1000 estudiantes:</b><br><br>
 Ingrese el id:<br>
 <form action='/Insertar1000' method='GET'>
 <input type= 'text' name='id' />
@@ -33,7 +33,7 @@ Ingrese el id:<br>
 </form>
 <br>
 
-<b>Insertar 10000 Estudiantes:</b>
+<b>Insertar 10000 estudiantes:</b><br><br>
 Ingrese el id:<br>
 <form action='/Insertar10000' method='GET'>
 <input type= 'text' name='id' />
@@ -42,7 +42,7 @@ Ingrese el id:<br>
 </form>
 <br>
 
-<b>Insertar 100000 Estudiantes:</b>
+<b>Insertar 100000 estudiantes:</b><br><br>
 Ingrese el id:<br>
 <form action='/Insertar100000' method='GET'>
 <input type= 'text' name='id' />
@@ -55,7 +55,7 @@ Ingrese el id:<br>
 Ingrese el semestre: </br>
 <form action='/ConsultaEstudianteSemestreA' method='GET'>
 <input type='text' name='semestre' /><br><br>
-<input type='submit' value='Consultar' /><br><br>
+<input type='submit' value='Consultar' /><br>
 </form>
 </br>
 
@@ -63,7 +63,7 @@ Ingrese el semestre: </br>
 Ingrese el semestre: </br>
 <form action='/ConsultaEstudianteSemestreB' method='GET'>
 <input type='text' name='semestre' /><br><br>
-<input type='submit' value='Consultar' /><br><br>
+<input type='submit' value='Consultar' /><br>
 </form>
 </br>
 
@@ -71,7 +71,7 @@ Ingrese el semestre: </br>
 Ingrese el semestre: </br>
 <form action='/ConsultaEstudianteSemestreC' method='GET'>
 <input type='text' name='semestre' /><br><br>
-<input type='submit' value='Consultar' /><br><br>
+<input type='submit' value='Consultar' /><br>
 </form>
 </br>
 

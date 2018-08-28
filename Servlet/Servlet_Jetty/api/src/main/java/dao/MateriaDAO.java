@@ -63,7 +63,7 @@ public class MateriaDAO {
         conn = DriverManager.getConnection(jdbc, username, password);
 			String query = "INSERT INTO materia (id_materia, nombre_materia, salon_materia, horario_materia) VALUES (?,?,?,?)";
 			try(PreparedStatement statement = conn.prepareStatement(query)){
-				statement.setInt(1, materia.getId_materia());
+				statement.setString(1, materia.getId_materia());
 				statement.setString(2, materia.getNombre_materia());
 				statement.setString(3, materia.getSalon_materia());
 				statement.setString(4, materia.getHorario_materia());
@@ -85,7 +85,7 @@ public class MateriaDAO {
 			Statement statement = conn.createStatement();
 			ResultSet resulSet = statement.executeQuery(sql);
 			while (resulSet.next()) {
-				int id_materia = resulSet.getInt("id_materia");
+				String id_materia = resulSet.getString("id_materia");
 				String nombre_materia = resulSet.getString("nombre_materia");
 				String salon_materia = resulSet.getString("salon_materia");
 				String horario_materia = resulSet.getString("horario_materia");
@@ -101,14 +101,14 @@ public class MateriaDAO {
 	}
 
 
-	public Integer eliminar(Integer id) throws SQLException {
+	public Integer eliminar(String id) throws SQLException {
 		int result = 0;
 		Connection conn = null;
     try {
         conn = DriverManager.getConnection(jdbc, username, password);
 			String sql = "DELETE FROM materia WHERE id_materia = ?";
 			try(PreparedStatement statement = conn.prepareStatement(sql)){
-				statement.setInt(1, id);
+				statement.setString(1, id);
 				result = statement.executeUpdate();
 				statement.close();
 			}

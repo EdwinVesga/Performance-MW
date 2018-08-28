@@ -32,13 +32,33 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>ConsultaEstudianteSemestre</servlet-name>
-    <servlet-class>controller.ConsultaEstudianteSemestre</servlet-class>
+    <servlet-name>ConsultaEstudianteSemestreA</servlet-name>
+    <servlet-class>controller.ConsultaEstudianteSemestreA</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>ConsultaEstudianteSemestre</servlet-name>
-    <url-pattern>/ConsultaEstudianteSemestre</url-pattern>
+    <servlet-name>ConsultaEstudianteSemestreA</servlet-name>
+    <url-pattern>/ConsultaEstudianteSemestreA</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ConsultaEstudianteSemestreB</servlet-name>
+    <servlet-class>controller.ConsultaEstudianteSemestreB</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ConsultaEstudianteSemestreB</servlet-name>
+    <url-pattern>/ConsultaEstudianteSemestreB</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ConsultaEstudianteSemestreC</servlet-name>
+    <servlet-class>controller.ConsultaEstudianteSemestreC</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ConsultaEstudianteSemestreC</servlet-name>
+    <url-pattern>/ConsultaEstudianteSemestreC</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -69,6 +89,37 @@
   <servlet-mapping>
     <servlet-name>InsertarEliminar</servlet-name>
     <url-pattern>/InsertarEliminar</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>Insertar1000</servlet-name>
+    <servlet-class>controller.Insertar1000</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Insertar1000</servlet-name>
+    <url-pattern>/Insertar1000</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>Insertar10000</servlet-name>
+    <servlet-class>controller.Insertar10000</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Insertar10000</servlet-name>
+    <url-pattern>/Insertar10000</url-pattern>
+  </servlet-mapping>
+
+
+  <servlet>
+    <servlet-name>Insertar100000</servlet-name>
+    <servlet-class>controller.Insertar100000</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Insertar100000</servlet-name>
+    <url-pattern>/Insertar100000</url-pattern>
   </servlet-mapping>
 
 </web-app>

@@ -1,16 +1,16 @@
 package model;
 
 public class Profesor {
-	int id_prof;
+	String id_prof;
 	String primer_nombre_prof;
  	String segundo_nombre_prof;
  	String primer_apellido_prof;
  	String segundo_apellido_prof;
  	String escuela_prof;
  	String fecha_incorporacion_prof;
-	
-	
-	public Profesor(int id_prof, String primer_nombre_prof, String segundo_nombre_prof, String primer_apellido_prof,
+
+
+	public Profesor(String id_prof, String primer_nombre_prof, String segundo_nombre_prof, String primer_apellido_prof,
 			String segundo_apellido_prof, String escuela_prof, String fecha_incorporacion_prof) {
 		super();
 		this.id_prof = id_prof;
@@ -21,7 +21,7 @@ public class Profesor {
 		this.escuela_prof = escuela_prof;
 		this.fecha_incorporacion_prof = fecha_incorporacion_prof;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Profesor [id_prof=" + id_prof + ", primer_nombre_prof=" + primer_nombre_prof + ", segundo_nombre_prof="
@@ -30,10 +30,10 @@ public class Profesor {
 				+ fecha_incorporacion_prof + "]";
 	}
 
-	public int getId_prof() {
+	public String getId_prof() {
 		return id_prof;
 	}
-	public void setId_prof(int id_prof) {
+	public void setId_prof(String id_prof) {
 		this.id_prof = id_prof;
 	}
 	public String getPrimer_nombre_prof() {
@@ -72,5 +72,5 @@ public class Profesor {
 	public void setFecha_incorporacion_prof(String fecha_incorporacion_prof) {
 		this.fecha_incorporacion_prof = fecha_incorporacion_prof;
 	}
-	
+
 }
