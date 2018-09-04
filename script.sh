@@ -559,7 +559,9 @@ llenarTablas(){
 	rm -rf $j/Insertar10000.csv
 	rm -rf $j/Insertar100000.csv
 	$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/Insertar1000.jmx -l $j/Insertar1000.csv
+	sleep 5s
 	$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/Insertar10000.jmx -l $j/Insertar10000.csv
+	sleep 10s
 	$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/Insertar100000.jmx -l $j/Insertar100000.csv
 	menumain
 }
