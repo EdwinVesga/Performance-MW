@@ -122,3 +122,45 @@ CREATE TABLE IF NOT EXISTS `profesorC` (
   PRIMARY KEY (`id_prof`),
   UNIQUE KEY `id_prof` (`id_prof`)
 );
+
+DELIMITER //
+CREATE DEFINER=`performance`@`%` PROCEDURE `InsertarTablasDeConsultas`()
+BEGIN
+DECLARE aleatorio VARCHAR(11);
+DECLARE x  INT;
+
+SET x = 1;
+
+WHILE x  <= 1000 DO
+
+ SET  x = x + 1; 
+ SET aleatorio = TRUNCATE(RAND()*10000,0);
+ INSERT INTO estudianteA VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, aleatorio, '2014-11-11');
+ INSERT INTO estudianteB VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, aleatorio, '2014-11-11');
+ INSERT INTO estudianteC VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, aleatorio, '2014-11-11');
+
+END WHILE;
+
+WHILE x  <= 5000 DO
+
+ SET  x = x + 1; 
+ SET aleatorio = TRUNCATE(RAND()*10000,0);
+ INSERT INTO estudianteB VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, aleatorio, '2014-11-11');
+ INSERT INTO estudianteC VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, aleatorio, '2014-11-11');
+
+END WHILE;
+
+WHILE x  <= 10000 DO
+
+ SET  x = x + 1; 
+ SET aleatorio = TRUNCATE(RAND()*10000,0);
+ INSERT INTO estudianteC VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, aleatorio, '2014-11-11');
+
+END WHILE;
+
+
+END//
+DELIMITER ;
+
+CALL InsertarTablasDeConsultas();
+

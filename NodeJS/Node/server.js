@@ -83,7 +83,6 @@ router.get('/ConsultaMateria', function(req,res,next){
 router.get('/ConsultaEstudianteSemestreA', function(req,res,next){
 
   let semestre_est = req.param('semestre');
-  console.log("Semestre A: "+semestre_est);
   try {
 
     var query = pool.query ("select count(*) AS cantidad from estudianteA where semestre_est= ?", semestre_est,  function (err, result) {
