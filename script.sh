@@ -5,15 +5,12 @@ menumain(){
 echo ""
 echo "-- MENU PRINCIPAL --"
 PS3='Please enter your choice: '
-options=("Desplegar Aplicación" "Llenar Tablas Consulta" "Ejecutar Prueba" "Detener Contenedores" "Eliminar Contenedores" "Eliminar Imagenes" "Subir a GitHub" "Quit")
+options=("Desplegar Aplicación" "Ejecutar Prueba" "Detener Contenedores" "Eliminar Contenedores" "Eliminar Imagenes" "Subir a GitHub" "Quit")
 select opt in "${options[@]}"
 do
 	case $opt in
 		"Desplegar Aplicación")
 		desplegar
-		;;
-		"Llenar Tablas Consulta")
-		llenarTablas
 		;;
 		"Ejecutar Prueba")
 		#jmeter -n -t test.jmx -l resultados.jtl
@@ -49,20 +46,60 @@ select opt in "${options[@]}"
 do
 	case $opt in
 		"VertX")
+		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
+		read y
+		if [ $y -eq 1 ]
+		then
+		cd ./VertX/BaseDeDatos_VertX && sudo docker-compose up --build
+		elif [ $y -eq 2]
+		then
 		gnome-terminal --tab -e "bash -c 'cd ./VertX/BaseDeDatos_VertX && sudo docker-compose up --build'"
 		menumain
+		else
+		menumain
+		fi
 		;;
 		"Servlet_Tomcat")
+		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
+		read y
+		if [ $y -eq 1 ]
+		then
+		cd ./Servlet/Servlet_Tomcat && sudo docker-compose up --build
+		elif [ $y -eq 2]
+		then
 		gnome-terminal --tab -e "bash -c 'cd ./Servlet/Servlet_Tomcat && sudo docker-compose up --build'"
 		menumain
+		else
+		menumain
+		fi
 		;;
 		"Servlet_Jetty")
+		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
+		read y
+		if [ $y -eq 1 ]
+		then
+		cd ./Servlet/Servlet_Jetty && sudo docker-compose up --build
+		elif [ $y -eq 2]
+		then
 		gnome-terminal --tab -e "bash -c 'cd ./Servlet/Servlet_Jetty && sudo docker-compose up --build'"
 		menumain
+		else
+		menumain
+		fi
 		;;
 		"NodeJS")
+		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
+		read y
+		if [ $y -eq 1 ]
+		then
+		cd ./NodeJS && sudo docker-compose up --build
+		elif [ $y -eq 2]
+		then
 		gnome-terminal --tab -e "bash -c 'cd ./NodeJS && sudo docker-compose up --build'"
 		menumain
+		else
+		menumain
+		fi
 		;;
 		"Regresar")
 		menumain
@@ -541,29 +578,6 @@ do
 		*)echo "Invalid Option $Reply";;
 	esac
 done
-}
-
-llenarTablas(){
-	echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
-	read y
-	if [ $y -eq 1 ]
-	then
-	j=./Jmeter_Test/Remoto
-	elif [ $y -eq 2 ]
-	then
-	j=./Jmeter_Test
-	else
-	menumain
-	fi
-	rm -rf $j/Insertar1000.csv
-	rm -rf $j/Insertar10000.csv
-	rm -rf $j/Insertar100000.csv
-	$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/Insertar1000.jmx -l $j/Insertar1000.csv
-	sleep 5s
-	$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/Insertar10000.jmx -l $j/Insertar10000.csv
-	sleep 10s
-	$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/Insertar100000.jmx -l $j/Insertar100000.csv
-	menumain
 }
 
 menumain
