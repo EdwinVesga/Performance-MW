@@ -13,8 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/ContarPrimos")
 public class ContarPrimos extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    
+
+
     public ContarPrimos() {
         super();
         // TODO Auto-generated constructor stub

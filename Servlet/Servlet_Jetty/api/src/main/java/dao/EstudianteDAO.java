@@ -150,7 +150,7 @@ public EstudianteDAO() throws SQLException {
 	public int contarSemestreA(String semestre) throws SQLException {
 		int numberOfRows=0;
 		try(Connection conn = ds.getConnection()) {
-				String sql = "SELECT COUNT(*) AS cantidad FROM estudianteA WHERE semestre_est = ?";
+				String sql = "SELECT COUNT(*) FROM estudianteA WHERE semestre_est = ?";
 				try(PreparedStatement statement = conn.prepareStatement(sql)){
 					statement.setInt(1, Integer.parseInt(semestre));
 					try {
@@ -173,7 +173,7 @@ public EstudianteDAO() throws SQLException {
 	public int contarSemestreB(String semestre) throws SQLException {
 		int numberOfRows=0;
 		try(Connection conn = ds.getConnection()) {
-				String sql = "SELECT COUNT(*) AS cantidad FROM estudianteB WHERE semestre_est = ?";
+				String sql = "SELECT COUNT(*) FROM estudianteB WHERE semestre_est = ?";
 				try(PreparedStatement statement = conn.prepareStatement(sql)){
 					statement.setInt(1, Integer.parseInt(semestre));
 					try {
@@ -196,7 +196,7 @@ public EstudianteDAO() throws SQLException {
 	public int contarSemestreC(String semestre) throws SQLException {
 		int numberOfRows=0;
 		try(Connection conn = ds.getConnection()) {
-				String sql = "SELECT COUNT(*) AS cantidad FROM estudianteC WHERE semestre_est = ?";
+				String sql = "SELECT COUNT(*) FROM estudianteC WHERE semestre_est = ?";
 				try(PreparedStatement statement = conn.prepareStatement(sql)){
 					statement.setInt(1, Integer.parseInt(semestre));
 					try {

@@ -85,7 +85,7 @@ router.get('/ConsultaEstudianteSemestreA', function(req,res,next){
   let semestre_est = req.param('semestre');
   try {
 
-    var query = pool.query ("select count(*) AS cantidad from estudianteA where semestre_est= ?", semestre_est,  function (err, result) {
+    var query = pool.query ("select count(*) from estudianteA where semestre_est= ?", semestre_est,  function (err, result) {
     if (err) throw new Error (err);
 
     res.render('ConsultaEstudianteSemestre',{title:"NodeJS",semestre:semestre_est, rows:result});
@@ -104,7 +104,7 @@ router.get('/ConsultaEstudianteSemestreB', function(req,res,next){
 
   try {
 
-    var query = pool.query ("select count(*) AS cantidad from estudianteB where semestre_est= ?", semestre_est,  function (err, result) {
+    var query = pool.query ("select count(*) from estudianteB where semestre_est= ?", semestre_est,  function (err, result) {
     if (err) throw new Error (err);
 
     res.render('ConsultaEstudianteSemestre',{title:"NodeJS",semestre:semestre_est, rows:result});
@@ -123,7 +123,7 @@ router.get('/ConsultaEstudianteSemestreC', function(req,res,next){
 
   try {
 
-    var query = pool.query ("select count(*) AS cantidad from estudianteC where semestre_est= ?", semestre_est,  function (err, result) {
+    var query = pool.query ("select count(*) from estudianteC where semestre_est= ?", semestre_est,  function (err, result) {
     if (err) throw new Error (err);
 
     res.render('ConsultaEstudianteSemestre',{title:"NodeJS",semestre:semestre_est, rows:result});
@@ -142,7 +142,7 @@ router.get('/ConsultaProfesorEscuela', function(req,res,next){
 
   try {
 
-    var query = pool.query ("select count(*) AS cantidad from profesorC where escuela_prof= ?", escuela_prof, function(err, result) {
+    var query = pool.query ("select count(*) from profesorC where escuela_prof= ?", escuela_prof, function(err, result) {
     if (err) throw new Error (err);
 
     res.render('ConsultaProfesorEscuela',{title:"NodeJS",escuela:escuela_prof, rows:result});
@@ -163,8 +163,6 @@ router.get('/Insertar1000', async function(req,res,next){
   try {
 
     var insert1 = await pool.query ("INSERT INTO estudianteA VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
-    var insert2 = await pool.query ("INSERT INTO profesorA VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
-    var insert3 = await pool.query ("INSERT INTO materiaA VALUES (?,?,?,?)", [id, intAleatorio, intAleatorio, intAleatorio]);
 
     res.render('Insertar',{title:"NodeJS"});
 
@@ -182,8 +180,6 @@ router.get('/Insertar10000', async function(req,res,next){
   try {
 
     var insert1 = await pool.query ("INSERT INTO estudianteB VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
-    var insert2 = await pool.query ("INSERT INTO profesorB VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
-    var insert3 = await pool.query ("INSERT INTO materiaB VALUES (?,?,?,?)", [id, intAleatorio, intAleatorio, intAleatorio]);
 
     res.render('Insertar',{title:"NodeJS"});
 
@@ -201,8 +197,6 @@ router.get('/Insertar100000', async function(req,res,next){
   try {
 
     var insert1 = await pool.query ("INSERT INTO estudianteC VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
-    var insert2 = await pool.query ("INSERT INTO profesorC VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
-    var insert3 = await pool.query ("INSERT INTO materiaC VALUES (?,?,?,?)", [id, intAleatorio, intAleatorio, intAleatorio]);
 
     res.render('Insertar',{title:"NodeJS"});
 
@@ -261,6 +255,4 @@ router.get('/ContarPrimos', function(req,res,next){
 app.use('/', router);
 
 
-var server = app.listen(4000,function(){
-
-});
+var server = app.listen(4000);

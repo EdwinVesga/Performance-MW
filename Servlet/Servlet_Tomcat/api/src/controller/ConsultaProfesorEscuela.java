@@ -15,7 +15,7 @@ import dao.ProfesorDAO;
 public class ConsultaProfesorEscuela extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ProfesorDAO profesorDAO;
-	
+
 	public void init() {
 		try {
 			profesorDAO = new ProfesorDAO();
@@ -23,7 +23,7 @@ public class ConsultaProfesorEscuela extends HttpServlet {
 			// TODO: handle exception
 		}
 	}
-       
+
     public ConsultaProfesorEscuela() {
         super();
         // TODO Auto-generated constructor stub
@@ -34,7 +34,6 @@ public class ConsultaProfesorEscuela extends HttpServlet {
 			Integer count = profesorDAO.contarEscuela(request.getParameter("escuela"));
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/ConsultaProfesorEscuela.jsp");
 			request.setAttribute("count", count);
-			System.out.println("Count: "+count);
 			request.setAttribute("escuela", request.getParameter("escuela"));
 			dispatcher.forward(request, response);
 			}catch(SQLException e) {

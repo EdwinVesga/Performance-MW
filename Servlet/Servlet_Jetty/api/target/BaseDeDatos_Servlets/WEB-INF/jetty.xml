@@ -4,7 +4,7 @@
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
   <Arg name="threadpool">
     <New id="threadpool" class="org.eclipse.jetty.util.thread.QueuedThreadPool">
-      <Set name="maxThreads">10000</Set>
+      <Set name="maxThreads">100000</Set>
     </New>
   </Arg>
 </Configure>
