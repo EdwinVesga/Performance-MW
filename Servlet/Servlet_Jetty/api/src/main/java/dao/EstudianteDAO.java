@@ -21,48 +21,21 @@ import java.sql.DriverManager;
 
 public class EstudianteDAO {
 
-private String jdbc;
-private String username;
-private String password;
-private String className;
+private DataSource ds;
 
-	public EstudianteDAO() throws SQLException {
-
-		Properties prop = new Properties();
-    InputStream in = getClass().getResourceAsStream("/application.properties");
-    if ( in == null ) {
-        System.out.println("Missing application.properties in the war.");
-    } else {
-			try{
-				prop.load(in);
-				in.close();
-			}catch(IOException e){
-				e.printStackTrace();
-			}
-
-    }
-
-		jdbc = prop.getProperty("universidad.datasource.url");
-		username = prop.getProperty("universidad.datasource.username");
-		password = prop.getProperty("universidad.datasource.password");
-		className = prop.getProperty("universidad.datasource.driverClassName");
-
-
-    try {
-        Class.forName(className);
-    } catch (ClassNotFoundException e) {
-        System.out.println("Falta el Driver JDBC: "+className);
-        e.printStackTrace();
-        return;
-    }
-
+public EstudianteDAO() throws SQLException {
+	try {
+		Context envContext = new InitialContext();
+			this.ds = (DataSource)envContext.lookup("java:/comp/env/jdbc/ConexionDB");
+	}catch(NamingException e) {
+		e.printStackTrace();
 	}
+
+}
 
 	public void insertar(Estudiante estudiante) throws SQLException {
 
-		Connection conn = null;
-    try {
-        conn = DriverManager.getConnection(jdbc, username, password);
+		try(Connection conn = ds.getConnection()) {
 			String query = "INSERT INTO estudiante (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
 			try(PreparedStatement statement = conn.prepareStatement(query)){
 				statement.setString(1, estudiante.getId());
@@ -73,20 +46,15 @@ private String className;
 				statement.setInt(6, estudiante.getSemestre());
 				statement.setString(7, estudiante.getFechaIngreso());
 				statement.executeUpdate();
-				statement.close();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-		conn.close();
 	}
 
 	public void insertarA(Estudiante estudiante) throws SQLException {
 
-		Connection conn = null;
-    try {
-        conn = DriverManager.getConnection(jdbc, username, password);
+		try(Connection conn = ds.getConnection()) {
 			String query = "INSERT INTO estudianteA (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
 			try(PreparedStatement statement = conn.prepareStatement(query)){
 				statement.setString(1, estudiante.getId());
@@ -97,20 +65,15 @@ private String className;
 				statement.setInt(6, estudiante.getSemestre());
 				statement.setString(7, estudiante.getFechaIngreso());
 				statement.executeUpdate();
-				statement.close();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-		conn.close();
 	}
 
 	public void insertarB(Estudiante estudiante) throws SQLException {
 
-		Connection conn = null;
-    try {
-        conn = DriverManager.getConnection(jdbc, username, password);
+		try(Connection conn = ds.getConnection()) {
 			String query = "INSERT INTO estudianteB (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
 			try(PreparedStatement statement = conn.prepareStatement(query)){
 				statement.setString(1, estudiante.getId());
@@ -121,20 +84,15 @@ private String className;
 				statement.setInt(6, estudiante.getSemestre());
 				statement.setString(7, estudiante.getFechaIngreso());
 				statement.executeUpdate();
-				statement.close();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-		conn.close();
 	}
 
 	public void insertarC(Estudiante estudiante) throws SQLException {
 
-		Connection conn = null;
-    try {
-        conn = DriverManager.getConnection(jdbc, username, password);
+		try(Connection conn = ds.getConnection()) {
 			String query = "INSERT INTO estudianteC (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
 			try(PreparedStatement statement = conn.prepareStatement(query)){
 				statement.setString(1, estudiante.getId());
@@ -145,20 +103,15 @@ private String className;
 				statement.setInt(6, estudiante.getSemestre());
 				statement.setString(7, estudiante.getFechaIngreso());
 				statement.executeUpdate();
-				statement.close();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-		conn.close();
 	}
 
 	public List<Estudiante> listarEstudiantes() throws SQLException {
 		List<Estudiante> listaEstudiantes = new ArrayList<Estudiante>();
-		Connection conn = null;
-    try {
-        conn = DriverManager.getConnection(jdbc, username, password);
+		try(Connection conn = ds.getConnection()) {
 			String sql = "SELECT * FROM estudianteC";
 			Statement statement = conn.createStatement();
 			ResultSet resulSet = statement.executeQuery(sql);
@@ -174,38 +127,30 @@ private String className;
 						segundo_apellido_est, semestre_est, fecha_ingreso_est);
 				listaEstudiantes.add(estudiante);
 			}
-			statement.close();
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}
-		conn.close();
 		return listaEstudiantes;
 	}
 
 	public Integer eliminar(String id) throws SQLException {
 		int result=0;
-		Connection conn = null;
-    try {
-       conn = DriverManager.getConnection(jdbc, username, password);
+		try(Connection conn = ds.getConnection()) {
 			String sql = "DELETE FROM estudiante WHERE id_est = ?";
 			try(PreparedStatement statement = conn.prepareStatement(sql)){
 				statement.setString(1, id);
 				result = statement.executeUpdate();
-				statement.close();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		conn.close();
 		return result;
 	}
 
 	public int contarSemestreA(String semestre) throws SQLException {
 		int numberOfRows=0;
-		Connection conn = null;
-		try {
-				conn = DriverManager.getConnection(jdbc, username, password);
-				String sql = "SELECT COUNT(*) FROM estudianteA WHERE semestre_est = ?";
+		try(Connection conn = ds.getConnection()) {
+				String sql = "SELECT COUNT(*) AS cantidad FROM estudianteA WHERE semestre_est = ?";
 				try(PreparedStatement statement = conn.prepareStatement(sql)){
 					statement.setInt(1, Integer.parseInt(semestre));
 					try {
@@ -218,21 +163,17 @@ private String className;
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
-					statement.close();
 				}
 			}catch(SQLException e) {
 				e.printStackTrace();
 			}
-			conn.close();
 			return numberOfRows;
 	}
 
 	public int contarSemestreB(String semestre) throws SQLException {
 		int numberOfRows=0;
-		Connection conn = null;
-		try {
-				conn = DriverManager.getConnection(jdbc, username, password);
-				String sql = "SELECT COUNT(*) FROM estudianteB WHERE semestre_est = ?";
+		try(Connection conn = ds.getConnection()) {
+				String sql = "SELECT COUNT(*) AS cantidad FROM estudianteB WHERE semestre_est = ?";
 				try(PreparedStatement statement = conn.prepareStatement(sql)){
 					statement.setInt(1, Integer.parseInt(semestre));
 					try {
@@ -245,21 +186,17 @@ private String className;
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
-					statement.close();
 				}
 			}catch(SQLException e) {
 				e.printStackTrace();
 			}
-			conn.close();
 			return numberOfRows;
 	}
 
 	public int contarSemestreC(String semestre) throws SQLException {
 		int numberOfRows=0;
-		Connection conn = null;
-		try {
-				conn = DriverManager.getConnection(jdbc, username, password);
-				String sql = "SELECT COUNT(*) FROM estudianteC WHERE semestre_est = ?";
+		try(Connection conn = ds.getConnection()) {
+				String sql = "SELECT COUNT(*) AS cantidad FROM estudianteC WHERE semestre_est = ?";
 				try(PreparedStatement statement = conn.prepareStatement(sql)){
 					statement.setInt(1, Integer.parseInt(semestre));
 					try {
@@ -272,12 +209,10 @@ private String className;
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
-					statement.close();
 				}
 			}catch(SQLException e) {
 				e.printStackTrace();
 			}
-			conn.close();
 			return numberOfRows;
 	}
 

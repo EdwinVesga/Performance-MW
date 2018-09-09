@@ -21,45 +21,20 @@ import java.sql.DriverManager;
 
 public class ProfesorDAO {
 
-	private String jdbc;
-	private String username;
-	private String password;
-	private String className;
+private DataSource ds;
 
-	public ProfesorDAO() throws SQLException {
-		Properties prop = new Properties();
-    InputStream in = getClass().getResourceAsStream("/application.properties");
-    if ( in == null ) {
-        System.out.println("Missing application.properties in the war.");
-    } else {
-			try{
-				prop.load(in);
-				in.close();
-			}catch(IOException e){
-				e.printStackTrace();
-			}
+public ProfesorDAO() throws SQLException {
+		try {
+			Context envContext = new InitialContext();
+				this.ds = (DataSource)envContext.lookup("java:/comp/env/jdbc/ConexionDB");
+		}catch(NamingException e) {
+			e.printStackTrace();
+		}
 
-    }
-
-		jdbc = prop.getProperty("universidad.datasource.url");
-		username = prop.getProperty("universidad.datasource.username");
-		password = prop.getProperty("universidad.datasource.password");
-		className = prop.getProperty("universidad.datasource.driverClassName");
-
-
-    try {
-        Class.forName(className);
-    } catch (ClassNotFoundException e) {
-        System.out.println("Falta el Driver JDBC: "+className);
-        e.printStackTrace();
-        return;
-    }
 	}
 
 	public void insertar(Profesor profesor) throws SQLException {
-		Connection conn = null;
-    try {
-        conn = DriverManager.getConnection(jdbc, username, password);
+		try(Connection conn = ds.getConnection()) {
 			String query = "INSERT INTO profesor (id_prof, primer_nombre_prof, segundo_nombre_prof, primer_apellido_prof, segundo_apellido_prof, escuela_prof, fecha_incorporacion_prof) VALUES (?,?,?,?,?,?,?)";
 			try(PreparedStatement statement = conn.prepareStatement(query)){
 				statement.setString(1, profesor.getId_prof());
@@ -70,20 +45,16 @@ public class ProfesorDAO {
 				statement.setString(6, profesor.getEscuela_prof());
 				statement.setString(7, profesor.getFecha_incorporacion_prof());
 				statement.executeUpdate();
-				statement.close();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		conn.close();
 	}
 
 	public List<Profesor> listarProfesores() throws SQLException {
 
 		List<Profesor> listaProfesores = new ArrayList<Profesor>();
-		Connection conn = null;
-    try {
-        conn = DriverManager.getConnection(jdbc, username, password);
+		try(Connection conn = ds.getConnection()) {
 			String sql = "SELECT * FROM profesorC";
 			Statement statement = conn.createStatement();
 			ResultSet resulSet = statement.executeQuery(sql);
@@ -99,38 +70,30 @@ public class ProfesorDAO {
 						segundo_apellido_prof, escuela_prof, fecha_incorporacion_prof);
 				listaProfesores.add(profesor);
 			}
-			statement.close();
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}
-		conn.close();
 		return listaProfesores;
 	}
 
     public Integer eliminar(String id) throws SQLException {
     	int result = 0;
-			Connection conn = null;
-	    try {
-	        conn = DriverManager.getConnection(jdbc, username, password);
+			try(Connection conn = ds.getConnection()) {
 			String sql = "DELETE FROM profesor WHERE id_prof = ?";
 			try(PreparedStatement statement = conn.prepareStatement(sql)){
 				statement.setString(1, id);
 				result = statement.executeUpdate();
-				statement.close();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		conn.close();
 		return result;
 	}
 
     public int contarEscuela(String escuela) throws SQLException {
 
 		int numberOfRows=0;
-		Connection conn = null;
-		try {
-				conn = DriverManager.getConnection(jdbc, username, password);
+		try(Connection conn = ds.getConnection()) {
 			String sql = "SELECT COUNT(*)  FROM profesorC WHERE escuela_prof = ?";
 			try(PreparedStatement statement = conn.prepareStatement(sql)){
 				statement.setString(1, escuela);
@@ -144,12 +107,10 @@ public class ProfesorDAO {
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
-				statement.close();
 			}
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}
-		conn.close();
 		return numberOfRows;
 
 	}
