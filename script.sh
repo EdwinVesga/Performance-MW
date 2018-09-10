@@ -50,7 +50,7 @@ do
 		read y
 		if [ $y -eq 1 ]
 		then
-		cd ./VertX/BaseDeDatos_VertX && sudo docker-compose up --build
+		bash -c 'cd ./VertX/BaseDeDatos_VertX && sudo docker-compose up --build'
 		elif [ $y -eq 2 ]
 		then
 		gnome-terminal --tab -e "bash -c 'cd ./VertX/BaseDeDatos_VertX && sudo docker-compose up --build'"
@@ -64,7 +64,7 @@ do
 		read y
 		if [ $y -eq 1 ]
 		then
-		cd ./Servlet/Servlet_Tomcat && sudo docker-compose up --build
+		bash -c 'cd ./Servlet/Servlet_Tomcat && sudo docker-compose up --build'
 		elif [ $y -eq 2 ]
 		then
 		gnome-terminal --tab -e "bash -c 'cd ./Servlet/Servlet_Tomcat && sudo docker-compose up --build'"
@@ -78,7 +78,7 @@ do
 		read y
 		if [ $y -eq 1 ]
 		then
-		cd ./Servlet/Servlet_Jetty && sudo docker-compose up --build
+		bash -c 'cd ./Servlet/Servlet_Jetty && sudo docker-compose up --build'
 		elif [ $y -eq 2 ]
 		then
 		gnome-terminal --tab -e "bash -c 'cd ./Servlet/Servlet_Jetty && sudo docker-compose up --build'"
@@ -92,7 +92,7 @@ do
 		read y
 		if [ $y -eq 1 ]
 		then
-		cd ./NodeJS && sudo docker-compose up --build
+		bash -c 'cd ./NodeJS && sudo docker-compose up --build'
 		elif [ $y -eq 2 ]
 		then
 		gnome-terminal --tab -e "bash -c 'cd ./NodeJS && sudo docker-compose up --build'"
