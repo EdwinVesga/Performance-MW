@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+
+<Configure id='wac' class="org.eclipse.jetty.webapp.WebAppContext">
+    <New  id="cf"  class="org.eclipse.jetty.plus.jndi.Resource">
+        <Arg><Ref refid="wac"/></Arg>
+        <Arg>jdbc/ConexionDB</Arg>
+        <Arg>
+            <New  class="com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource">
+                <Set name="Url">jdbc:mysql://db:3306/universidad?max-connections=100000</Set>
+                <Set name="User">performance</Set>
+                <Set name="Password">123456</Set>
+            </New>
+        </Arg>
+    </New>
+</Configure>

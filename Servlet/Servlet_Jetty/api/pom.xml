@@ -1,82 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>BaseDeDatos_Servlets</groupId>
-	<artifactId>BaseDeDatos_Servlets</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
-
-	<name>Maven Jetty JDBC Servlet </name>
-	<description>CRUD en Java Web con JSP, Jetty y Servlet</description>
-
-	<properties>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	       xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<modelVersion>4.0.0</modelVersion>
+<groupId>BaseDeDatos_Servlets</groupId>
+<version>1.0-SNAPSHOT</version>
+<artifactId>BaseDeDatos_Servlets</artifactId>
+<packaging>war</packaging>
+<properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
     <skipTests>false</skipTests>
 		<mysql-connector-java-version>5.1.21</mysql-connector-java-version>
-  </properties>
+</properties>
 
-	<dependencies>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
-        </dependency>
+	  <dependencies>
+	    <dependency>
+	      <groupId>javax.servlet</groupId>
+	      <artifactId>servlet-api</artifactId>
+	      <version>2.4</version>
+	    </dependency>
 
-				<dependency>
-				    <groupId>javax.servlet</groupId>
-				    <artifactId>javax.servlet-api</artifactId>
-				    <version>3.0.1</version>
-				    <scope>provided</scope>
-				</dependency>
+			<dependency>
+				 <groupId>javax.servlet</groupId>
+				 <artifactId>javax.servlet-api</artifactId>
+				 <version>3.0.1</version>
+				 <scope>provided</scope>
+			</dependency>
 
-				<dependency>
-				    <groupId>com.thetransactioncompany</groupId>
-				    <artifactId>java-property-utils</artifactId>
-				    <version>1.6</version>
-				</dependency>
+			<dependency>
+				 <groupId>com.thetransactioncompany</groupId>
+				 <artifactId>java-property-utils</artifactId>
+				 <version>1.6</version>
+			</dependency>
 
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.35</version>
-        </dependency>
+			<dependency>
+				<groupId>javax.servlet.jsp</groupId>
+				<artifactId>javax.servlet.jsp-api</artifactId>
+				<version>2.3.1</version>
+				<scope>provided</scope>
+			</dependency>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
+			<dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>5.1.35</version>
+      </dependency>
 
-				<dependency>
-					<groupId>javax.servlet.jsp</groupId>
-					<artifactId>javax.servlet.jsp-api</artifactId>
-					<version>2.3.1</version>
-					<scope>provided</scope>
-				</dependency>
+			<dependency>
+      	<groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>3.8.1</version>
+        <scope>test</scope>
+      </dependency>
 
-				<dependency>
-					<groupId>jstl</groupId>
-					<artifactId>jstl</artifactId>
-					<version>1.2</version>
-				</dependency>
+	  </dependencies>
+	  <build>
+			<finalName>ROOT</finalName>
+	    <plugins>
 
-  </dependencies>
+				<plugin>
+	        <artifactId>maven-compiler-plugin</artifactId>
+	        <version>2.3.2</version>
+	        <configuration>
+	          <source>${java.version}</source>
+	          <target>${java.version}</target>
+	        </configuration>
+      	</plugin>
 
-	<build>
-    <finalName>BaseDeDatos_Servlets</finalName>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-        </configuration>
-      </plugin>
-      <plugin>
+				<plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
@@ -96,11 +88,34 @@
 					</dependency>
 				</dependencies>
 				<configuration>
-					<jettyXml>src/main/webapp/WEB-INF/jetty-ConfDatabase.xml, src/main/webapp/WEB-INF/jetty.xml</jettyXml>
+					<jettyXml>src/main/webapp/WEB-INF/jetty-envxml, src/main/webapp/WEB-INF/jetty.xml</jettyXml>
 				</configuration>
 			</plugin>
 
-    </plugins>
-  </build>
-
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-dependency-plugin</artifactId>
+	        <version>2.4</version>
+	        <executions>
+	          <execution>
+	            <id>copy-dependencies</id>
+	            <phase>package</phase>
+	                <goals><goal>copy</goal></goals>
+	                <configuration>
+										<webXml>src\main\webapp\WEB-INF\web.xml</webXml>
+											<jettyXml>src/main/webapp/WEB-INF/jetty-env.xml, src/main/webapp/WEB-INF/jetty.xml</jettyXml>
+	                    <artifactItems>
+	                        <artifactItem>
+	                            <groupId>org.eclipse.jetty</groupId>
+	                            <artifactId>jetty-runner</artifactId>
+	                            <version>9.2.7.v20150116</version>
+	                            <destFileName>jetty-runner.jar</destFileName>
+	                        </artifactItem>
+	                    </artifactItems>
+	                </configuration>
+	          </execution>
+	        </executions>
+	      </plugin>
+	    </plugins>
+	  </build>
 </project>

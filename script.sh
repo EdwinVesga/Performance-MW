@@ -5,7 +5,8 @@ menumain(){
 echo ""
 echo "-- MENU PRINCIPAL --"
 PS3='Please enter your choice: '
-options=("Desplegar Aplicación" "Ejecutar Prueba" "Detener Contenedores" "Eliminar Contenedores" "Eliminar Imagenes" "Subir a GitHub" "Quit")
+options=("Desplegar Aplicación" "Ejecutar Prueba" "Detener Contenedores" "Eliminar Contenedores" "Eliminar Imagenes" "Clean Docker" "Detener PerfMon"
+ "Instalar Plugins JMeter" "Quit")
 select opt in "${options[@]}"
 do
 	case $opt in
@@ -13,7 +14,6 @@ do
 		desplegar
 		;;
 		"Ejecutar Prueba")
-		#jmeter -n -t test.jmx -l resultados.jtl
 		pruebas
 		;;
 		"Detener Contenedores")
@@ -25,10 +25,19 @@ do
 		"Eliminar Imagenes")
 		sudo docker rmi $(sudo docker images -q)>/dev/null 2>&1
 		;;
-		"Subir a GitHub")
-		git add .
-		git commit -m "Se actualizaron las pruebas."
-		git push origin master
+		"Clean Docker")
+		sudo docker system prune
+		sudo docker rmi $(sudo docker images -q)>/dev/null 2>&1
+		sudo docker volume rm $(sudo docker volume ls -qf dangling=true)
+		;;
+		"Detener PerfMon")
+		echo "Ingrese la dirección IP del servidor"
+		read k
+		./server_agent_shutdown.sh $k
+		rm -rf ./ServerAgent-2.2.3
+		;;
+		"Instalar Plugins JMeter")
+		./jmeterplugins.sh
 		;;
 		"Quit")
 		exit
@@ -41,10 +50,13 @@ desplegar(){
 echo ""
 echo "-- MENU APLICACIONES --"
 PS3="Seleccione la aplicacion a desplegar: "
-options=("VertX" "Servlet_Tomcat" "Servlet_Jetty" "NodeJS" "Regresar")
+options=("Activar PerfMon" "VertX" "Servlet_Tomcat" "Servlet_Jetty" "NodeJS" "Regresar")
 select opt in "${options[@]}"
 do
 	case $opt in
+		"Activar PerfMon")
+		./server_agent_script.sh
+		;;
 		"VertX")
 		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
 		read y
@@ -112,21 +124,25 @@ pruebas(){
 echo ""
 echo "-- MENU PRUEBAS --"
 PS3="Seleccione la aplicación a probar: "
-options=("VertX" "Servlet_Tomcat" "Servlet_Jetty" "NodeJS" "Regresar")
+options=("VertX" "Tomcat" "Jetty" "NodeJS" "Regresar")
 select opt in "${options[@]}"
 do
 	case $opt in
 		"VertX")
-		pruebasVertx
+		p="VertX"
+		pruebaApp $p
 		;;
-		"Servlet_Tomcat")
-		pruebasServlet_Tomcat
+		"Tomcat")
+		p="Tomcat"
+		pruebaApp $p
 		;;
-		"Servlet_Jetty")
-		pruebasServlet_Jetty
+		"Jetty")
+		p="Jetty"
+		pruebaApp $p
 		;;
 		"NodeJS")
-		pruebasNodeJS
+		p="NodeJS"
+		pruebaApp $p
 		;;
 		"Regresar")
 		menumain
@@ -135,109 +151,34 @@ do
 	esac
 done
 }
-pruebasVertx(){
+
+pruebaApp(){
 echo ""
-echo "-- MENU PRUEBAS VERTX --"
+echo "-- MENU PRUEBAS $1 --"
 PS3="Seleccione la prueba a ejecutar: "
-options=("Consulta" "InsertaryEliminar" "ContarPrimos" "MenuPrincipal")
+options=("PruebaRendimientoConsulta" "PruebaRendimientoInsertar" "PruebaRendimientoContarPrimos" "PruebaCargaConsulta" "PruebaEstrésConsulta" "MenuPrincipal")
 select opt in "${options[@]}"
 do
 	case $opt in
-		"Consulta")
-		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
-		read y
-		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
-		read x
-		if [ $y -eq 1 ]
-		then
-		p=./VertX/ResultadosRemotos
-		j=./Jmeter_Test/Remoto
-		elif [ $y -eq 2 ]
-		then
-		p=./VertX/Resultados
-		j=./Jmeter_Test
-		else
-		menumain
-		fi
-		for ((a=1; a <= x; a++))
-		do
-			rm -rf $p/Consulta$a/*
-			mkdir -p $p/Consulta$a
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta1.jmx -l $p/Consulta$a/Consulta100_1.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta2.jmx -l $p/Consulta$a/Consulta100_2.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta3.jmx -l $p/Consulta$a/Consulta100_3.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/Consulta1.jmx -l $p/Consulta$a/Consulta500_1.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/Consulta2.jmx -l $p/Consulta$a/Consulta500_2.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/Consulta3.jmx -l $p/Consulta$a/Consulta500_3.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/Consulta1.jmx -l $p/Consulta$a/Consulta1000_1.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/Consulta2.jmx -l $p/Consulta$a/Consulta1000_2.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/Consulta3.jmx -l $p/Consulta$a/Consulta1000_3.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta100_1.csv -o $p/Consulta$a/index100_1/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta100_2.csv -o $p/Consulta$a/index100_2/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta100_3.csv -o $p/Consulta$a/index100_3/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta500_1.csv -o $p/Consulta$a/index500_1/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta500_2.csv -o $p/Consulta$a/index500_2/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta500_3.csv -o $p/Consulta$a/index500_3/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta1000_1.csv -o $p/Consulta$a/index1000_1/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta1000_2.csv -o $p/Consulta$a/index1000_2/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta1000_3.csv -o $p/Consulta$a/index1000_3/
- 		done
+		"PruebaRendimientoConsulta")
+		p="Consulta"
+		dirPrueba $1 $p
 		;;
-		"InsertaryEliminar")
-		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
-		read y
-		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
-		read x
-		if [ $y -eq 1 ]
-		then
-		p=./VertX/ResultadosRemotos
-		j=./Jmeter_Test/Remoto
-		elif [ $y -eq 2 ]
-		then
-		p=./VertX/Resultados
-		j=./Jmeter_Test
-		else
-		menumain
-		fi
-		for ((a=1; a <= x; a++))
-		do
-			rm -rf $p/InsertaryEliminar$a/*
-			mkdir -p $p/InsertaryEliminar$a
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar100.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar500.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar1000.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/InsertaryEliminar$a/InsertaryEliminar100.csv -o $p/InsertaryEliminar$a/index100/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/InsertaryEliminar$a/InsertaryEliminar500.csv -o $p/InsertaryEliminar$a/index500/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/InsertaryEliminar$a/InsertaryEliminar1000.csv -o $p/InsertaryEliminar$a/index1000/
-		done
+		"PruebaRendimientoInsertar")
+		p="Insertar"
+		dirPrueba $1 $p
 		;;
-		"ContarPrimos")
-		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
-		read y
-		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
-		read x
-		if [ $y -eq 1 ]
-		then
-		p=./VertX/ResultadosRemotos
-		j=./Jmeter_Test/Remoto
-		elif [ $y -eq 2 ]
-		then
-		p=./VertX/Resultados
-		j=./Jmeter_Test
-		else
-		menumain
-		fi
-		for ((a=1; a <= x; a++))
-		do
-			rm -rf $p/ContarPrimos$a/*
-			mkdir -p $p/ContarPrimos$a
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos100.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos500.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos1000.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/ContarPrimos$a/ContarPrimos100.csv -o $p/ContarPrimos$a/index100/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/ContarPrimos$a/ContarPrimos500.csv -o $p/ContarPrimos$a/index500/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/ContarPrimos$a/ContarPrimos1000.csv -o $p/ContarPrimos$a/index1000/
-		done
+		"PruebaRendimientoContarPrimos")
+		p="ContarPrimos"
+		dirPrueba $1 $p
+		;;
+		"PruebaCargaConsulta")
+		p="CargaConsulta"
+		dirPruebaExclusiva $1 $p
+		;;
+		"PruebaEstrésConsulta")
+		p="PicoConsulta"
+		dirPruebaExclusiva $1 $p
 		;;
 		"MenuPrincipal")
 		menumain
@@ -246,338 +187,204 @@ do
 	esac
 done
 }
-pruebasServlet_Tomcat(){
-echo ""
-echo "-- MENU PRUEBAS SERVLET_TOMCAT --"
-PS3="Seleccione la prueba a ejecutar: "
-options=("Consulta" "InsertaryEliminar" "ContarPrimos" "MenuPrincipal")
-select opt in "${options[@]}"
+
+dirPrueba(){
+echo -n "Modo de Prueba: 1)AWS 2)Local 3)Regresar: "
+read y
+echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
+read x
+echo -n "Ingrese el Periodo: "
+read z
+if [ $1 = "VertX" ] || [ $1 = "NodeJS" ]
+then
+	if [ $y -eq 1 ]
+	then
+	p=./$1/ResultadosRemotosAWS/Periodo$z
+	echo ""
+	echo "Ingrese el host del servidor AWS: "
+	read j
+	elif [ $y -eq 2 ]
+	then
+	p=./$1/Resultados/Periodo$z
+	j=localhost
+	else
+	menumain
+	fi
+	prueba$2 $x $p $j $z
+elif [ $1 = "Tomcat" ] || [ $1 = "Jetty" ]
+then
+	if [ $y -eq 1 ]
+	then
+	p=./Servlet/Resultados$1RemotosAWS/Periodo$z
+	echo ""
+	echo "Ingrese el host del servidor AWS: "
+	read j
+	elif [ $y -eq 2 ]
+	then
+	p=./Servlet/Resultados$1/Periodo$z
+	j=localhost
+	else
+	menumain
+	fi
+	prueba$2 $x $p $j $z
+fi
+}
+
+dirPruebaExclusiva(){
+echo -n "Modo de Prueba: 1)AWS 2)Local 3)Regresar: "
+read y
+echo -n "Ingrese el valor Limite de Solicitudes: "
+read x
+if [ $1 = "VertX" ] || [ $1 = "NodeJS" ]
+then
+		if [ $y -eq 1 ]
+		then
+		p=./$1/ResultadosRemotosAWS/Prueba$2
+		echo ""
+		echo "Ingrese el host del servidor AWS: "
+		read j
+		elif [ $y -eq 2 ]
+		then
+		p=./$1/Resultados/Prueba$2
+		j=localhost
+		else
+		menumain
+		fi
+		prueba$2 $p $j $x
+elif [ $1 = "Tomcat" ] || [ $1 = "Jetty" ]
+then
+		if [ $y -eq 1 ]
+		then
+		p=./Servlet/Resultados$1RemotosAWS/Prueba$2
+		echo ""
+		echo "Ingrese el host del servidor AWS: "
+		read j
+		elif [ $y -eq 2 ]
+		then
+		p=./Servlet/Resultados$1/Prueba$2
+		j=localhost
+		else
+		menumain
+		fi
+		prueba$2 $p $j $x
+fi
+}
+
+
+pruebaConsulta(){
+for ((a=1; a <= $1; a++))
 do
-	case $opt in
-		"Consulta")
-		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
-		read y
-		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
-		read x
-		if [ $y -eq 1 ]
-		then
-		p=./Servlet/ResultadosTomcatRemotos
-		j=./Jmeter_Test/Remoto
-		elif [ $y -eq 2 ]
-		then
-		p=./Servlet/ResultadosTomcat
-		j=./Jmeter_Test
-		else
-		menumain
-		fi
-		for ((a=1; a <= x; a++))
+	rm -rf $2/Consulta$a/*
+	mkdir -p $2/Consulta$a
+	N=(1000 2000 3000)
+	c=(1 2 3)
+	ruta=$2/Consulta$a
+	for i in ${N[@]}
+	do
+		for j in ${c[@]}
 		do
-			rm -rf $p/Consulta$a/*
-			mkdir -p $p/Consulta$a
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta1.jmx -l $p/Consulta$a/Consulta100_1.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta2.jmx -l $p/Consulta$a/Consulta100_2.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta3.jmx -l $p/Consulta$a/Consulta100_3.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/Consulta1.jmx -l $p/Consulta$a/Consulta500_1.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/Consulta2.jmx -l $p/Consulta$a/Consulta500_2.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/Consulta3.jmx -l $p/Consulta$a/Consulta500_3.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/Consulta1.jmx -l $p/Consulta$a/Consulta1000_1.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/Consulta2.jmx -l $p/Consulta$a/Consulta1000_2.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/Consulta3.jmx -l $p/Consulta$a/Consulta1000_3.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta100_1.csv -o $p/Consulta$a/index100_1/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta100_2.csv -o $p/Consulta$a/index100_2/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta100_3.csv -o $p/Consulta$a/index100_3/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta500_1.csv -o $p/Consulta$a/index500_1/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta500_2.csv -o $p/Consulta$a/index500_2/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta500_3.csv -o $p/Consulta$a/index500_3/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta1000_1.csv -o $p/Consulta$a/index1000_1/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta1000_2.csv -o $p/Consulta$a/index1000_2/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta1000_3.csv -o $p/Consulta$a/index1000_3/
- 		done
-		;;
-		"InsertaryEliminar")
-		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
-		read y
-		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
-		read x
-		if [ $y -eq 1 ]
-		then
-		p=./Servlet/ResultadosTomcatRemotos
-		j=./Jmeter_Test/Remoto
-		elif [ $y -eq 2 ]
-		then
-		p=./Servlet/ResultadosTomcat
-		j=./Jmeter_Test
-		else
-		menumain
-		fi
-		for ((a=1; a <= x; a++))
-		do
-			rm -rf $p/InsertaryEliminar$a/*
-			mkdir -p $p/InsertaryEliminar$a
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar100.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar500.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar1000.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/InsertaryEliminar$a/InsertaryEliminar100.csv -o $p/InsertaryEliminar$a/index100/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/InsertaryEliminar$a/InsertaryEliminar500.csv -o $p/InsertaryEliminar$a/index500/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/InsertaryEliminar$a/InsertaryEliminar1000.csv -o $p/InsertaryEliminar$a/index1000/
+		resultfile=Consulta"$i"_$j.csv
+		perfMonFile=PerfMon_Consulta"$i"_$j.csv
+		$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -JDominio=$3 -JPeriodo=$4 -JRuta=$ruta/$perfMonFile -t ./Jmeter_Test/TG_$i/Consulta$j.jmx -l $ruta/$resultfile
+		$HOME/apache-jmeter-4.0/bin/shutdown.sh
 		done
-		;;
-		"ContarPrimos")
-		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
-		read y
-		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
-		read x
-		if [ $y -eq 1 ]
-		then
-		p=./Servlet/ResultadosTomcatRemotos
-		j=./Jmeter_Test/Remoto
-		elif [ $y -eq 2 ]
-		then
-		p=./Servlet/ResultadosTomcat
-		j=./Jmeter_Test
-		else
-		menumain
-		fi
-		for ((a=1; a <= x; a++))
+	done
+	for i in ${N[@]}
+	do
+		for j in ${c[@]}
 		do
-			rm -rf $p/ContarPrimos$a/*
-			mkdir -p $p/ContarPrimos$a
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos100.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos500.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos1000.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/ContarPrimos$a/ContarPrimos100.csv -o $p/ContarPrimos$a/index100/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/ContarPrimos$a/ContarPrimos500.csv -o $p/ContarPrimos$a/index500/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/ContarPrimos$a/ContarPrimos1000.csv -o $p/ContarPrimos$a/index1000/
+		resultfile=Consulta"$i"_$j.csv
+		$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $ruta/$resultfile -o $ruta/index"$i"_$j/
+		$HOME/apache-jmeter-4.0/bin/shutdown.sh
 		done
-		;;
-		"MenuPrincipal")
-		menumain
-		;;
-		*) echo "Invalid Option $Reply";;
-	esac
+	done
 done
 }
-pruebasServlet_Jetty(){
-echo ""
-echo "-- MENU PRUEBAS SERVLET_JETTY --"
-PS3="Seleccione la prueba a ejecutar: "
-options=("Consulta" "InsertaryEliminar" "ContarPrimos" "MenuPrincipal")
-select opt in "${options[@]}"
+
+pruebaInsertar(){
+for ((a=1; a <= $1; a++))
 do
-	case $opt in
-		"Consulta")
-		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
-		read y
-		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
-		read x
-		if [ $y -eq 1 ]
-		then
-		p=./Servlet/ResultadosJettyRemotos
-		j=./Jmeter_Test/Remoto
-		elif [ $y -eq 2 ]
-		then
-		p=./Servlet/ResultadosJetty
-		j=./Jmeter_Test
-		else
-		menumain
-		fi
-		for ((a=1; a <= x; a++))
+	rm -rf $2/Insertar$a/*
+	mkdir -p $2/Insertar$a
+	N=(1000 2000 3000)
+	c=(1 2 3)
+	ruta=$2/Insertar$a
+	for i in ${N[@]}
+	do
+		for j in ${c[@]}
 		do
-			rm -rf $p/Consulta$a/*
-			mkdir -p $p/Consulta$a
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta1.jmx -l $p/Consulta$a/Consulta100_1.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta2.jmx -l $p/Consulta$a/Consulta100_2.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta3.jmx -l $p/Consulta$a/Consulta100_3.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/Consulta1.jmx -l $p/Consulta$a/Consulta500_1.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/Consulta2.jmx -l $p/Consulta$a/Consulta500_2.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/Consulta3.jmx -l $p/Consulta$a/Consulta500_3.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/Consulta1.jmx -l $p/Consulta$a/Consulta1000_1.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/Consulta2.jmx -l $p/Consulta$a/Consulta1000_2.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/Consulta3.jmx -l $p/Consulta$a/Consulta1000_3.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta100_1.csv -o $p/Consulta$a/index100_1/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta100_2.csv -o $p/Consulta$a/index100_2/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta100_3.csv -o $p/Consulta$a/index100_3/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta500_1.csv -o $p/Consulta$a/index500_1/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta500_2.csv -o $p/Consulta$a/index500_2/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta500_3.csv -o $p/Consulta$a/index500_3/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta1000_1.csv -o $p/Consulta$a/index1000_1/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta1000_2.csv -o $p/Consulta$a/index1000_2/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta1000_3.csv -o $p/Consulta$a/index1000_3/
- 		done
-		;;
-		"InsertaryEliminar")
-		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
-		read y
-		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
-		read x
-		if [ $y -eq 1 ]
-		then
-		p=./Servlet/ResultadosJettyRemotos
-		j=./Jmeter_Test/Remoto
-		elif [ $y -eq 2 ]
-		then
-		p=./Servlet/ResultadosJetty
-		j=./Jmeter_Test
-		else
-		menumain
-		fi
-		for ((a=1; a <= x; a++))
-		do
-			rm -rf $p/InsertaryEliminar$a/*
-			mkdir -p $p/InsertaryEliminar$a
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar100.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar500.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar1000.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/InsertaryEliminar$a/InsertaryEliminar100.csv -o $p/InsertaryEliminar$a/index100/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/InsertaryEliminar$a/InsertaryEliminar500.csv -o $p/InsertaryEliminar$a/index500/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/InsertaryEliminar$a/InsertaryEliminar1000.csv -o $p/InsertaryEliminar$a/index1000/
+		resultfile=Insertar"$i"_$j.csv
+		perfMonFile=PerfMon_Insertar"$i"_$j.csv
+		$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -JDominio=$3 -JPeriodo=$4 -JRuta=$ruta/$perfMonFile -t ./Jmeter_Test/TG_$i/Insertar$j.jmx -l $ruta/$resultfile
+		$HOME/apache-jmeter-4.0/bin/shutdown.sh
 		done
-		;;
-		"ContarPrimos")
-		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
-		read y
-		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
-		read x
-		if [ $y -eq 1 ]
-		then
-		p=./Servlet/ResultadosJettyRemotos
-		j=./Jmeter_Test/Remoto
-		elif [ $y -eq 2 ]
-		then
-		p=./Servlet/ResultadosJetty
-		j=./Jmeter_Test
-		else
-		menumain
-		fi
-		for ((a=1; a <= x; a++))
+	done
+	for i in ${N[@]}
+	do
+		for j in ${c[@]}
 		do
-			rm -rf $p/ContarPrimos$a/*
-			mkdir -p $p/ContarPrimos$a
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos100.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos500.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos1000.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/ContarPrimos$a/ContarPrimos100.csv -o $p/ContarPrimos$a/index100/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/ContarPrimos$a/ContarPrimos500.csv -o $p/ContarPrimos$a/index500/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/ContarPrimos$a/ContarPrimos1000.csv -o $p/ContarPrimos$a/index1000/
+		resultfile=Insertar"$i"_$j.csv
+		$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $ruta/$resultfile -o $ruta/index"$i"_$j/
+		$HOME/apache-jmeter-4.0/bin/shutdown.sh
 		done
-		;;
-		"MenuPrincipal")
-		menumain
-		;;
-		*) echo "Invalid Option $Reply";;
-	esac
+	done
 done
 }
-pruebasNodeJS(){
-echo ""
-echo "-- MENU PRUEBAS NODEJS --"
-PS3="Seleccione la prueba a ejecutar: "
-options=("Consulta" "InsertaryEliminar" "ContarPrimos" "MenuPrincipal")
-select opt in "${options[@]}"
+
+pruebaContarPrimos(){
+for ((a=1; a <= $1; a++))
 do
-	case $opt in
-		"Consulta")
-		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
-		read y
-		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
-		read x
-		if [ $y -eq 1 ]
-		then
-		p=./NodeJS/ResultadosRemotos
-		j=./Jmeter_Test/Remoto
-		elif [ $y -eq 2 ]
-		then
-		p=./NodeJS/Resultados
-		j=./Jmeter_Test
-		else
-		menumain
-		fi
-		for ((a=1; a <= x; a++))
+	rm -rf $2/ContarPrimos$a/*
+	mkdir -p $2/ContarPrimos$a
+	N=(1000 2000 3000)
+	c=(1 2 3)
+	ruta=$2/ContarPrimos$a
+	for i in ${N[@]}
+	do
+		for j in ${c[@]}
 		do
-			rm -rf $p/Consulta$a/*
-			mkdir -p $p/Consulta$a
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta1.jmx -l $p/Consulta$a/Consulta100_1.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta2.jmx -l $p/Consulta$a/Consulta100_2.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/Consulta3.jmx -l $p/Consulta$a/Consulta100_3.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/Consulta1.jmx -l $p/Consulta$a/Consulta500_1.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/Consulta2.jmx -l $p/Consulta$a/Consulta500_2.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/Consulta3.jmx -l $p/Consulta$a/Consulta500_3.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/Consulta1.jmx -l $p/Consulta$a/Consulta1000_1.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/Consulta2.jmx -l $p/Consulta$a/Consulta1000_2.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/Consulta3.jmx -l $p/Consulta$a/Consulta1000_3.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta100_1.csv -o $p/Consulta$a/index100_1/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta100_2.csv -o $p/Consulta$a/index100_2/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta100_3.csv -o $p/Consulta$a/index100_3/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta500_1.csv -o $p/Consulta$a/index500_1/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta500_2.csv -o $p/Consulta$a/index500_2/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta500_3.csv -o $p/Consulta$a/index500_3/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta1000_1.csv -o $p/Consulta$a/index1000_1/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta1000_2.csv -o $p/Consulta$a/index1000_2/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/Consulta$a/Consulta1000_3.csv -o $p/Consulta$a/index1000_3/
- 		done
-		;;
-		"InsertaryEliminar")
-		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
-		read y
-		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
-		read x
-		if [ $y -eq 1 ]
-		then
-		p=./NodeJS/ResultadosRemotos
-		j=./Jmeter_Test/Remoto
-		elif [ $y -eq 2 ]
-		then
-		p=./NodeJS/Resultados
-		j=./Jmeter_Test
-		else
-		menumain
-		fi
-		for ((a=1; a <= x; a++))
-		do
-			rm -rf $p/InsertaryEliminar$a/*
-			mkdir -p $p/InsertaryEliminar$a
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar100.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar500.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/InsertaryEliminar.jmx -l $p/InsertaryEliminar$a/InsertaryEliminar1000.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/InsertaryEliminar$a/InsertaryEliminar100.csv -o $p/InsertaryEliminar$a/index100/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/InsertaryEliminar$a/InsertaryEliminar500.csv -o $p/InsertaryEliminar$a/index500/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/InsertaryEliminar$a/InsertaryEliminar1000.csv -o $p/InsertaryEliminar$a/index1000/
+		resultfile=ContarPrimos"$i"_$j.csv
+		perfMonFile=PerfMon_ContarPrimos"$i"_$j.csv
+		$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -JDominio=$3 -JPeriodo=$4 -JRuta=$ruta/$perfMonFile -t ./Jmeter_Test/TG_$i/ContarPrimos$j.jmx -l $ruta/$resultfile
+		$HOME/apache-jmeter-4.0/bin/shutdown.sh
 		done
-		;;
-		"ContarPrimos")
-		echo -n "Modo de Prueba: 1)Remoto 2)Local 3)Regresar: "
-		read y
-		echo -n "Ingrese el número de veces que desea ejecutar la prueba: "
-		read x
-		if [ $y -eq 1 ]
-		then
-		p=./NodeJS/ResultadosRemotos
-		j=./Jmeter_Test/Remoto
-		elif [ $y -eq 2 ]
-		then
-		p=./NodeJS/Resultados
-		j=./Jmeter_Test
-		else
-		menumain
-		fi
-		for ((a=1; a <= x; a++))
+	done
+	for i in ${N[@]}
+	do
+		for j in ${c[@]}
 		do
-			rm -rf $p/ContarPrimos$a/*
-			mkdir -p $p/ContarPrimos$a
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_100/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos100.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_500/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos500.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -t $j/TG_1000/ContarPrimos.jmx -l $p/ContarPrimos$a/ContarPrimos1000.csv
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/ContarPrimos$a/ContarPrimos100.csv -o $p/ContarPrimos$a/index100/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/ContarPrimos$a/ContarPrimos500.csv -o $p/ContarPrimos$a/index500/
-			$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $p/ContarPrimos$a/ContarPrimos1000.csv -o $p/ContarPrimos$a/index1000/
+		resultfile=ContarPrimos"$i"_$j.csv
+		$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $ruta/$resultfile -o $ruta/index"$i"_$j/
+		$HOME/apache-jmeter-4.0/bin/shutdown.sh
 		done
-		;;
-		"MenuPrincipal")
-		menumain
-		;;
-		*)echo "Invalid Option $Reply";;
-	esac
+	done
 done
+}
+
+
+pruebaCargaConsulta(){
+
+mkdir -p $1/
+resultfile=CargaConsulta_$3.csv
+perfMonFile=PerfMon_CargaConsulta_$3.csv
+$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -JDominio=$2 -JRuta=$1/$perfMonFile -JLimite=$3 -t ./Jmeter_Test/PruebaCarga/CargaConsulta.jmx -l $1/$resultfile
+$HOME/apache-jmeter-4.0/bin/shutdown.sh
+$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $1/$resultfile -o $1/index_$3/
+$HOME/apache-jmeter-4.0/bin/shutdown.sh
+
+}
+
+
+pruebaPicoConsulta(){
+
+mkdir -p $1/
+resultfile=PicoConsulta_$3.csv
+perfMonFile=PerfMon_PicoConsulta_$3.csv
+$HOME/apache-jmeter-4.0/bin/jmeter.sh -n -JDominio=$2 -JRuta=$1/$perfMonFile -JLimite=$3 -t ./Jmeter_Test/PruebaPico/PicoConsulta.jmx -l $1/$resultfile
+$HOME/apache-jmeter-4.0/bin/shutdown.sh
+$HOME/apache-jmeter-4.0/bin/jmeter.sh -g $1/$resultfile -o $1/index_$3/
+$HOME/apache-jmeter-4.0/bin/shutdown.sh
+
 }
 
 menumain

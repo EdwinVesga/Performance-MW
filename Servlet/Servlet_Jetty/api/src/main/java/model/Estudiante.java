@@ -1,7 +1,7 @@
 package model;
-
+ 
 public class Estudiante {
-
+	
     String id;
     String primerNombre;
     String segundoNombre;
@@ -9,8 +9,8 @@ public class Estudiante {
     String segundoApellido;
     int semestre;
     String fechaIngreso;
-
-
+    
+    
 	public Estudiante(String id, String primerNombre, String segundoNombre, String primerApellido, String segundoApellido,
 			int semestre, String fechaIngreso) {
 		super();

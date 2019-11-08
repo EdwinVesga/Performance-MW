@@ -29,11 +29,11 @@ app.get('/',function(req,res){
 
 //RESTful route
 
-router.get('/ConsultaEstudiante', function(req,res,next){
+router.get('/ConsultaEstudiante', (req,res,next)=>{
 
   try {
 
-    var query = pool.query ("SELECT * FROM estudianteC", function (err, result) {
+    var query = pool.query ("SELECT * FROM estudianteC", (err, result)=>{
     if (err) throw new Error (err);
     res.render('ConsultaEstudiante',{title:"NodeJS",data:result});
 
@@ -46,11 +46,11 @@ router.get('/ConsultaEstudiante', function(req,res,next){
 });
 
 
-router.get('/ConsultaProfesor', function(req,res,next){
+router.get('/ConsultaProfesor', (req,res,next)=>{
 
   try {
 
-    var query = pool.query ("SELECT * FROM profesorC", function (err, result) {
+    var query = pool.query ("SELECT * FROM profesorC", (err, result)=>{
     if (err) throw new Error (err);
     res.render('ConsultaProfesor',{title:"NodeJS",data:result});
 
@@ -63,86 +63,83 @@ router.get('/ConsultaProfesor', function(req,res,next){
 });
 
 
-router.get('/ConsultaMateria', function(req,res,next){
+router.get('/ConsultaMateria', (req,res,next)=>{
 
   try {
 
-    var query = pool.query ("SELECT * FROM materiaC", function (err, result) {
+    var query = pool.query ("SELECT * FROM materiaC", (err, result)=>{
     if (err) throw new Error (err);
     res.render('ConsultaMateria',{title:"NodeJS",data:result});
 
     });
 
     } catch (err) {
-
+      throw new Error (err);
     }
 
 });
 
+router.get('/ConsultaEstudianteSemestreA', (req,res,next)=>{
 
-router.get('/ConsultaEstudianteSemestreA', function(req,res,next){
-
-  let semestre_est = req.param('semestre');
+  let cantidadSemestre = 0;
+  let intAleatorio = Math.floor(Math.random()*10)+1;
   try {
+      var query = pool.query ("select * from estudianteA where semestre_est= ?", intAleatorio, (err, result)=>{
+      if (err) throw new Error (err);
 
-    var query = pool.query ("select count(*) from estudianteA where semestre_est= ?", semestre_est,  function (err, result) {
-    if (err) throw new Error (err);
+      cantidadSemestre=result.length;
+      res.render('ConsultaEstudianteSemestre',{title:"NodeJS", semestre:intAleatorio, cantidad:cantidadSemestre});
 
-    res.render('ConsultaEstudianteSemestre',{title:"NodeJS",semestre:semestre_est, rows:result});
-
-    });
-
+      });
     } catch (err) {
-        throw new Error (err);
+          throw new Error (err);
     }
 
 });
 
-router.get('/ConsultaEstudianteSemestreB', function(req,res,next){
+router.get('/ConsultaEstudianteSemestreB', (req,res,next)=>{
 
-  let semestre_est = req.param('semestre');
-
+  let cantidadSemestre = 0;
+  let intAleatorio = Math.floor(Math.random()*10)+1;
   try {
+      var query = pool.query ("select * from estudianteB where semestre_est= ?", intAleatorio, (err, result)=>{
+      if (err) throw new Error (err);
 
-    var query = pool.query ("select count(*) from estudianteB where semestre_est= ?", semestre_est,  function (err, result) {
-    if (err) throw new Error (err);
+      cantidadSemestre=result.length;
+      res.render('ConsultaEstudianteSemestre',{title:"NodeJS", semestre:intAleatorio, cantidad:cantidadSemestre});
 
-    res.render('ConsultaEstudianteSemestre',{title:"NodeJS",semestre:semestre_est, rows:result});
-
-    });
-
+      });
     } catch (err) {
-        throw new Error (err);
+          throw new Error (err);
     }
 
 });
 
-router.get('/ConsultaEstudianteSemestreC', function(req,res,next){
+router.get('/ConsultaEstudianteSemestreC', (req,res,next)=>{
 
-  let semestre_est = req.param('semestre');
-
+  let cantidadSemestre = 0;
+  let intAleatorio = Math.floor(Math.random()*10)+1;
   try {
+      var query = pool.query ("select * from estudianteC where semestre_est= ?", intAleatorio, (err, result)=>{
+      if (err) throw new Error (err);
 
-    var query = pool.query ("select count(*) from estudianteC where semestre_est= ?", semestre_est,  function (err, result) {
-    if (err) throw new Error (err);
+      cantidadSemestre=result.length;
+      res.render('ConsultaEstudianteSemestre',{title:"NodeJS", semestre:intAleatorio, cantidad:cantidadSemestre});
 
-    res.render('ConsultaEstudianteSemestre',{title:"NodeJS",semestre:semestre_est, rows:result});
-
-    });
-
+      });
     } catch (err) {
-        throw new Error (err);
+          throw new Error (err);
     }
 
 });
 
-router.get('/ConsultaProfesorEscuela', function(req,res,next){
+router.get('/ConsultaProfesorEscuela', (req,res,next)=>{
 
   let escuela_prof = req.param('escuela');
 
   try {
 
-    var query = pool.query ("select count(*) from profesorC where escuela_prof= ?", escuela_prof, function(err, result) {
+    var query = pool.query ("select count(*) from profesorC where escuela_prof= ?", escuela_prof, (err, result)=>{
     if (err) throw new Error (err);
 
     res.render('ConsultaProfesorEscuela',{title:"NodeJS",escuela:escuela_prof, rows:result});
@@ -155,99 +152,245 @@ router.get('/ConsultaProfesorEscuela', function(req,res,next){
 
 });
 
-router.get('/Insertar1000', async function(req,res,next){
+router.get('/Insertar1', (req,res,next)=>{
 
-  let id = req.param('id');
-  const intAleatorio = parseInt(Math.random()*1000);
+  let id1 = req.query.id;
+  let intAleatorio = Math.floor(Math.random()*10)+1;
 
-  try {
-
-    var insert1 = await pool.query ("INSERT INTO estudianteA VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
-
-    res.render('Insertar',{title:"NodeJS"});
-
+  try{
+    async.parallel([
+      function(callback) {
+        pool.query ("INSERT INTO estudiante VALUES (?,?,?,?,?,?,'2014-04-04')", [id1, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO profesor VALUES (?,?,?,?,?,?,'2014-04-04')", [id1, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO materia VALUES (?,?,?,?)", [id1, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      }
+    ], function (err) {
+      if (err) throw new Error (err);
+      res.render('InsertarEliminar',{title:"NodeJS"});
+    });
   } catch (err) {
-      throw new Error (err);
+        throw new Error (err);
   }
 
 });
 
-router.get('/Insertar10000', async function(req,res,next){
+router.get('/Insertar3', (req,res,next)=>{
 
-  let id = req.param('id');
-  const intAleatorio = parseInt(Math.random()*1000);
+  let id1 = req.query.id1;
+  let id2 = req.query.id2;
+  let id3 = req.query.id3;
+  let intAleatorio = Math.floor(Math.random()*10)+1;
 
-  try {
-
-    var insert1 = await pool.query ("INSERT INTO estudianteB VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
-
-    res.render('Insertar',{title:"NodeJS"});
-
+  try{
+    async.parallel([
+      function(callback) {
+        pool.query ("INSERT INTO estudiante VALUES (?,?,?,?,?,?,'2014-04-04')", [id1, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO profesor VALUES (?,?,?,?,?,?,'2014-04-04')", [id1, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO materia VALUES (?,?,?,?)", [id1, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO estudiante VALUES (?,?,?,?,?,?,'2014-04-04')", [id2, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO profesor VALUES (?,?,?,?,?,?,'2014-04-04')", [id2, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO materia VALUES (?,?,?,?)", [id2, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO estudiante VALUES (?,?,?,?,?,?,'2014-04-04')", [id3, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO profesor VALUES (?,?,?,?,?,?,'2014-04-04')", [id3, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO materia VALUES (?,?,?,?)", [id3, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      }
+    ], function (err) {
+      if (err) throw new Error (err);
+      res.render('InsertarEliminar',{title:"NodeJS"});
+    });
   } catch (err) {
-      throw new Error (err);
+        throw new Error (err);
   }
 
 });
 
-router.get('/Insertar100000', async function(req,res,next){
 
-  let id = req.param('id');
-  const intAleatorio = parseInt(Math.random()*1000);
+router.get('/Insertar6', (req,res,next)=>{
 
-  try {
+  let id1 = req.query.id1;
+  let id2 = req.query.id2;
+  let id3 = req.query.id3;
+  let id4 = req.query.id4;
+  let id5 = req.query.id5;
+  let id6 = req.query.id6;
+  let intAleatorio = Math.floor(Math.random()*10)+1;
 
-    var insert1 = await pool.query ("INSERT INTO estudianteC VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
-
-    res.render('Insertar',{title:"NodeJS"});
-
+  try{
+    async.parallel([
+      function(callback) {
+        pool.query ("INSERT INTO estudiante VALUES (?,?,?,?,?,?,'2014-04-04')", [id1, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO profesor VALUES (?,?,?,?,?,?,'2014-04-04')", [id1, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO materia VALUES (?,?,?,?)", [id1, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO estudiante VALUES (?,?,?,?,?,?,'2014-04-04')", [id2, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO profesor VALUES (?,?,?,?,?,?,'2014-04-04')", [id2, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO materia VALUES (?,?,?,?)", [id2, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO estudiante VALUES (?,?,?,?,?,?,'2014-04-04')", [id3, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO profesor VALUES (?,?,?,?,?,?,'2014-04-04')", [id3, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO materia VALUES (?,?,?,?)", [id3, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO estudiante VALUES (?,?,?,?,?,?,'2014-04-04')", [id4, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO profesor VALUES (?,?,?,?,?,?,'2014-04-04')", [id4, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO materia VALUES (?,?,?,?)", [id4, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO estudiante VALUES (?,?,?,?,?,?,'2014-04-04')", [id5, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO profesor VALUES (?,?,?,?,?,?,'2014-04-04')", [id5, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO materia VALUES (?,?,?,?)", [id5, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO estudiante VALUES (?,?,?,?,?,?,'2014-04-04')", [id6, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO profesor VALUES (?,?,?,?,?,?,'2014-04-04')", [id6, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      },
+      function(callback) {
+        pool.query ("INSERT INTO materia VALUES (?,?,?,?)", [id6, intAleatorio, intAleatorio, intAleatorio]);
+        callback();
+      }
+    ], function (err) {
+      if (err) throw new Error (err);
+      res.render('InsertarEliminar',{title:"NodeJS"});
+    });
   } catch (err) {
-      throw new Error (err);
+        throw new Error (err);
   }
 
 });
 
+router.get('/ContarPrimos1000', (req,res,next)=>{
 
-router.get('/InsertarEliminar', async function(req,res,next){
-
-  let id = req.param('id');
-  const intAleatorio = parseInt(Math.random()*1000);
-
-  try {
-
-    var insert1 = await pool.query ("INSERT INTO estudiante VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
-    var insert2 = await pool.query ("INSERT INTO profesor VALUES (?,?,?,?,?,?,'2014-04-04')", [id, intAleatorio, intAleatorio, intAleatorio, intAleatorio, intAleatorio]);
-    var insert3 = await pool.query ("INSERT INTO materia VALUES (?,?,?,?)", [id, intAleatorio, intAleatorio, intAleatorio]);
-    var delete1 = await pool.query ("DELETE FROM estudiante WHERE id_est = ?", id);
-    var delete2 = await pool.query ("DELETE FROM profesor WHERE id_prof = ?", id);
-    var delete3 = await pool.query ("DELETE FROM materia WHERE id_materia = ?", id);
-
-    res.render('InsertarEliminar',{title:"NodeJS"});
-
-  } catch (err) {
-      throw new Error (err);
-  }
-
-});
-
-
-router.get('/ContarPrimos', function(req,res,next){
-
-            var array = [];
+            var total = 0;
             var suma = 1;
-            for (var i = 0; i < 100000; i++) {
+            for (let i = 0; i < 1000; i++) {
                 suma = suma + 1;
                 var contador = 2;
-                var primo=true;
+                var primo = true;
                 while ((primo) && (contador!=suma)){
                   if ((suma % contador) == 0)
                     primo = false;
                   contador++;
                 }
-      			if(primo) array.push(suma);
+      			if(primo) total++;
 
             }
 
-            res.render('ContarPrimos',{title:"NodeJS",size:array.length});
+            res.render('ContarPrimos',{title:"NodeJS",size:total, limit:1000});
+
+});
+
+router.get('/ContarPrimos2000', (req,res,next)=>{
+
+            var total = 0;
+            var suma = 1;
+            for (let i = 0; i < 2000; i++) {
+                suma = suma + 1;
+                var contador = 2;
+                var primo = true;
+                while ((primo) && (contador!=suma)){
+                  if ((suma % contador) == 0)
+                    primo = false;
+                  contador++;
+                }
+            if(primo) total++;
+
+            }
+
+            res.render('ContarPrimos',{title:"NodeJS",size:total, limit:2000});
+
+});
+
+router.get('/ContarPrimos3000', (req,res,next)=>{
+
+            var total = 0;
+            var suma = 1;
+            for (let i = 0; i < 3000; i++) {
+                suma = suma + 1;
+                var contador = 2;
+                var primo = true;
+                while ((primo) && (contador!=suma)){
+                  if ((suma % contador) == 0)
+                    primo = false;
+                  contador++;
+                }
+            if(primo) total++;
+
+            }
+
+            res.render('ContarPrimos',{title:"NodeJS",size:total, limit:3000});
 
 });
 

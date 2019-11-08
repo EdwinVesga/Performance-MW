@@ -1,9 +1,11 @@
-FROM maven:3.5.4-jdk-8
+FROM jetty:latest
 
-ADD /api/ /
+ENV PATH_XML /api/src/main/webapp/WEB-INF
 
-CMD ["cd /api"]
+ADD /api/target/ROOT.war $JETTY_BASE/webapps/
+
+ADD $PATH_XML/jetty.xml $JETTY_HOME/etc/jetty.xml
+
+ADD $PATH_XML/jetty-threadpool.xml $JETTY_HOME/etc/jetty-threadpool.xml
 
 EXPOSE 8080
-
-

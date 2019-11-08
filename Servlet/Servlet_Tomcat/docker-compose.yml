@@ -10,10 +10,13 @@ services:
       - MYSQL_ROOT_PASSWORD=123456
     ports:
       - "3306:3306"
-    command: "mysqld --max_connections=100000"
+    command: "mysqld --max_connections=100000 --connect-timeout=31536000 --max-prepared-stmt-count=1048576"
     depends_on:
       - tomcat
   tomcat:
     build: .
     ports:
       - "4000:8080"
+    environment:
+      - JAVA_OPTS=-Xms10g -Xmx10g
+      - CATALINA_OPTS=-Xms10g -Xmx10g

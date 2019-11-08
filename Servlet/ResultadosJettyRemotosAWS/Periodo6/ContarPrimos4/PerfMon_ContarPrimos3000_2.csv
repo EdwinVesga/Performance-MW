@@ -1,0 +1,13 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1549584879281,1085,18.188.171.52 CPU,,,,,true,,0,0,0,0,null,0,0,0
+1549584879281,79287,18.188.171.52 Memory,,,,,true,,0,0,0,0,null,0,0,0
+1549584880282,4987,18.188.171.52 CPU,,,,,true,,0,0,0,0,null,0,0,0
+1549584880282,79287,18.188.171.52 Memory,,,,,true,,0,0,0,0,null,0,0,0
+1549584881282,3783,18.188.171.52 CPU,,,,,true,,0,0,0,0,null,0,0,0
+1549584881282,79288,18.188.171.52 Memory,,,,,true,,0,0,0,0,null,0,0,0
+1549584882282,4785,18.188.171.52 CPU,,,,,true,,0,0,0,0,null,0,0,0
+1549584882282,79290,18.188.171.52 Memory,,,,,true,,0,0,0,0,null,0,0,0
+1549584883283,6102,18.188.171.52 CPU,,,,,true,,0,0,0,0,null,0,0,0
+1549584883283,79292,18.188.171.52 Memory,,,,,true,,0,0,0,0,null,0,0,0
+1549584884283,5632,18.188.171.52 CPU,,,,,true,,0,0,0,0,null,0,0,0
+1549584884283,79294,18.188.171.52 Memory,,,,,true,,0,0,0,0,null,0,0,0

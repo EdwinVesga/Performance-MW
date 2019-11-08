@@ -1,13 +1,20 @@
 {
   "scripts": {
-    "start": "node server.js"
+    "start": "set UV_THREADPOOL_SIZE=128 && node --nouse-idle-notification --expose-gc --v8-pool-size=700 --max_old_space_size=10240 cluster.js"
   },
-  "name": "BaseDeDatos_NodeJS",
+  "name": "NodeJS",
   "version": "",
+  "description": "Aplicación para Node.js",
+  "repository": {
+  "type": "git",
+  "url": "https://github.com/vivianamaldonado/Performance-MW.git"
+  },
+  "license": "UNLICENSED",
   "dependencies": {
     "array-list": "^1.0.7",
     "arraylist": "^0.1.0",
     "async": "^2.6.1",
+    "async-chainable": "^2.6.0",
     "biguint-format": "^1.0.0",
     "body-parser": "^1.18.3",
     "dotenv": "^6.0.0",

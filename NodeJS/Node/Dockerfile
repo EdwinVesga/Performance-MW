@@ -2,14 +2,12 @@ FROM node:latest
 
 WORKDIR /node/
 
-COPY package*.json /node/
+COPY . .
+
+ENV UV_THREADPOOL_SIZE 128
 
 RUN npm install
-
-COPY . .
 
 EXPOSE 4000
 
 CMD [ "npm", "start" ]
-
-

@@ -64,16 +64,16 @@ public class ProfesorDAO {
 						segundo_apellido_prof, escuela_prof, fecha_incorporacion_prof);
 				listaProfesores.add(profesor);
 			}
-			
+
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return listaProfesores;
 	}
 
 
-    public Integer eliminar(String id) throws SQLException {
+    public void eliminar(String id) throws SQLException {
     	int result = 0;
 		try(Connection conn = ds.getConnection()) {
 			String sql = "DELETE FROM profesor WHERE id_prof = ?";
@@ -84,7 +84,6 @@ public class ProfesorDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return result;
 	}
     public int contarEscuela(String escuela) throws SQLException {
 
@@ -107,7 +106,7 @@ public class ProfesorDAO {
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return numberOfRows;
 
 	}

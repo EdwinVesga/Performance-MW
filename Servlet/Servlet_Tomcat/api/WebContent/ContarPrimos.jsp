@@ -5,7 +5,7 @@
 <title>Servlet</title>
 </head>
 <body>
-<h1>Imprime la cantidad de primos entre 0 y 100000.</h1>
+<h1>Imprime la cantidad de primos entre 0 y <c:out value="${limit}"/>.</h1>
 <font color="blue">
   <h1>
       <c:out value="${size}"/>

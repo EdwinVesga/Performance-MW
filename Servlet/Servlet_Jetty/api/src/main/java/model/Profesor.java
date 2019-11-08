@@ -8,8 +8,8 @@ public class Profesor {
  	String segundo_apellido_prof;
  	String escuela_prof;
  	String fecha_incorporacion_prof;
-
-
+	
+	
 	public Profesor(String id_prof, String primer_nombre_prof, String segundo_nombre_prof, String primer_apellido_prof,
 			String segundo_apellido_prof, String escuela_prof, String fecha_incorporacion_prof) {
 		super();
@@ -21,7 +21,7 @@ public class Profesor {
 		this.escuela_prof = escuela_prof;
 		this.fecha_incorporacion_prof = fecha_incorporacion_prof;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "Profesor [id_prof=" + id_prof + ", primer_nombre_prof=" + primer_nombre_prof + ", segundo_nombre_prof="
@@ -72,5 +72,5 @@ public class Profesor {
 	public void setFecha_incorporacion_prof(String fecha_incorporacion_prof) {
 		this.fecha_incorporacion_prof = fecha_incorporacion_prof;
 	}
-
+	
 }

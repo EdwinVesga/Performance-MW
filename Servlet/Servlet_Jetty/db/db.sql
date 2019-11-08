@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS estudiante (
   segundo_nombre_est varchar(50) DEFAULT NULL,
   primer_apellido_est varchar(50) NOT NULL,
   segundo_apellido_est varchar(50) NOT NULL,
-  semestre_est int(11) NOT NULL,
+  semestre_est int(2) NOT NULL,
   fecha_ingreso_est date NOT NULL,
   PRIMARY KEY (id_est),
   UNIQUE KEY id_est (id_est)
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `estudianteA` (
   `segundo_nombre_est` varchar(50) DEFAULT NULL,
   `primer_apellido_est` varchar(50) NOT NULL,
   `segundo_apellido_est` varchar(50) NOT NULL,
-  `semestre_est` int(11) NOT NULL,
+  `semestre_est` int(2) NOT NULL,
   `fecha_ingreso_est` date NOT NULL,
   PRIMARY KEY (`id_est`),
   UNIQUE KEY `id_est` (`id_est`)
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `estudianteB` (
   `segundo_nombre_est` varchar(50) DEFAULT NULL,
   `primer_apellido_est` varchar(50) NOT NULL,
   `segundo_apellido_est` varchar(50) NOT NULL,
-  `semestre_est` int(11) NOT NULL,
+  `semestre_est` int(2) NOT NULL,
   `fecha_ingreso_est` date NOT NULL,
   PRIMARY KEY (`id_est`),
   UNIQUE KEY `id_est` (`id_est`)
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `estudianteC` (
   `segundo_nombre_est` varchar(50) DEFAULT NULL,
   `primer_apellido_est` varchar(50) NOT NULL,
   `segundo_apellido_est` varchar(50) NOT NULL,
-  `semestre_est` int(11) NOT NULL,
+  `semestre_est` int(2) NOT NULL,
   `fecha_ingreso_est` date NOT NULL,
   PRIMARY KEY (`id_est`),
   UNIQUE KEY `id_est` (`id_est`)
@@ -128,33 +128,37 @@ CREATE DEFINER=`performance`@`%` PROCEDURE `InsertarTablasDeConsultas`()
 BEGIN
 DECLARE aleatorio VARCHAR(11);
 DECLARE x  INT;
+DECLARE semestre INT;
 
 SET x = 1;
 
 WHILE x  <= 1000 DO
 
- SET  x = x + 1; 
- SET aleatorio = TRUNCATE(RAND()*10000,0);
- INSERT INTO estudianteA VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, aleatorio, '2014-11-11');
- INSERT INTO estudianteB VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, aleatorio, '2014-11-11');
- INSERT INTO estudianteC VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, aleatorio, '2014-11-11');
+ SET  x = x + 1;
+ SET aleatorio = ROUND((RAND() * (10000-1))+1);
+ SET semestre = ROUND((RAND() * (10-1))+1);
+ INSERT INTO estudianteA VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, semestre, '2014-11-11');
+ INSERT INTO estudianteB VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, semestre, '2014-11-11');
+ INSERT INTO estudianteC VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, semestre, '2014-11-11');
 
 END WHILE;
 
 WHILE x  <= 5000 DO
 
- SET  x = x + 1; 
- SET aleatorio = TRUNCATE(RAND()*10000,0);
- INSERT INTO estudianteB VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, aleatorio, '2014-11-11');
- INSERT INTO estudianteC VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, aleatorio, '2014-11-11');
+ SET  x = x + 1;
+ SET aleatorio = ROUND((RAND() * (10000-1))+1);
+ SET semestre = ROUND((RAND() * (10-1))+1);
+ INSERT INTO estudianteB VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, semestre, '2014-11-11');
+ INSERT INTO estudianteC VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, semestre, '2014-11-11');
 
 END WHILE;
 
 WHILE x  <= 10000 DO
 
- SET  x = x + 1; 
- SET aleatorio = TRUNCATE(RAND()*10000,0);
- INSERT INTO estudianteC VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, aleatorio, '2014-11-11');
+ SET  x = x + 1;
+ SET aleatorio = ROUND((RAND() * (10000-1))+1);
+ SET semestre = ROUND((RAND() * (10-1))+1);
+ INSERT INTO estudianteC VALUES(UUID(), aleatorio, aleatorio, aleatorio, aleatorio, semestre, '2014-11-11');
 
 END WHILE;
 
@@ -163,4 +167,3 @@ END//
 DELIMITER ;
 
 CALL InsertarTablasDeConsultas();
-

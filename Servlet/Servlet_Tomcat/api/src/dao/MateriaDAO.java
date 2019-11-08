@@ -16,7 +16,7 @@ import model.Materia;
 
 
 public class MateriaDAO {
-	
+
 	private DataSource ds;
 
 	public MateriaDAO() throws SQLException {
@@ -59,15 +59,15 @@ public class MateriaDAO {
 				Materia materia = new Materia(id_materia, nombre_materia, salon_materia, horario_materia);
 				listaMaterias.add(materia);
 			}
-			
+
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}
 		return listaMaterias;
 	}
 
-	
-	public Integer eliminar(String id) throws SQLException {
+
+	public void eliminar(String id) throws SQLException {
 		int result = 0;
 		try(Connection conn = ds.getConnection()) {
 			String sql = "DELETE FROM materia WHERE id_materia = ?";
@@ -78,7 +78,6 @@ public class MateriaDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return result;
 	}
 
 }

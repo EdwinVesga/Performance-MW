@@ -1,15 +1,9 @@
-FROM tomcat:8.0.53-jre8
+FROM tomcat:8.5.34-jre8
 
-ENV PATH_WAR /api/target/BaseDeDatos_Servlets-0.0.1-SNAPSHOT.war
+ENV PATH_API /api/target/ROOT.war
 
-ADD /tomcat-conf/tomcat-users.xml /usr/local/tomcat/conf/tomcat-users.xml
+ADD /api/WebContent/WEB-INF/server.xml /usr/local/tomcat/conf/server.xml
 
-ADD /tomcat-conf/context.xml /usr/local/tomcat/conf/context.xml
+RUN rm -r /usr/local/tomcat/webapps/ROOT
 
-COPY $PATH_WAR /usr/local/tomcat/webapps/
-
-RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT.OLD
-
-RUN mkdir /usr/local/tomcat/webapps/ROOT
-
-COPY /api/target/BaseDeDatos_Servlets-0.0.1-SNAPSHOT /usr/local/tomcat/webapps/ROOT/
+COPY $PATH_API /usr/local/tomcat/webapps/

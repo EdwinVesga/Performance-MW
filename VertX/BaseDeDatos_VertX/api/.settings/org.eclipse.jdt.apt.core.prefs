@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+org.eclipse.jdt.apt.aptEnabled=true
+org.eclipse.jdt.apt.genSrcDir=src/main/generated
+org.eclipse.jdt.apt.genTestSrcDir=target/generated-test-sources/test-annotations
+org.eclipse.jdt.apt.processorOptions/outputDirectory=/home/edwinvesga/M\u00FAsica/Performance-MW/VertX/BaseDeDatos_VertX/api/src/main

@@ -1,0 +1,3 @@
+Etiqueta,# Muestras,Media,Mediana,90% Line,95% Line,99% Line,Mín,Máx,% Error,Rendimiento,Kb/sec,Desv. Estándar
+Petición HTTP,1000,3,2,2,3,71,1,135,"0,00%","95,8","35,5","11,77"
+Total,1000,3,2,2,3,71,1,135,"0,00%","95,8","35,5","11,77"

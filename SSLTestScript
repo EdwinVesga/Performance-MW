@@ -1,0 +1,306 @@
+import pandas as pd
+import numpy as np
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import scipy.stats as stats
+import seaborn as sns
+
+def totalTime(data):
+    m = (max([(data.timeStamp[i]+data.elapsed[i]) for i in range(data.shape[0])])-min(data.timeStamp))*1.0
+    return m
+    
+def cargar_PruebaCarga(app):
+    if(str(app) == "Tomcat") or (str(app) == "Jetty"):
+        ruta1 = "./Servlet/Resultados"+str(app)+"RemotosAWS/PruebaCargaConsulta/CargaConsulta.csv"
+    else:
+        ruta1 = "./"+str(app)+"/ResultadosRemotosAWS/PruebaCargaConsulta/CargaConsulta.csv"
+    return pd.read_csv(ruta1)
+
+def cargar_PruebaCargaLimite(app):
+    if(str(app) == "Tomcat") or (str(app) == "Jetty"):
+        ruta1 = "./Servlet/Resultados"+str(app)+"RemotosAWS/PruebaCargaConsulta/CargaConsultaLimite.csv"
+    else:
+        ruta1 = "./"+str(app)+"/ResultadosRemotosAWS/PruebaCargaConsulta/CargaConsultaLimite.csv"
+    return pd.read_csv(ruta1)
+
+def cargar_PruebaPico(app):
+    if(str(app) == "Tomcat") or (str(app) == "Jetty"):
+        ruta1 = "./Servlet/Resultados"+str(app)+"RemotosAWS/PruebaPicoConsulta/PicoConsulta.csv"
+    else:
+        ruta1 = "./"+str(app)+"/ResultadosRemotosAWS/PruebaPicoConsulta/PicoConsulta.csv"
+    return pd.read_csv(ruta1)
+    
+def cargar_PruebaPico(app):
+    if(str(app) == "Tomcat") or (str(app) == "Jetty"):
+        ruta1 = "./Servlet/Resultados"+str(app)+"RemotosAWS/PruebaPicoConsulta/PicoConsulta.csv"
+    else:
+        ruta1 = "./"+str(app)+"/ResultadosRemotosAWS/PruebaPicoConsulta/PicoConsulta.csv"
+    return pd.read_csv(ruta1)
+
+def cargar_PerfMon_PruebaCarga(app):
+    if(str(app) == "Tomcat") or (str(app) == "Jetty"):
+        ruta1 = "./Servlet/Resultados"+str(app)+"RemotosAWS/PruebaCargaConsulta/PerfMon_CargaConsulta.csv"
+    else:
+        ruta1 = "./"+str(app)+"/ResultadosRemotosAWS/PruebaCargaConsulta/PerfMon_CargaConsulta.csv"
+    return pd.read_csv(ruta1)
+
+def cargar_PerfMon_PruebaCargaLimite(app):
+    if(str(app) == "Tomcat") or (str(app) == "Jetty"):
+        ruta1 = "./Servlet/Resultados"+str(app)+"RemotosAWS/PruebaCargaConsulta/PerfMon_CargaConsultaLimite.csv"
+    else:
+        ruta1 = "./"+str(app)+"/ResultadosRemotosAWS/PruebaCargaConsulta/PerfMon_CargaConsultaLimite.csv"
+    return pd.read_csv(ruta1)
+    
+def cargar_PerfMon_PruebaPico(app):
+    if(str(app) == "Tomcat") or (str(app) == "Jetty"):
+        ruta1 = "./Servlet/Resultados"+str(app)+"RemotosAWS/PruebaPicoConsulta/PerfMon_PicoConsulta.csv"
+    else:
+        ruta1 = "./"+str(app)+"/ResultadosRemotosAWS/PruebaPicoConsulta/PerfMon_PicoConsulta.csv"
+    return pd.read_csv(ruta1)
+    
+def cargar_Summary_PruebaCarga(app):
+    if(str(app) == "Tomcat") or (str(app) == "Jetty"):
+        ruta1 = "./Servlet/Resultados"+str(app)+"RemotosAWS/PruebaCargaConsulta/Summary_CargaConsulta.csv"
+    else:
+        ruta1 = "./"+str(app)+"/ResultadosRemotosAWS/PruebaCargaConsulta/Summary_CargaConsulta.csv"
+    return pd.read_csv(ruta1)
+
+def cargar_Summary_PruebaCargaLimite(app):
+    if(str(app) == "Tomcat") or (str(app) == "Jetty"):
+        ruta1 = "./Servlet/Resultados"+str(app)+"RemotosAWS/PruebaCargaConsulta/Summary_CargaConsultaLimite.csv"
+    else:
+        ruta1 = "./"+str(app)+"/ResultadosRemotosAWS/PruebaCargaConsulta/Summary_CargaConsultaLimite.csv"
+    return pd.read_csv(ruta1)
+
+def cargar_Summary_PruebaPico(app):
+    if(str(app) == "Tomcat") or (str(app) == "Jetty"):
+        ruta1 = "./Servlet/Resultados"+str(app)+"RemotosAWS/PruebaPicoConsulta/Summary_PicoConsulta.csv"
+    else:
+        ruta1 = "./"+str(app)+"/ResultadosRemotosAWS/PruebaPicoConsulta/Summary_PicoConsulta.csv"
+    return pd.read_csv(ruta1)
+    
+
+# Pruebas Carga Remotas
+
+pvC = cargar_PruebaCarga("VertX")
+ptC = cargar_PruebaCarga("Tomcat")
+pjC = cargar_PruebaCarga("Jetty")
+pnC = cargar_PruebaCarga("NodeJS")
+
+# Pruebas Carga Remotas Limite
+
+pvCL = cargar_PruebaCargaLimite("VertX")
+ptCL = cargar_PruebaCargaLimite("Tomcat")
+pjCL = cargar_PruebaCargaLimite("Jetty")
+pnCL = cargar_PruebaCargaLimite("NodeJS")
+
+# Pruebas Pico Remotas
+
+pvP = cargar_PruebaPico("VertX")
+ptP = cargar_PruebaPico("Tomcat")
+pjP = cargar_PruebaPico("Jetty")
+pnP = cargar_PruebaPico("NodeJS")
+
+# Pruebas PerfMon Carga Remotas
+
+mpvC = cargar_PerfMon_PruebaCarga("VertX")
+mptC = cargar_PerfMon_PruebaCarga("Tomcat")
+mpjC = cargar_PerfMon_PruebaCarga("Jetty")
+mpnC = cargar_PerfMon_PruebaCarga("NodeJS")
+
+# Pruebas PerfMon Pico Remotas
+
+mpvP = cargar_PerfMon_PruebaPico("VertX")
+mptP = cargar_PerfMon_PruebaPico("Tomcat")
+mpjP = cargar_PerfMon_PruebaPico("Jetty")
+mpnP = cargar_PerfMon_PruebaPico("NodeJS")
+
+# Pruebas PerfMon Carga Remotas Limite
+
+mpvCL = cargar_PerfMon_PruebaCargaLimite("VertX")
+mptCL = cargar_PerfMon_PruebaCargaLimite("Tomcat")
+mpjCL = cargar_PerfMon_PruebaCargaLimite("Jetty")
+mpnCL = cargar_PerfMon_PruebaCargaLimite("NodeJS")
+
+# Pruebas Summary Carga Remotas
+
+spvC = cargar_Summary_PruebaCarga("VertX")
+sptC = cargar_Summary_PruebaCarga("Tomcat")
+spjC = cargar_Summary_PruebaCarga("Jetty")
+spnC = cargar_Summary_PruebaCarga("NodeJS")
+
+# Pruebas Summary Carga Remotas Limite
+
+spvCL = cargar_Summary_PruebaCargaLimite("VertX")
+sptCL = cargar_Summary_PruebaCargaLimite("Tomcat")
+spjCL = cargar_Summary_PruebaCargaLimite("Jetty")
+spnCL = cargar_Summary_PruebaCargaLimite("NodeJS")
+
+# Pruebas Summary Pico Remotas
+
+spvP = cargar_Summary_PruebaPico("VertX")
+sptP = cargar_Summary_PruebaPico("Tomcat")
+spjP = cargar_Summary_PruebaPico("Jetty")
+spnP = cargar_Summary_PruebaPico("NodeJS")
+
+# Función para gráficar el diagrama de caja
+
+def graficarBox(data1,data2,data3,data4, tp):
+    fig, ax = plt.subplots(2,2,figsize=(12,12),squeeze=False) 
+    ax1=ax[0,0]
+    ax1.set_title("Vertx: Prueba de "+str(tp), fontsize=10)
+    ax1.set_ylabel('milisegundos', fontsize=10)
+    data1.boxplot(column=["elapsed"], showfliers=False, ax = ax1)
+    ax2=ax[0,1]
+    ax2.set_title("NodeJS: Prueba de "+str(tp), fontsize=10)
+    ax2.set_ylabel('milisegundos', fontsize=10)
+    data2.boxplot(column=["elapsed"], showfliers=False, ax = ax2)
+    ax3=ax[1,0]
+    ax3.set_title("Tomcat: Prueba de "+str(tp), fontsize=10)
+    ax3.set_ylabel('milisegundos', fontsize=10)
+    data3.boxplot(column=["elapsed"], showfliers=False, ax = ax3)
+    ax4=ax[1,1]
+    ax4.set_title("Jetty: Prueba de "+str(tp), fontsize=10)
+    ax4.set_ylabel('milisegundos', fontsize=10)
+    data4.boxplot(column=["elapsed"], showfliers=False, ax = ax4)
+
+def graficarHists(data1,data2,data3,data4, tp):
+    fig, ax = plt.subplots(2,2,figsize=(12,12),squeeze=False) 
+    ax1=ax[0,0]
+    ax1.set_ylabel('Frecuency', fontsize=10)
+    data1.hist(column=["elapsed"], ax = ax1)
+    ax1.set_title("Vertx: Prueba de "+str(tp), fontsize=10)
+    ax2=ax[0,1]
+    ax2.set_ylabel('Frecuency', fontsize=10)
+    data2.hist(column=["elapsed"], ax = ax2)
+    ax2.set_title("NodeJS: Prueba de "+str(tp), fontsize=10)
+    ax3=ax[1,0]
+    ax3.set_ylabel('Frecuency', fontsize=10)
+    data3.hist(column=["elapsed"], ax = ax3)
+    ax3.set_title("Tomcat: Prueba de "+str(tp), fontsize=10)
+    ax4=ax[1,1]
+    ax4.set_ylabel('Frecuency', fontsize=10)
+    data4.hist(column=["elapsed"], ax = ax4)
+    ax4.set_title("Jetty: Prueba de "+str(tp), fontsize=10)
+    
+def plot_ActiveThreads(data, tipo, app):
+    temp = data.loc[:,["timeStamp","threadName"]]
+    min1= np.min(temp["timeStamp"])
+    temp["timeStamp"] = temp["timeStamp"].map(lambda x: (x - min1)//1000)
+    fig, axes = plt.subplots(1,1,squeeze=False)
+    plt.subplots_adjust(top=0.95, bottom=0.05, left=0.0, right=1, hspace=0.4)
+    axes[0,0].set_title("Prueba "+str(tipo)+" - "+ str(app))
+    axes[0,0].set_ylabel('Active Threads', fontsize=12)
+    axes[0,0].set_xlabel('ElapsedTime [seconds]', fontsize=12)
+    df = temp.groupby("timeStamp").count()
+    data = { "Threads" : df["threadName"].values}
+    index = df.index
+    axtemp = pd.DataFrame(data,index).plot.line(ax=axes[0,0], color = "#FF9559")
+    patches, labels = axtemp.get_legend_handles_labels()
+        
+
+    
+def plot_ElapsedTime(data1, tipo, app):
+    temp1 = data1.loc[:,["timeStamp","elapsed", "success"]]
+    min1= np.min(temp1["timeStamp"])
+    df1 = temp1[temp1["success"] == True ]
+    df1["timeStamp"] = df1["timeStamp"].apply(lambda x: (x - min1)/1000)
+    fig, axes = plt.subplots(1,1,squeeze=False)
+    plt.subplots_adjust(top=0.95, bottom=0.05, left=0.0, right=1, hspace=0.4)
+    axes[0,0].set_title("Prueba "+str(tipo)+" - "+str(app), fontsize=12)
+    axes[0,0].set_ylabel('Response Time [miliseconds]', fontsize=12)
+    df1.plot.line(x="timeStamp",y="elapsed", ax= axes[0,0], color = "#FF9559")
+    axes[0,0].set_xlabel('ElapsedTime [seconds]', fontsize=12)
+    patches, labels = axes[0,0].get_legend_handles_labels()
+    labels = []
+    axes[0,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.18, 1), borderaxespad=0.)
+
+def plot_ElapsedTime_Error(data1,data2,data3,data4,tipo):
+    temp1 = data1.loc[:,["timeStamp","elapsed", "success"]]
+    df1 = temp1[temp1["success"] == False ]
+    df1["timeStamp"] = df1["timeStamp"].map(lambda x: (x - min(temp1["timeStamp"]))/1000)
+    temp2 = data2.loc[:,["timeStamp","elapsed", "success"]]
+    df2 = temp2[temp2["success"] == False ]
+    df2["timeStamp"] = df2["timeStamp"].map(lambda x: (x - min(temp2["timeStamp"]))/1000)
+    temp3 = data3.loc[:,["timeStamp","elapsed", "success"]]
+    df3 = temp3[temp3["success"] == False ]
+    df3["timeStamp"] = df3["timeStamp"].map(lambda x: (x - min(temp3["timeStamp"]))/1000)
+    temp4 = data4.loc[:,["timeStamp","elapsed", "success"]]
+    df4 = temp4[temp4["success"] == False ]
+    df4["timeStamp"] = df4["timeStamp"].map(lambda x: (x - min(temp4["timeStamp"]))/1000)
+    fig, axes = plt.subplots(1,1,squeeze=False)
+    plt.subplots_adjust(top=0.95, bottom=0.05, left=0.0, right=1, hspace=0.4)
+    axes[0,0].set_title("Prueba "+str(tipo), fontsize=12)
+    axes[0,0].set_ylabel('Response Time [miliseconds]', fontsize=12)
+    df1.plot.line(x="timeStamp",y="elapsed", ax= axes[0,0])
+    df2.plot.line(x="timeStamp",y="elapsed", ax= axes[0,0])
+    df3.plot.line(x="timeStamp",y="elapsed", ax= axes[0,0])
+    df4.plot.line(x="timeStamp",y="elapsed", ax= axes[0,0])
+    axes[0,0].set_xlabel('ElapsedTime [seconds]', fontsize=12)
+    patches, labels = axes[0,0].get_legend_handles_labels()
+    labels = ["VertX", "Tomcat", "Jetty", "NodeJS"]
+    axes[0,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.18, 1), borderaxespad=0.)
+
+def plot_CPU(data1,data2,data3,data4,tipo):
+    # Adquiere el dataframe de CPU metrics
+    data1["label"] = data1["label"].map(lambda x: "CPU" if "CPU" in x else x)
+    df1 = data1[data1["label"] == "CPU"].loc[:,["timeStamp","elapsed"]]
+    df1["timeStamp"] = df1["timeStamp"].map(lambda x: (x - min(df1["timeStamp"]))//1000)
+    df1["elapsed"] = df1["elapsed"].map(lambda x: x/100)
+    data2["label"] = data2["label"].map(lambda x: "CPU" if "CPU" in x else x)
+    df2 = data2[data2["label"] == "CPU"].loc[:,["timeStamp","elapsed"]]
+    df2["timeStamp"] = df2["timeStamp"].map(lambda x: (x - min(df2["timeStamp"]))//1000)
+    df2["elapsed"] = df2["elapsed"].map(lambda x: x/100)
+    data3["label"] = data3["label"].map(lambda x: "CPU" if "CPU" in x else x)
+    df3 = data3[data3["label"] == "CPU"].loc[:,["timeStamp","elapsed"]]
+    df3["timeStamp"] = df3["timeStamp"].map(lambda x: (x - min(df3["timeStamp"]))//1000)
+    df3["elapsed"] = df3["elapsed"].map(lambda x: x/100)
+    data4["label"] = data4["label"].map(lambda x: "CPU" if "CPU" in x else x)
+    df4 = data4[data4["label"] == "CPU"].loc[:,["timeStamp","elapsed"]]
+    df4["timeStamp"] = df4["timeStamp"].map(lambda x: (x - min(df4["timeStamp"]))//1000)
+    df4["elapsed"] = df4["elapsed"].map(lambda x: x/100)
+    # Grafica
+    fig, axes = plt.subplots(1,1,squeeze=False)
+    plt.subplots_adjust(top=0.95, bottom=0.05, left=0.0, right=1, hspace=0.4)
+    df1.plot.line(x="timeStamp",y="elapsed",ax=axes[0,0])
+    df2.plot.line(x="timeStamp",y="elapsed",ax=axes[0,0])
+    df3.plot.line(x="timeStamp",y="elapsed",ax=axes[0,0])
+    df4.plot.line(x="timeStamp",y="elapsed",ax=axes[0,0])
+    axes[0,0].set_title("Prueba "+str(tipo), fontsize=12)
+    axes[0,0].set_ylabel('CPU - Performance Metric', fontsize=12)
+    axes[0,0].set_xlabel('ElapsedTime [seconds]', fontsize=12)
+    patches, labels = axes[0,0].get_legend_handles_labels()
+    labels = ["VertX", "Tomcat", "Jetty", "NodeJS"]
+    axes[0,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.18, 1), borderaxespad=0.)
+    
+def plot_Memory(data1,data2,data3,data4,tipo):
+    # Adquiere el dataframe de Memory metrics
+    data1["label"] = data1["label"].map(lambda x: "Memory" if "Memory" in x else x)
+    df1 = data1[data1["label"] == "Memory"].loc[:,["timeStamp","elapsed"]]
+    df1["timeStamp"] = df1["timeStamp"].map(lambda x: (x - min(df1["timeStamp"]))//1000)
+    df1["elapsed"] = df1["elapsed"].map(lambda x: x/100)
+    data2["label"] = data2["label"].map(lambda x: "Memory" if "Memory" in x else x)
+    df2 = data2[data2["label"] == "Memory"].loc[:,["timeStamp","elapsed"]]
+    df2["timeStamp"] = df2["timeStamp"].map(lambda x: (x - min(df2["timeStamp"]))//1000)
+    df2["elapsed"] = df2["elapsed"].map(lambda x: x/100)
+    data3["label"] = data3["label"].map(lambda x: "Memory" if "Memory" in x else x)
+    df3 = data3[data3["label"] == "Memory"].loc[:,["timeStamp","elapsed"]]
+    df3["timeStamp"] = df3["timeStamp"].map(lambda x: (x - min(df3["timeStamp"]))//1000)
+    df3["elapsed"] = df3["elapsed"].map(lambda x: x/100)
+    data4["label"] = data4["label"].map(lambda x: "Memory" if "Memory" in x else x)
+    df4 = data4[data4["label"] == "Memory"].loc[:,["timeStamp","elapsed"]]
+    df4["timeStamp"] = df4["timeStamp"].map(lambda x: (x - min(df4["timeStamp"]))//1000)
+    df4["elapsed"] = df4["elapsed"].map(lambda x: x/100)
+    # Grafica
+    fig, axes = plt.subplots(1,1,squeeze=False)
+    plt.subplots_adjust(top=0.95, bottom=0.05, left=0.0, right=1, hspace=0.4)
+    df1.plot.line(x="timeStamp",y="elapsed",ax=axes[0,0])
+    df2.plot.line(x="timeStamp",y="elapsed",ax=axes[0,0])
+    df3.plot.line(x="timeStamp",y="elapsed",ax=axes[0,0])
+    df4.plot.line(x="timeStamp",y="elapsed",ax=axes[0,0])
+    axes[0,0].set_title("Prueba "+str(tipo), fontsize=12)
+    axes[0,0].set_ylabel('Memory - Performance Metric', fontsize=12)
+    axes[0,0].set_xlabel('ElapsedTime [seconds]', fontsize=12)
+    patches, labels = axes[0,0].get_legend_handles_labels()
+    labels = ["VertX", "Tomcat", "Jetty", "NodeJS"]
+    axes[0,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.18, 1), borderaxespad=0.)

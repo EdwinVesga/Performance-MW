@@ -5,12 +5,16 @@
 <title>Servlet</title>
 </head>
 <body>
-	<h1>La cantidad de estudiantes que pertenecen al semestre <c:out value="${semestre}"/> son:</h1>
-  <h1>
-    <font color="blue">
-        <c:out value="${count}"/>
-    </font>
-  </h1>
-
+<h1>Tabla de Cantidad de Estudiantes en el semestre <c:out value="${semestre}"/>:</h1>
+<table border="1">
+<tr>
+<th>Semestre</th>
+<th>Cantidad Estudiantes</th>
+</tr>
+<tr>
+<td><c:out value="${semestre}"/></td>
+<td><c:out value="${total}"/></td>
+</tr>
+</table>
 </body>
 </html>

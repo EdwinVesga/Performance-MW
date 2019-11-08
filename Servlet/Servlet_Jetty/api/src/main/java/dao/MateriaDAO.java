@@ -13,11 +13,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import model.Materia;
 
-import java.io.*;
 
-import java.util.Properties;
-import java.util.Enumeration;
-import java.sql.DriverManager;
 
 public class MateriaDAO {
 
@@ -25,14 +21,12 @@ public class MateriaDAO {
 
 	public MateriaDAO() throws SQLException {
 		try {
-			Context envContext = new InitialContext();
-				this.ds = (DataSource)envContext.lookup("java:/comp/env/jdbc/ConexionDB");
+			InitialContext envContext = new InitialContext();
+		    this.ds = (DataSource)envContext.lookup("java:/comp/env/jdbc/ConexionDB");
 		}catch(NamingException e) {
 			e.printStackTrace();
 		}
-
 	}
-
 
 	public void insertar(Materia materia) throws SQLException {
 
@@ -48,11 +42,12 @@ public class MateriaDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
 	}
 	public List<Materia> listarMaterias() throws SQLException {
 
 		List<Materia> listaMaterias = new ArrayList<Materia>();
-		try(Connection conn = ds.getConnection()) {
+		try(Connection conn = ds.getConnection()){
 			String sql = "SELECT * FROM materiaC";
 			Statement statement = conn.createStatement();
 			ResultSet resulSet = statement.executeQuery(sql);
@@ -64,6 +59,7 @@ public class MateriaDAO {
 				Materia materia = new Materia(id_materia, nombre_materia, salon_materia, horario_materia);
 				listaMaterias.add(materia);
 			}
+
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}
@@ -71,7 +67,7 @@ public class MateriaDAO {
 	}
 
 
-	public Integer eliminar(String id) throws SQLException {
+	public void eliminar(String id) throws SQLException {
 		int result = 0;
 		try(Connection conn = ds.getConnection()) {
 			String sql = "DELETE FROM materia WHERE id_materia = ?";
@@ -82,7 +78,6 @@ public class MateriaDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return result;
 	}
 
 }

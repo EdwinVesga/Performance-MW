@@ -13,24 +13,18 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import model.Profesor;
 
-import java.io.*;
 
-import java.util.Properties;
-import java.util.Enumeration;
-import java.sql.DriverManager;
 
 public class ProfesorDAO {
+	private DataSource ds;
 
-private DataSource ds;
-
-public ProfesorDAO() throws SQLException {
+	public ProfesorDAO() throws SQLException {
 		try {
-			Context envContext = new InitialContext();
-				this.ds = (DataSource)envContext.lookup("java:/comp/env/jdbc/ConexionDB");
+			InitialContext envContext = new InitialContext();
+		    this.ds = (DataSource)envContext.lookup("java:/comp/env/jdbc/ConexionDB");
 		}catch(NamingException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public void insertar(Profesor profesor) throws SQLException {
@@ -49,12 +43,12 @@ public ProfesorDAO() throws SQLException {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}
 
+	}
 	public List<Profesor> listarProfesores() throws SQLException {
 
 		List<Profesor> listaProfesores = new ArrayList<Profesor>();
-		try(Connection conn = ds.getConnection()) {
+		try(Connection conn = ds.getConnection()){
 			String sql = "SELECT * FROM profesorC";
 			Statement statement = conn.createStatement();
 			ResultSet resulSet = statement.executeQuery(sql);
@@ -70,15 +64,18 @@ public ProfesorDAO() throws SQLException {
 						segundo_apellido_prof, escuela_prof, fecha_incorporacion_prof);
 				listaProfesores.add(profesor);
 			}
+
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}
+
 		return listaProfesores;
 	}
 
-    public Integer eliminar(String id) throws SQLException {
+
+    public void eliminar(String id) throws SQLException {
     	int result = 0;
-			try(Connection conn = ds.getConnection()) {
+		try(Connection conn = ds.getConnection()) {
 			String sql = "DELETE FROM profesor WHERE id_prof = ?";
 			try(PreparedStatement statement = conn.prepareStatement(sql)){
 				statement.setString(1, id);
@@ -87,13 +84,11 @@ public ProfesorDAO() throws SQLException {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return result;
 	}
-
     public int contarEscuela(String escuela) throws SQLException {
 
 		int numberOfRows=0;
-		try(Connection conn = ds.getConnection()) {
+		try(Connection conn = ds.getConnection()){
 			String sql = "SELECT COUNT(*)  FROM profesorC WHERE escuela_prof = ?";
 			try(PreparedStatement statement = conn.prepareStatement(sql)){
 				statement.setString(1, escuela);
@@ -111,6 +106,7 @@ public ProfesorDAO() throws SQLException {
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}
+
 		return numberOfRows;
 
 	}

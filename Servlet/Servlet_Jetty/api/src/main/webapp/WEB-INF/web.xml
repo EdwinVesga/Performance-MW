@@ -1,6 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" version="2.4"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http:/java.sun.com/dtd/web-app_2_3.dtd">
+
+         <welcome-file-list>
+               <welcome-file>index.html</welcome-file>
+               <welcome-file>index.htm</welcome-file>
+               <welcome-file>index.jsp</welcome-file>
+         </welcome-file-list>
+
   <servlet>
     <servlet-name>ConsultaEstudiante</servlet-name>
     <servlet-class>controller.ConsultaEstudiante</servlet-class>
@@ -72,54 +81,63 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>ContarPrimos</servlet-name>
-    <servlet-class>controller.ContarPrimos</servlet-class>
+    <servlet-name>Insertar1</servlet-name>
+    <servlet-class>controller.Insertar1</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>ContarPrimos</servlet-name>
-    <url-pattern>/ContarPrimos</url-pattern>
+    <servlet-name>Insertar1</servlet-name>
+    <url-pattern>/Insertar1</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>InsertarEliminar</servlet-name>
-    <servlet-class>controller.InsertarEliminar</servlet-class>
+    <servlet-name>Insertar3</servlet-name>
+    <servlet-class>controller.Insertar3</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>InsertarEliminar</servlet-name>
-    <url-pattern>/InsertarEliminar</url-pattern>
+    <servlet-name>Insertar3</servlet-name>
+    <url-pattern>/Insertar3</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>Insertar1000</servlet-name>
-    <servlet-class>controller.Insertar1000</servlet-class>
+    <servlet-name>Insertar6</servlet-name>
+    <servlet-class>controller.Insertar6</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>Insertar1000</servlet-name>
-    <url-pattern>/Insertar1000</url-pattern>
+    <servlet-name>Insertar6</servlet-name>
+    <url-pattern>/Insertar6</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>Insertar10000</servlet-name>
-    <servlet-class>controller.Insertar10000</servlet-class>
+    <servlet-name>ContarPrimos1000</servlet-name>
+    <servlet-class>controller.ContarPrimos1000</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>Insertar10000</servlet-name>
-    <url-pattern>/Insertar10000</url-pattern>
+    <servlet-name>ContarPrimos1000</servlet-name>
+    <url-pattern>/ContarPrimos1000</url-pattern>
   </servlet-mapping>
 
-
   <servlet>
-    <servlet-name>Insertar100000</servlet-name>
-    <servlet-class>controller.Insertar100000</servlet-class>
+    <servlet-name>ContarPrimos2000</servlet-name>
+    <servlet-class>controller.ContarPrimos2000</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>Insertar100000</servlet-name>
-    <url-pattern>/Insertar100000</url-pattern>
+    <servlet-name>ContarPrimos2000</servlet-name>
+    <url-pattern>/ContarPrimos2000</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ContarPrimos3000</servlet-name>
+    <servlet-class>controller.ContarPrimos3000</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ContarPrimos3000</servlet-name>
+    <url-pattern>/ContarPrimos3000</url-pattern>
   </servlet-mapping>
 
   <resource-ref>
@@ -127,6 +145,9 @@
     <res-ref-name>jdbc/ConexionDB</res-ref-name>
     <res-type>javax.sql.DataSource</res-type>
     <res-auth>Container</res-auth>
+    <res-maxActive>100000</res-maxActive>
+    <res-maxTotal>100000</res-maxTotal>
+    <res-maxIdle>300</res-maxIdle>
   </resource-ref>
 
 </web-app>

@@ -2,7 +2,7 @@ version: "3"
 services:
 
   vertx:
-    build: ./Consulta
+    build: ./api
     ports:
       - "4000:4000"
     depends_on:
@@ -16,4 +16,4 @@ services:
       - MYSQL_USER=performance
       - MYSQL_PASSWORD=123456
       - MYSQL_ROOT_PASSWORD=123456
-    command: "mysqld --max_connections=100000"
+    command: "mysqld --max_connections=100000 --connect-timeout=31536000 --max-prepared-stmt-count=1048576"

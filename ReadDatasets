@@ -1,0 +1,1377 @@
+import pandas as pd
+import numpy as np
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import scipy.stats as stats
+import seaborn as sns
+
+n=6
+
+def Totalf(data):
+    m = [(max([(v.timeStamp[i]+v.elapsed[i]) for i in range(v.shape[0])])-min(v.timeStamp))*1.0 for v in data]
+    return m
+    
+def Mediaf(data):
+    m = [np.mean(v.elapsed[v["success"]==True])*1.0 for v in data]
+    return m
+    
+def std_f(data):
+    m = [np.std(v.elapsed[v["success"]==True])*1.0 for v in data]
+    return m
+    
+def Errorf(data):
+    m=[(np.sum(v["success"]==False)/len(v)) for v in data]    
+    return m
+
+def Rendimiento(data):
+    m = np.mean([(np.sum(v["success"]==True))/(max([(v.timeStamp[i]+v.elapsed[i]) for i in range(v.shape[0])])-min(v.timeStamp)) for v in data])
+    return m*1000
+
+def RendimientoJmeter(data):
+    o = [v.Rendimiento[v["Etiqueta"]=="Total"].replace(",",".", regex=True).astype(float).values for v in data]
+    while (len(o) >3 ):
+        o.remove(max(o))
+    return np.mean(o)
+
+def elapsedTime(data):
+    temp = [ v.loc[:,["timeStamp","elapsed","success"]] for v in data]
+    for v in temp:
+        v["timeStamp"] = v["timeStamp"].map(lambda x: (x - min(v["timeStamp"]))/1000)
+    df = pd.concat(temp)
+    grouped = df.groupby("timeStamp")
+    return grouped.agg({"elapsed": lambda x: np.mean(x)})
+
+def CPU(data):
+    for v in  data:
+        v["label"] = v["label"].map(lambda x: "CPU" if "CPU" in x else x)
+    temp = [ v[v["label"] == "CPU"].loc[:,["timeStamp","elapsed"]] for v in data]
+    for v in temp:
+        v["timeStamp"] = v["timeStamp"].map(lambda x: (x - min(v["timeStamp"]))//1000)
+        v["elapsed"] = v["elapsed"].map(lambda x: x/100)
+    df = pd.concat(temp)
+    grouped = df.groupby("timeStamp")
+    return grouped.agg({"elapsed": lambda x: np.mean(x)})
+
+def RAM(data):
+    for v in  data:
+        v["label"] = v["label"].map(lambda x: "Memory" if "Memory" in x else x)
+    temp = [ v[v["label"] == "Memory"].loc[:,["timeStamp","elapsed"]] for v in data]
+    for v in temp:
+        v["timeStamp"] = v["timeStamp"].map(lambda x: (x - min(v["timeStamp"]))//1000)
+        v["elapsed"] = v["elapsed"].map(lambda x: x/100)
+    df = pd.concat(temp)
+    grouped = df.groupby("timeStamp")
+    return grouped.agg({"elapsed": lambda x: np.mean(x)})
+
+
+def cargar_Dataframes(app,caso,n):
+    periodo = [6,8,10]
+    N = [1000,2000,3000]
+    c = [1,2,3]
+    o = np.zeros((3,3,3), dtype = object)
+    if(str(app) == "Tomcat") or (str(app) == "Jetty"):
+        ruta1 = "./Servlet/Resultados"+str(app)+"RemotosAWS/"
+    else:
+        ruta1 = "./"+str(app)+"/ResultadosRemotosAWS/"
+    for i in range(3):
+        ruta2 = str(ruta1) + "Periodo"+str(periodo[i])+"/"
+        for j in range(3):
+            ruta3 = str(ruta2) + str(caso)
+            for k in range(3):
+                ruta4 = "/"+str(caso)+str(N[j])+"_"+str(c[k])+".csv"
+                o[i,j,k] = [pd.read_csv(str(ruta3)+str(l)+str(ruta4)) for l in range(2,n)]
+    return o
+
+def cargar_PerfMon(app,caso,n):
+    periodo = [6,8,10]
+    N = [1000,2000,3000]
+    c = [1,2,3]
+    o = np.zeros((3,3,3), dtype = object)
+    if(str(app) == "Tomcat") or (str(app) == "Jetty"):
+        ruta1 = "./Servlet/Resultados"+str(app)+"RemotosAWS/"
+    else:
+        ruta1 = "./"+str(app)+"/ResultadosRemotosAWS/"
+    for i in range(3):
+        ruta2 = str(ruta1) + "Periodo"+str(periodo[i])+"/"
+        for j in range(3):
+            ruta3 = str(ruta2) + str(caso)
+            for k in range(3):
+                ruta4 = "/PerfMon_"+str(caso)+str(N[j])+"_"+str(c[k])+".csv"
+                o[i,j,k] = [pd.read_csv(str(ruta3)+str(l)+str(ruta4)).loc[:,["timeStamp","elapsed","label"]] for l in range(2,n)]
+    return o
+    
+def cargar_ReporteResumen(app, caso, n):
+    periodo = [6,8,10]
+    N = [1000,2000,3000]
+    c = [1,2,3]
+    o = np.zeros((3,3,3), dtype = object)
+    if(str(app) == "Tomcat") or (str(app) == "Jetty"):
+        ruta1 = "./Servlet/Resultados"+str(app)+"RemotosAWS/"
+    else:
+        ruta1 = "./"+str(app)+"/ResultadosRemotosAWS/"
+    for i in range(3):
+        ruta2 = str(ruta1) + "Periodo"+str(periodo[i])+"/"
+        for j in range(3):
+            ruta3 = str(ruta2) + str(caso)
+            for k in range(3):
+                ruta4 = "/Summary_"+str(caso)+str(N[j])+"_"+str(c[k])+".csv"
+                o[i,j,k] = [pd.read_csv(str(ruta3)+str(l)+str(ruta4)) for l in range(2,n)]
+    return o
+    
+# Función para gráficar la Densidad del ElapsedTime de un DataFrame
+
+def graficarDensidad(data1,data2,data3,data4,tg,tp):
+    var1 = pd.concat(data1, ignore_index=True)
+    var2 = pd.concat(data2, ignore_index=True)
+    var3 = pd.concat(data3, ignore_index=True)
+    var4 = pd.concat(data4, ignore_index=True)
+    fig, ax = plt.subplots(2,2,figsize=(12,12),squeeze=False) 
+    ax1=ax[0,0]
+    ax1.set_title('Vertx: '+str(tg)+"_"+str(tp), fontsize=10)
+    ax2=ax[0,1]
+    ax2.set_title('NodeJS: '+str(tg)+"_"+str(tp), fontsize=10)
+    ax3=ax[1,0]
+    ax3.set_title('Tomcat: '+str(tg)+"_"+str(tp), fontsize=10)
+    ax4=ax[1,1]
+    ax4.set_title('Jetty: '+str(tg)+"_"+str(tp), fontsize=10)
+    var1.elapsed.plot.kde(ax = ax1)
+    var2.elapsed.plot.kde(ax = ax2)
+    var3.elapsed.plot.kde(ax = ax3)
+    var4.elapsed.plot.kde(ax = ax4)
+    
+# Función para calcular la media de un DataFrame
+
+def Media(data):
+    o = [np.mean(v.elapsed[v["success"]==True])*1.0 for v in data]
+    while (len(o) >3 ):
+        o.remove(max(o))
+    return np.mean(o)
+    
+# Función para calcular la desviación estándar promedio
+
+def Std(data):
+    o = [np.std(v.elapsed[v["success"]==True])*1.0 for v in data]
+    while (len(o) >3 ) & ((max(o)/min(o)) > 1.5):
+        o.remove(max(o))
+    return np.mean(o)
+
+
+    
+# Funcion para gráficar la densidad
+
+def graficarDensidad(data1,data2,data3,data4,tg,tp):
+    var1 = pd.concat(data1, ignore_index=True)
+    var2 = pd.concat(data2, ignore_index=True)
+    var3 = pd.concat(data3, ignore_index=True)
+    var4 = pd.concat(data4, ignore_index=True)
+    fig, ax = plt.subplots(2,2,figsize=(12,12),squeeze=False) 
+    ax1=ax[0,0]
+    ax1.set_title('Vertx: '+str(tg)+"_"+str(tp), fontsize=10)
+    ax2=ax[0,1]
+    ax2.set_title('NodeJS: '+str(tg)+"_"+str(tp), fontsize=10)
+    ax3=ax[1,0]
+    ax3.set_title('Tomcat: '+str(tg)+"_"+str(tp), fontsize=10)
+    ax4=ax[1,1]
+    ax4.set_title('Jetty: '+str(tg)+"_"+str(tp), fontsize=10)
+    var1.elapsed.plot.kde(ax = ax1)
+    var2.elapsed.plot.kde(ax = ax2)
+    var3.elapsed.plot.kde(ax = ax3)
+    var4.elapsed.plot.kde(ax = ax4)
+
+# Pruebas Performance Remotas
+
+rvI = cargar_Dataframes("VertX", "Insertar", n)
+rtI = cargar_Dataframes("Tomcat", "Insertar", n)
+rjI = cargar_Dataframes("Jetty", "Insertar", n)
+rnI = cargar_Dataframes("NodeJS", "Insertar", n)
+
+rvC = cargar_Dataframes("VertX", "Consulta", n)
+rtC = cargar_Dataframes("Tomcat", "Consulta", n)
+rjC = cargar_Dataframes("Jetty", "Consulta", n)
+rnC = cargar_Dataframes("NodeJS", "Consulta", n)
+
+rvCP = cargar_Dataframes("VertX", "ContarPrimos", n)
+rtCP = cargar_Dataframes("Tomcat", "ContarPrimos", n)
+rjCP = cargar_Dataframes("Jetty", "ContarPrimos", n)
+rnCP = cargar_Dataframes("NodeJS", "ContarPrimos", n)
+
+# Summary Reports
+
+svI = cargar_ReporteResumen("VertX","Insertar",n)
+stI = cargar_ReporteResumen("Tomcat","Insertar",n)
+sjI = cargar_ReporteResumen("Jetty","Insertar",n)
+snI = cargar_ReporteResumen("NodeJS","Insertar",n)
+
+svC = cargar_ReporteResumen("VertX","Consulta",n)
+stC = cargar_ReporteResumen("Tomcat","Consulta",n)
+sjC = cargar_ReporteResumen("Jetty","Consulta",n)
+snC = cargar_ReporteResumen("NodeJS","Consulta",n)
+
+svCP = cargar_ReporteResumen("VertX","ContarPrimos",n)
+stCP = cargar_ReporteResumen("Tomcat","ContarPrimos",n)
+sjCP = cargar_ReporteResumen("Jetty","ContarPrimos",n)
+snCP = cargar_ReporteResumen("NodeJS","ContarPrimos",n)
+
+# Performance Monitoring
+
+mvI = cargar_PerfMon("VertX","Insertar",n)
+mtI = cargar_PerfMon("Tomcat","Insertar",n)
+mjI = cargar_PerfMon("Jetty","Insertar",n)
+mnI = cargar_PerfMon("NodeJS","Insertar",n)
+
+mvC = cargar_PerfMon("VertX","Consulta",n)
+mtC = cargar_PerfMon("Tomcat","Consulta",n)
+mjC = cargar_PerfMon("Jetty","Consulta",n)
+mnC = cargar_PerfMon("NodeJS","Consulta",n)
+
+mvCP = cargar_PerfMon("VertX","ContarPrimos",n)
+mtCP = cargar_PerfMon("Tomcat","ContarPrimos",n)
+mjCP = cargar_PerfMon("Jetty","ContarPrimos",n)
+mnCP = cargar_PerfMon("NodeJS","ContarPrimos",n)
+
+
+
+def datos_insertar_vertx():
+
+    index = pd.MultiIndex.from_tuples([('Vertx_Periodo_6','1000_1'),('Vertx_Periodo_6','1000_2')
+                                      ,('Vertx_Periodo_6','1000_3'),('Vertx_Periodo_6','2000_1')
+                                      ,('Vertx_Periodo_6','2000_2'),('Vertx_Periodo_6','2000_3')
+                                      ,('Vertx_Periodo_6','3000_1'),('Vertx_Periodo_6','3000_2')
+                                      ,('Vertx_Periodo_6','3000_3'),('Vertx_Periodo_8','1000_1')
+                                      ,('Vertx_Periodo_8','1000_2'),('Vertx_Periodo_8','1000_3')
+                                      ,('Vertx_Periodo_8','2000_1'),('Vertx_Periodo_8','2000_2')
+                                      ,('Vertx_Periodo_8','2000_3'),('Vertx_Periodo_8','3000_1')
+                                      ,('Vertx_Periodo_8','3000_2'),('Vertx_Periodo_8','3000_3')
+                                      ,('Vertx_Periodo_10','1000_1'),('Vertx_Periodo_10','1000_2')
+                                      ,('Vertx_Periodo_10','1000_3'),('Vertx_Periodo_10','2000_1')
+                                      ,('Vertx_Periodo_10','2000_2'),('Vertx_Periodo_10','2000_3')
+                                      ,('Vertx_Periodo_10','3000_1'),('Vertx_Periodo_10','3000_2')
+                                      ,('Vertx_Periodo_10','3000_3')], names = ['APP_Periodo','INSERTAR'])
+    
+    data = {'mean_1': [Mediaf(rvI[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_2': [Mediaf(rvI[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_3': [Mediaf(rvI[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_4': [Mediaf(rvI[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_1': [std_f(rvI[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_2': [std_f(rvI[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_3': [std_f(rvI[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_4': [std_f(rvI[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_1': [Totalf(rvI[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_2': [Totalf(rvI[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_3': [Totalf(rvI[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_4': [Totalf(rvI[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)]
+           }
+    
+    return pd.DataFrame(data,index)
+   
+def datos_insertar_tomcat():
+
+    index = pd.MultiIndex.from_tuples([('Tomcat_Periodo_6','1000_1'),('Tomcat_Periodo_6','1000_2')
+                                      ,('Tomcat_Periodo_6','1000_3'),('Tomcat_Periodo_6','2000_1')
+                                      ,('Tomcat_Periodo_6','2000_2'),('Tomcat_Periodo_6','2000_3')
+                                      ,('Tomcat_Periodo_6','3000_1'),('Tomcat_Periodo_6','3000_2')
+                                      ,('Tomcat_Periodo_6','3000_3'),('Tomcat_Periodo_8','1000_1')
+                                      ,('Tomcat_Periodo_8','1000_2'),('Tomcat_Periodo_8','1000_3')
+                                      ,('Tomcat_Periodo_8','2000_1'),('Tomcat_Periodo_8','2000_2')
+                                      ,('Tomcat_Periodo_8','2000_3'),('Tomcat_Periodo_8','3000_1')
+                                      ,('Tomcat_Periodo_8','3000_2'),('Tomcat_Periodo_8','3000_3')
+                                      ,('Tomcat_Periodo_10','1000_1'),('Tomcat_Periodo_10','1000_2')
+                                      ,('Tomcat_Periodo_10','1000_3'),('Tomcat_Periodo_10','2000_1')
+                                      ,('Tomcat_Periodo_10','2000_2'),('Tomcat_Periodo_10','2000_3')
+                                      ,('Tomcat_Periodo_10','3000_1'),('Tomcat_Periodo_10','3000_2')
+                                      ,('Tomcat_Periodo_10','3000_3')], names = ['APP_Periodo','INSERTAR'])
+    
+    data = {'mean_1': [Mediaf(rtI[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_2': [Mediaf(rtI[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_3': [Mediaf(rtI[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_4': [Mediaf(rtI[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_1': [std_f(rtI[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_2': [std_f(rtI[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_3': [std_f(rtI[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_4': [std_f(rtI[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_1': [Totalf(rtI[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_2': [Totalf(rtI[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_3': [Totalf(rtI[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_4': [Totalf(rtI[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)]
+           }
+    
+    return pd.DataFrame(data,index)
+    
+def datos_insertar_nodejs():
+
+    index = pd.MultiIndex.from_tuples([('NodeJS_Periodo_6','1000_1'),('NodeJS_Periodo_6','1000_2')
+                                      ,('NodeJS_Periodo_6','1000_3'),('NodeJS_Periodo_6','2000_1')
+                                      ,('NodeJS_Periodo_6','2000_2'),('NodeJS_Periodo_6','2000_3')
+                                      ,('NodeJS_Periodo_6','3000_1'),('NodeJS_Periodo_6','3000_2')
+                                      ,('NodeJS_Periodo_6','3000_3'),('NodeJS_Periodo_8','1000_1')
+                                      ,('NodeJS_Periodo_8','1000_2'),('NodeJS_Periodo_8','1000_3')
+                                      ,('NodeJS_Periodo_8','2000_1'),('NodeJS_Periodo_8','2000_2')
+                                      ,('NodeJS_Periodo_8','2000_3'),('NodeJS_Periodo_8','3000_1')
+                                      ,('NodeJS_Periodo_8','3000_2'),('NodeJS_Periodo_8','3000_3')
+                                      ,('NodeJS_Periodo_10','1000_1'),('NodeJS_Periodo_10','1000_2')
+                                      ,('NodeJS_Periodo_10','1000_3'),('NodeJS_Periodo_10','2000_1')
+                                      ,('NodeJS_Periodo_10','2000_2'),('NodeJS_Periodo_10','2000_3')
+                                      ,('NodeJS_Periodo_10','3000_1'),('NodeJS_Periodo_10','3000_2')
+                                      ,('NodeJS_Periodo_10','3000_3')], names = ['APP_Periodo','INSERTAR'])
+    
+    data = {'mean_1': [Mediaf(rnI[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_2': [Mediaf(rnI[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_3': [Mediaf(rnI[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_4': [Mediaf(rnI[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_1': [std_f(rnI[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_2': [std_f(rnI[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_3': [std_f(rnI[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_4': [std_f(rnI[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_1': [Totalf(rnI[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_2': [Totalf(rnI[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_3': [Totalf(rnI[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_4': [Totalf(rnI[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)]
+           }
+    
+    return pd.DataFrame(data,index)
+
+def datos_insertar_jetty():
+
+    index = pd.MultiIndex.from_tuples([('Jetty_Periodo_6','1000_1'),('Jetty_Periodo_6','1000_2')
+                                      ,('Jetty_Periodo_6','1000_3'),('Jetty_Periodo_6','2000_1')
+                                      ,('Jetty_Periodo_6','2000_2'),('Jetty_Periodo_6','2000_3')
+                                      ,('Jetty_Periodo_6','3000_1'),('Jetty_Periodo_6','3000_2')
+                                      ,('Jetty_Periodo_6','3000_3'),('Jetty_Periodo_8','1000_1')
+                                      ,('Jetty_Periodo_8','1000_2'),('Jetty_Periodo_8','1000_3')
+                                      ,('Jetty_Periodo_8','2000_1'),('Jetty_Periodo_8','2000_2')
+                                      ,('Jetty_Periodo_8','2000_3'),('Jetty_Periodo_8','3000_1')
+                                      ,('Jetty_Periodo_8','3000_2'),('Jetty_Periodo_8','3000_3')
+                                      ,('Jetty_Periodo_10','1000_1'),('Jetty_Periodo_10','1000_2')
+                                      ,('Jetty_Periodo_10','1000_3'),('Jetty_Periodo_10','2000_1')
+                                      ,('Jetty_Periodo_10','2000_2'),('Jetty_Periodo_10','2000_3')
+                                      ,('Jetty_Periodo_10','3000_1'),('Jetty_Periodo_10','3000_2')
+                                      ,('Jetty_Periodo_10','3000_3')], names = ['APP_Periodo','INSERTAR'])
+    
+    data = {'mean_1': [Mediaf(rjI[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_2': [Mediaf(rjI[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_3': [Mediaf(rjI[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_4': [Mediaf(rjI[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_1': [std_f(rjI[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_2': [std_f(rjI[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_3': [std_f(rjI[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_4': [std_f(rjI[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_1': [Totalf(rjI[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_2': [Totalf(rjI[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_3': [Totalf(rjI[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_4': [Totalf(rjI[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)]
+           }
+    
+    return pd.DataFrame(data,index)
+    
+def datos_contarprimos_vertx():
+
+    index = pd.MultiIndex.from_tuples([('Vertx_Periodo_6','1000_1'),('Vertx_Periodo_6','1000_2')
+                                      ,('Vertx_Periodo_6','1000_3'),('Vertx_Periodo_6','2000_1')
+                                      ,('Vertx_Periodo_6','2000_2'),('Vertx_Periodo_6','2000_3')
+                                      ,('Vertx_Periodo_6','3000_1'),('Vertx_Periodo_6','3000_2')
+                                      ,('Vertx_Periodo_6','3000_3'),('Vertx_Periodo_8','1000_1')
+                                      ,('Vertx_Periodo_8','1000_2'),('Vertx_Periodo_8','1000_3')
+                                      ,('Vertx_Periodo_8','2000_1'),('Vertx_Periodo_8','2000_2')
+                                      ,('Vertx_Periodo_8','2000_3'),('Vertx_Periodo_8','3000_1')
+                                      ,('Vertx_Periodo_8','3000_2'),('Vertx_Periodo_8','3000_3')
+                                      ,('Vertx_Periodo_10','1000_1'),('Vertx_Periodo_10','1000_2')
+                                      ,('Vertx_Periodo_10','1000_3'),('Vertx_Periodo_10','2000_1')
+                                      ,('Vertx_Periodo_10','2000_2'),('Vertx_Periodo_10','2000_3')
+                                      ,('Vertx_Periodo_10','3000_1'),('Vertx_Periodo_10','3000_2')
+                                      ,('Vertx_Periodo_10','3000_3')], names = ['APP_Periodo','CONTAR_PRIMOS'])
+    
+    data = {'mean_1': [Mediaf(rvCP[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_2': [Mediaf(rvCP[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_3': [Mediaf(rvCP[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_4': [Mediaf(rvCP[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_1': [std_f(rvCP[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_2': [std_f(rvCP[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_3': [std_f(rvCP[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_4': [std_f(rvCP[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_1': [Totalf(rvCP[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_2': [Totalf(rvCP[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_3': [Totalf(rvCP[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_4': [Totalf(rvCP[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)]
+           }
+    
+    return pd.DataFrame(data,index)
+   
+def datos_contarprimos_tomcat():
+
+    index = pd.MultiIndex.from_tuples([('Tomcat_Periodo_6','1000_1'),('Tomcat_Periodo_6','1000_2')
+                                      ,('Tomcat_Periodo_6','1000_3'),('Tomcat_Periodo_6','2000_1')
+                                      ,('Tomcat_Periodo_6','2000_2'),('Tomcat_Periodo_6','2000_3')
+                                      ,('Tomcat_Periodo_6','3000_1'),('Tomcat_Periodo_6','3000_2')
+                                      ,('Tomcat_Periodo_6','3000_3'),('Tomcat_Periodo_8','1000_1')
+                                      ,('Tomcat_Periodo_8','1000_2'),('Tomcat_Periodo_8','1000_3')
+                                      ,('Tomcat_Periodo_8','2000_1'),('Tomcat_Periodo_8','2000_2')
+                                      ,('Tomcat_Periodo_8','2000_3'),('Tomcat_Periodo_8','3000_1')
+                                      ,('Tomcat_Periodo_8','3000_2'),('Tomcat_Periodo_8','3000_3')
+                                      ,('Tomcat_Periodo_10','1000_1'),('Tomcat_Periodo_10','1000_2')
+                                      ,('Tomcat_Periodo_10','1000_3'),('Tomcat_Periodo_10','2000_1')
+                                      ,('Tomcat_Periodo_10','2000_2'),('Tomcat_Periodo_10','2000_3')
+                                      ,('Tomcat_Periodo_10','3000_1'),('Tomcat_Periodo_10','3000_2')
+                                      ,('Tomcat_Periodo_10','3000_3')], names = ['APP_Periodo','CONTAR_PRIMOS'])
+    
+    data = {'mean_1': [Mediaf(rtCP[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_2': [Mediaf(rtCP[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_3': [Mediaf(rtCP[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_4': [Mediaf(rtCP[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_1': [std_f(rtCP[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_2': [std_f(rtCP[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_3': [std_f(rtCP[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_4': [std_f(rtCP[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_1': [Totalf(rtCP[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_2': [Totalf(rtCP[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_3': [Totalf(rtCP[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_4': [Totalf(rtCP[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)]
+           }
+    
+    return pd.DataFrame(data,index)
+    
+def datos_contarprimos_nodejs():
+
+    index = pd.MultiIndex.from_tuples([('NodeJS_Periodo_6','1000_1'),('NodeJS_Periodo_6','1000_2')
+                                      ,('NodeJS_Periodo_6','1000_3'),('NodeJS_Periodo_6','2000_1')
+                                      ,('NodeJS_Periodo_6','2000_2'),('NodeJS_Periodo_6','2000_3')
+                                      ,('NodeJS_Periodo_6','3000_1'),('NodeJS_Periodo_6','3000_2')
+                                      ,('NodeJS_Periodo_6','3000_3'),('NodeJS_Periodo_8','1000_1')
+                                      ,('NodeJS_Periodo_8','1000_2'),('NodeJS_Periodo_8','1000_3')
+                                      ,('NodeJS_Periodo_8','2000_1'),('NodeJS_Periodo_8','2000_2')
+                                      ,('NodeJS_Periodo_8','2000_3'),('NodeJS_Periodo_8','3000_1')
+                                      ,('NodeJS_Periodo_8','3000_2'),('NodeJS_Periodo_8','3000_3')
+                                      ,('NodeJS_Periodo_10','1000_1'),('NodeJS_Periodo_10','1000_2')
+                                      ,('NodeJS_Periodo_10','1000_3'),('NodeJS_Periodo_10','2000_1')
+                                      ,('NodeJS_Periodo_10','2000_2'),('NodeJS_Periodo_10','2000_3')
+                                      ,('NodeJS_Periodo_10','3000_1'),('NodeJS_Periodo_10','3000_2')
+                                      ,('NodeJS_Periodo_10','3000_3')], names = ['APP_Periodo','CONTAR_PRIMOS'])
+    
+    data = {'mean_1': [Mediaf(rnCP[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_2': [Mediaf(rnCP[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_3': [Mediaf(rnCP[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_4': [Mediaf(rnCP[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_1': [std_f(rnCP[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_2': [std_f(rnCP[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_3': [std_f(rnCP[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_4': [std_f(rnCP[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_1': [Totalf(rnCP[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_2': [Totalf(rnCP[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_3': [Totalf(rnCP[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_4': [Totalf(rnCP[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)]
+           }
+    
+    return pd.DataFrame(data,index)
+
+def datos_contarprimos_jetty():
+
+    index = pd.MultiIndex.from_tuples([('Jetty_Periodo_6','1000_1'),('Jetty_Periodo_6','1000_2')
+                                      ,('Jetty_Periodo_6','1000_3'),('Jetty_Periodo_6','2000_1')
+                                      ,('Jetty_Periodo_6','2000_2'),('Jetty_Periodo_6','2000_3')
+                                      ,('Jetty_Periodo_6','3000_1'),('Jetty_Periodo_6','3000_2')
+                                      ,('Jetty_Periodo_6','3000_3'),('Jetty_Periodo_8','1000_1')
+                                      ,('Jetty_Periodo_8','1000_2'),('Jetty_Periodo_8','1000_3')
+                                      ,('Jetty_Periodo_8','2000_1'),('Jetty_Periodo_8','2000_2')
+                                      ,('Jetty_Periodo_8','2000_3'),('Jetty_Periodo_8','3000_1')
+                                      ,('Jetty_Periodo_8','3000_2'),('Jetty_Periodo_8','3000_3')
+                                      ,('Jetty_Periodo_10','1000_1'),('Jetty_Periodo_10','1000_2')
+                                      ,('Jetty_Periodo_10','1000_3'),('Jetty_Periodo_10','2000_1')
+                                      ,('Jetty_Periodo_10','2000_2'),('Jetty_Periodo_10','2000_3')
+                                      ,('Jetty_Periodo_10','3000_1'),('Jetty_Periodo_10','3000_2')
+                                      ,('Jetty_Periodo_10','3000_3')], names = ['APP_Periodo','CONTAR_PRIMOS'])
+    
+    data = {'mean_1': [Mediaf(rjCP[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_2': [Mediaf(rjCP[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_3': [Mediaf(rjCP[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_4': [Mediaf(rjCP[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_1': [std_f(rjCP[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_2': [std_f(rjCP[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_3': [std_f(rjCP[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_4': [std_f(rjCP[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_1': [Totalf(rjCP[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_2': [Totalf(rjCP[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_3': [Totalf(rjCP[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_4': [Totalf(rjCP[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)]
+           }
+    
+    return pd.DataFrame(data,index)
+    
+def datos_consulta_vertx():
+
+    index = pd.MultiIndex.from_tuples([('Vertx_Periodo_6','1000_1'),('Vertx_Periodo_6','1000_2')
+                                      ,('Vertx_Periodo_6','1000_3'),('Vertx_Periodo_6','2000_1')
+                                      ,('Vertx_Periodo_6','2000_2'),('Vertx_Periodo_6','2000_3')
+                                      ,('Vertx_Periodo_6','3000_1'),('Vertx_Periodo_6','3000_2')
+                                      ,('Vertx_Periodo_6','3000_3'),('Vertx_Periodo_8','1000_1')
+                                      ,('Vertx_Periodo_8','1000_2'),('Vertx_Periodo_8','1000_3')
+                                      ,('Vertx_Periodo_8','2000_1'),('Vertx_Periodo_8','2000_2')
+                                      ,('Vertx_Periodo_8','2000_3'),('Vertx_Periodo_8','3000_1')
+                                      ,('Vertx_Periodo_8','3000_2'),('Vertx_Periodo_8','3000_3')
+                                      ,('Vertx_Periodo_10','1000_1'),('Vertx_Periodo_10','1000_2')
+                                      ,('Vertx_Periodo_10','1000_3'),('Vertx_Periodo_10','2000_1')
+                                      ,('Vertx_Periodo_10','2000_2'),('Vertx_Periodo_10','2000_3')
+                                      ,('Vertx_Periodo_10','3000_1'),('Vertx_Periodo_10','3000_2')
+                                      ,('Vertx_Periodo_10','3000_3')], names = ['APP_Periodo','CONSULTA'])
+    
+    data = {'mean_1': [Mediaf(rvC[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_2': [Mediaf(rvC[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_3': [Mediaf(rvC[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_4': [Mediaf(rvC[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_1': [std_f(rvC[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_2': [std_f(rvC[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_3': [std_f(rvC[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_4': [std_f(rvC[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_1': [Totalf(rvC[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_2': [Totalf(rvC[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_3': [Totalf(rvC[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_4': [Totalf(rvC[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)]
+           }
+    
+    return pd.DataFrame(data,index)
+   
+def datos_consulta_tomcat():
+
+    index = pd.MultiIndex.from_tuples([('Tomcat_Periodo_6','1000_1'),('Tomcat_Periodo_6','1000_2')
+                                      ,('Tomcat_Periodo_6','1000_3'),('Tomcat_Periodo_6','2000_1')
+                                      ,('Tomcat_Periodo_6','2000_2'),('Tomcat_Periodo_6','2000_3')
+                                      ,('Tomcat_Periodo_6','3000_1'),('Tomcat_Periodo_6','3000_2')
+                                      ,('Tomcat_Periodo_6','3000_3'),('Tomcat_Periodo_8','1000_1')
+                                      ,('Tomcat_Periodo_8','1000_2'),('Tomcat_Periodo_8','1000_3')
+                                      ,('Tomcat_Periodo_8','2000_1'),('Tomcat_Periodo_8','2000_2')
+                                      ,('Tomcat_Periodo_8','2000_3'),('Tomcat_Periodo_8','3000_1')
+                                      ,('Tomcat_Periodo_8','3000_2'),('Tomcat_Periodo_8','3000_3')
+                                      ,('Tomcat_Periodo_10','1000_1'),('Tomcat_Periodo_10','1000_2')
+                                      ,('Tomcat_Periodo_10','1000_3'),('Tomcat_Periodo_10','2000_1')
+                                      ,('Tomcat_Periodo_10','2000_2'),('Tomcat_Periodo_10','2000_3')
+                                      ,('Tomcat_Periodo_10','3000_1'),('Tomcat_Periodo_10','3000_2')
+                                      ,('Tomcat_Periodo_10','3000_3')], names = ['APP_Periodo','CONSULTA'])
+    
+    data = {'mean_1': [Mediaf(rtC[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_2': [Mediaf(rtC[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_3': [Mediaf(rtC[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_4': [Mediaf(rtC[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_1': [std_f(rtC[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_2': [std_f(rtC[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_3': [std_f(rtC[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_4': [std_f(rtC[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_1': [Totalf(rtC[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_2': [Totalf(rtC[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_3': [Totalf(rtC[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_4': [Totalf(rtC[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)]
+           }
+    
+    return pd.DataFrame(data,index)
+    
+def datos_consulta_nodejs():
+
+    index = pd.MultiIndex.from_tuples([('NodeJS_Periodo_6','1000_1'),('NodeJS_Periodo_6','1000_2')
+                                      ,('NodeJS_Periodo_6','1000_3'),('NodeJS_Periodo_6','2000_1')
+                                      ,('NodeJS_Periodo_6','2000_2'),('NodeJS_Periodo_6','2000_3')
+                                      ,('NodeJS_Periodo_6','3000_1'),('NodeJS_Periodo_6','3000_2')
+                                      ,('NodeJS_Periodo_6','3000_3'),('NodeJS_Periodo_8','1000_1')
+                                      ,('NodeJS_Periodo_8','1000_2'),('NodeJS_Periodo_8','1000_3')
+                                      ,('NodeJS_Periodo_8','2000_1'),('NodeJS_Periodo_8','2000_2')
+                                      ,('NodeJS_Periodo_8','2000_3'),('NodeJS_Periodo_8','3000_1')
+                                      ,('NodeJS_Periodo_8','3000_2'),('NodeJS_Periodo_8','3000_3')
+                                      ,('NodeJS_Periodo_10','1000_1'),('NodeJS_Periodo_10','1000_2')
+                                      ,('NodeJS_Periodo_10','1000_3'),('NodeJS_Periodo_10','2000_1')
+                                      ,('NodeJS_Periodo_10','2000_2'),('NodeJS_Periodo_10','2000_3')
+                                      ,('NodeJS_Periodo_10','3000_1'),('NodeJS_Periodo_10','3000_2')
+                                      ,('NodeJS_Periodo_10','3000_3')], names = ['APP_Periodo','CONSULTA'])
+    
+    data = {'mean_1': [Mediaf(rnC[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_2': [Mediaf(rnC[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_3': [Mediaf(rnC[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_4': [Mediaf(rnC[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_1': [std_f(rnC[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_2': [std_f(rnC[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_3': [std_f(rnC[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_4': [std_f(rnC[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_1': [Totalf(rnC[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_2': [Totalf(rnC[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_3': [Totalf(rnC[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_4': [Totalf(rnC[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)]
+           }
+    
+    return pd.DataFrame(data,index)
+
+def datos_consulta_jetty():
+
+    index = pd.MultiIndex.from_tuples([('Jetty_Periodo_6','1000_1'),('Jetty_Periodo_6','1000_2')
+                                      ,('Jetty_Periodo_6','1000_3'),('Jetty_Periodo_6','2000_1')
+                                      ,('Jetty_Periodo_6','2000_2'),('Jetty_Periodo_6','2000_3')
+                                      ,('Jetty_Periodo_6','3000_1'),('Jetty_Periodo_6','3000_2')
+                                      ,('Jetty_Periodo_6','3000_3'),('Jetty_Periodo_8','1000_1')
+                                      ,('Jetty_Periodo_8','1000_2'),('Jetty_Periodo_8','1000_3')
+                                      ,('Jetty_Periodo_8','2000_1'),('Jetty_Periodo_8','2000_2')
+                                      ,('Jetty_Periodo_8','2000_3'),('Jetty_Periodo_8','3000_1')
+                                      ,('Jetty_Periodo_8','3000_2'),('Jetty_Periodo_8','3000_3')
+                                      ,('Jetty_Periodo_10','1000_1'),('Jetty_Periodo_10','1000_2')
+                                      ,('Jetty_Periodo_10','1000_3'),('Jetty_Periodo_10','2000_1')
+                                      ,('Jetty_Periodo_10','2000_2'),('Jetty_Periodo_10','2000_3')
+                                      ,('Jetty_Periodo_10','3000_1'),('Jetty_Periodo_10','3000_2')
+                                      ,('Jetty_Periodo_10','3000_3')], names = ['APP_Periodo','CONSULTA'])
+    
+    data = {'mean_1': [Mediaf(rjC[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_2': [Mediaf(rjC[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_3': [Mediaf(rjC[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'mean_4': [Mediaf(rjC[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_1': [std_f(rjC[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_2': [std_f(rjC[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_3': [std_f(rjC[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'std_4': [std_f(rjC[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_1': [Totalf(rjC[k,j,i])[0] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_2': [Totalf(rjC[k,j,i])[1] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_3': [Totalf(rjC[k,j,i])[2] for k in range(3) for j in range(3) for i in range(3)],
+            
+            'time_4': [Totalf(rjC[k,j,i])[3] for k in range(3) for j in range(3) for i in range(3)]
+           }
+    
+    return pd.DataFrame(data,index)
+    
+def heatmap():
+
+    index = ['Insertar_1_p6', 'Insertar_2_p6', 'Insertar_3_p6']
+    data = {'Vertx_1000':[Media(rvI[0,0,i]) for i in range(3)], 
+            'Tomcat_1000':[Media(rtI[0,0,i]) for i in range(3)], 
+            'Jetty_1000':[Media(rjI[0,0,i]) for i in range(3)], 
+            'Nodejs_1000':[Media(rnI[0,0,i]) for i in range(3)],
+            'Vertx_2000':[Media(rvI[0,1,i]) for i in range(3)], 
+            'Tomcat_2000':[Media(rtI[0,1,i]) for i in range(3)], 
+            'Jetty_2000':[Media(rjI[0,1,i]) for i in range(3)], 
+            'Nodejs_2000':[Media(rnI[0,1,i]) for i in range(3)],
+            'Vertx_3000':[Media(rvI[0,2,i]) for i in range(3)], 
+            'Tomcat_3000':[Media(rtI[0,2,i]) for i in range(3)], 
+            'Jetty_3000':[Media(rjI[0,2,i]) for i in range(3)], 
+            'Nodejs_3000':[Media(rnI[0,2,i]) for i in range(3)]}
+    dfIp6 = pd.DataFrame(data, index)
+    index = ['Insertar_1_p8', 'Insertar_2_p8', 'Insertar_3_p8']
+    data = {'Vertx_1000':[Media(rvI[1,0,i]) for i in range(3)], 
+            'Tomcat_1000':[Media(rtI[1,0,i]) for i in range(3)], 
+            'Jetty_1000':[Media(rjI[1,0,i]) for i in range(3)], 
+            'Nodejs_1000':[Media(rnI[1,0,i]) for i in range(3)],
+            'Vertx_2000':[Media(rvI[1,1,i]) for i in range(3)], 
+            'Tomcat_2000':[Media(rtI[1,1,i]) for i in range(3)], 
+            'Jetty_2000':[Media(rjI[1,1,i]) for i in range(3)], 
+            'Nodejs_2000':[Media(rnI[1,1,i]) for i in range(3)],
+            'Vertx_3000':[Media(rvI[1,2,i]) for i in range(3)], 
+            'Tomcat_3000':[Media(rtI[1,2,i]) for i in range(3)], 
+            'Jetty_3000':[Media(rjI[1,2,i]) for i in range(3)], 
+            'Nodejs_3000':[Media(rnI[1,2,i]) for i in range(3)]}
+    dfIp8 = pd.DataFrame(data, index)
+    index = ['Insertar_1_p10', 'Insertar_2_p10', 'Insertar_3_p10']
+    data = {'Vertx_1000':[Media(rvI[2,0,i]) for i in range(3)], 
+            'Tomcat_1000':[Media(rtI[2,0,i]) for i in range(3)], 
+            'Jetty_1000':[Media(rjI[2,0,i]) for i in range(3)], 
+            'Nodejs_1000':[Media(rnI[2,0,i]) for i in range(3)],
+            'Vertx_2000':[Media(rvI[2,1,i]) for i in range(3)], 
+            'Tomcat_2000':[Media(rtI[2,1,i]) for i in range(3)], 
+            'Jetty_2000':[Media(rjI[2,1,i]) for i in range(3)], 
+            'Nodejs_2000':[Media(rnI[2,1,i]) for i in range(3)],
+            'Vertx_3000':[Media(rvI[2,2,i]) for i in range(3)], 
+            'Tomcat_3000':[Media(rtI[2,2,i]) for i in range(3)], 
+            'Jetty_3000':[Media(rjI[2,2,i]) for i in range(3)], 
+            'Nodejs_3000':[Media(rnI[2,2,i]) for i in range(3)]}
+    dfIp10 = pd.DataFrame(data, index)
+    index= ['Consulta_1_p6', 'Consulta_2_p6', 'Consulta_3_p6']
+    data = {'Vertx_1000':[Media(rvC[0,0,i]) for i in range(3)], 
+            'Tomcat_1000':[Media(rtC[0,0,i]) for i in range(3)], 
+            'Jetty_1000':[Media(rjC[0,0,i]) for i in range(3)], 
+            'Nodejs_1000':[Media(rnC[0,0,i]) for i in range(3)],
+            'Vertx_2000':[Media(rvC[0,1,i]) for i in range(3)], 
+            'Tomcat_2000':[Media(rtC[0,1,i]) for i in range(3)], 
+            'Jetty_2000':[Media(rjC[0,1,i]) for i in range(3)], 
+            'Nodejs_2000':[Media(rnC[0,1,i]) for i in range(3)],
+            'Vertx_3000':[Media(rvC[0,2,i]) for i in range(3)], 
+            'Tomcat_3000':[Media(rtC[0,2,i]) for i in range(3)], 
+            'Jetty_3000':[Media(rjC[0,2,i]) for i in range(3)], 
+            'Nodejs_3000':[Media(rnC[0,2,i]) for i in range(3)]}
+    dfCp6 = pd.DataFrame(data, index)
+    index= ['Consulta_1_p8', 'Consulta_2_p8', 'Consulta_3_p8']
+    data = {'Vertx_1000':[Media(rvC[1,0,i]) for i in range(3)], 
+            'Tomcat_1000':[Media(rtC[1,0,i]) for i in range(3)], 
+            'Jetty_1000':[Media(rjC[1,0,i]) for i in range(3)], 
+            'Nodejs_1000':[Media(rnC[1,0,i]) for i in range(3)],
+            'Vertx_2000':[Media(rvC[1,1,i]) for i in range(3)], 
+            'Tomcat_2000':[Media(rtC[1,1,i]) for i in range(3)], 
+            'Jetty_2000':[Media(rjC[1,1,i]) for i in range(3)], 
+            'Nodejs_2000':[Media(rnC[1,1,i]) for i in range(3)],
+            'Vertx_3000':[Media(rvC[1,2,i]) for i in range(3)], 
+            'Tomcat_3000':[Media(rtC[1,2,i]) for i in range(3)], 
+            'Jetty_3000':[Media(rjC[1,2,i]) for i in range(3)], 
+            'Nodejs_3000':[Media(rnC[1,2,i]) for i in range(3)]}
+    dfCp8 = pd.DataFrame(data, index)
+    index= ['Consulta_1_p10', 'Consulta_2_p10', 'Consulta_3_p10']
+    data = {'Vertx_1000':[Media(rvC[2,0,i]) for i in range(3)], 
+            'Tomcat_1000':[Media(rtC[2,0,i]) for i in range(3)], 
+            'Jetty_1000':[Media(rjC[2,0,i]) for i in range(3)], 
+            'Nodejs_1000':[Media(rnC[2,0,i]) for i in range(3)],
+            'Vertx_2000':[Media(rvC[2,1,i]) for i in range(3)], 
+            'Tomcat_2000':[Media(rtC[2,1,i]) for i in range(3)], 
+            'Jetty_2000':[Media(rjC[2,1,i]) for i in range(3)], 
+            'Nodejs_2000':[Media(rnC[2,1,i]) for i in range(3)],
+            'Vertx_3000':[Media(rvC[2,2,i]) for i in range(3)], 
+            'Tomcat_3000':[Media(rtC[2,2,i]) for i in range(3)], 
+            'Jetty_3000':[Media(rjC[2,2,i]) for i in range(3)], 
+            'Nodejs_3000':[Media(rnC[2,2,i]) for i in range(3)]}
+    dfCp10 = pd.DataFrame(data, index)
+    index= ['ContarPrimos_1_p6', 'ContarPrimos_2_p6', 'ContarPrimos_3_p6']
+    data = {'Vertx_1000':[Media(rvCP[0,0,i]) for i in range(3)], 
+            'Tomcat_1000':[Media(rtCP[0,0,i]) for i in range(3)], 
+            'Jetty_1000':[Media(rjCP[0,0,i]) for i in range(3)], 
+            'Nodejs_1000':[Media(rnCP[0,0,i]) for i in range(3)],
+            'Vertx_2000':[Media(rvCP[0,1,i]) for i in range(3)], 
+            'Tomcat_2000':[Media(rtCP[0,1,i]) for i in range(3)], 
+            'Jetty_2000':[Media(rjCP[0,1,i]) for i in range(3)], 
+            'Nodejs_2000':[Media(rnCP[0,1,i]) for i in range(3)],
+            'Vertx_3000':[Media(rvCP[0,2,i]) for i in range(3)], 
+            'Tomcat_3000':[Media(rtCP[0,2,i]) for i in range(3)], 
+            'Jetty_3000':[Media(rjCP[0,2,i]) for i in range(3)], 
+            'Nodejs_3000':[Media(rnCP[0,2,i]) for i in range(3)]}
+    dfCPp6 = pd.DataFrame(data, index,)
+    index= ['ContarPrimos_1_p8', 'ContarPrimos_2_p8', 'ContarPrimos_3_p8']
+    data = {'Vertx_1000':[Media(rvCP[1,0,i]) for i in range(3)], 
+            'Tomcat_1000':[Media(rtCP[1,0,i]) for i in range(3)], 
+            'Jetty_1000':[Media(rjCP[1,0,i]) for i in range(3)], 
+            'Nodejs_1000':[Media(rnCP[1,0,i]) for i in range(3)],
+            'Vertx_2000':[Media(rvCP[1,1,i]) for i in range(3)], 
+            'Tomcat_2000':[Media(rtCP[1,1,i]) for i in range(3)], 
+            'Jetty_2000':[Media(rjCP[1,1,i]) for i in range(3)], 
+            'Nodejs_2000':[Media(rnCP[1,1,i]) for i in range(3)],
+            'Vertx_3000':[Media(rvCP[1,2,i]) for i in range(3)], 
+            'Tomcat_3000':[Media(rtCP[1,2,i]) for i in range(3)], 
+            'Jetty_3000':[Media(rjCP[1,2,i]) for i in range(3)], 
+            'Nodejs_3000':[Media(rnCP[1,2,i]) for i in range(3)]}
+    dfCPp8= pd.DataFrame(data, index,)
+    index= ['ContarPrimos_1_p10', 'ContarPrimos_2_p10', 'ContarPrimos_3_p10']
+    data = {'Vertx_1000':[Media(rvCP[2,0,i]) for i in range(3)], 
+            'Tomcat_1000':[Media(rtCP[2,0,i]) for i in range(3)], 
+            'Jetty_1000':[Media(rjCP[2,0,i]) for i in range(3)], 
+            'Nodejs_1000':[Media(rnCP[2,0,i]) for i in range(3)],
+            'Vertx_2000':[Media(rvCP[2,1,i]) for i in range(3)], 
+            'Tomcat_2000':[Media(rtCP[2,1,i]) for i in range(3)], 
+            'Jetty_2000':[Media(rjCP[2,1,i]) for i in range(3)], 
+            'Nodejs_2000':[Media(rnCP[2,1,i]) for i in range(3)],
+            'Vertx_3000':[Media(rvCP[2,2,i]) for i in range(3)], 
+            'Tomcat_3000':[Media(rtCP[2,2,i]) for i in range(3)], 
+            'Jetty_3000':[Media(rjCP[2,2,i]) for i in range(3)], 
+            'Nodejs_3000':[Media(rnCP[2,2,i]) for i in range(3)]}
+    dfCPp10 = pd.DataFrame(data, index,)
+    fig, ax = plt.subplots(9,1,figsize=(20,20),squeeze=False) 
+    sns.heatmap(dfIp6, annot=True, ax = ax[0,0],linewidths=.5, cmap="RdYlGn_r")
+    sns.heatmap(dfIp8, annot=True, ax = ax[1,0],linewidths=.5, cmap="RdYlGn_r")
+    sns.heatmap(dfIp10, annot=True, ax = ax[2,0],linewidths=.5, cmap="RdYlGn_r")
+    sns.heatmap(dfCp6, annot=True, ax = ax[3,0],linewidths=.5, cmap="RdYlGn_r")
+    sns.heatmap(dfCp8, annot=True, ax = ax[4,0],linewidths=.5, cmap="RdYlGn_r")
+    sns.heatmap(dfCp10, annot=True, ax = ax[5,0],linewidths=.5, cmap="RdYlGn_r")
+    sns.heatmap(dfCPp6, annot=True, ax = ax[6,0],linewidths=.5, cmap="RdYlGn_r")
+    sns.heatmap(dfCPp8, annot=True, ax = ax[7,0],linewidths=.5, cmap="RdYlGn_r")
+    sns.heatmap(dfCPp10, annot=True, ax = ax[8,0],linewidths=.5, cmap="RdYlGn_r")
+
+def heatmap_vertical():
+
+    index = pd.MultiIndex.from_tuples([('Periodo_6','1000_1'),('Periodo_6','1000_2')
+                                      ,('Periodo_6','1000_3'),('Periodo_6','2000_1')
+                                      ,('Periodo_6','2000_2'),('Periodo_6','2000_3')
+                                      ,('Periodo_6','3000_1'),('Periodo_6','3000_2')
+                                      ,('Periodo_6','3000_3'),('Periodo_8','1000_1')
+                                      ,('Periodo_8','1000_2'),('Periodo_8','1000_3')
+                                      ,('Periodo_8','2000_1'),('Periodo_8','2000_2')
+                                      ,('Periodo_8','2000_3'),('Periodo_8','3000_1')
+                                      ,('Periodo_8','3000_2'),('Periodo_8','3000_3')
+                                      ,('Periodo_10','1000_1'),('Periodo_10','1000_2')
+                                      ,('Periodo_10','1000_3'),('Periodo_10','2000_1')
+                                      ,('Periodo_10','2000_2'),('Periodo_10','2000_3')
+                                      ,('Periodo_10','3000_1'),('Periodo_10','3000_2')
+                                      ,('Periodo_10','3000_3')], names = ['APP_Periodo','INSERTAR'])
+    
+    data = {'VertX': [Media(rvI[k,j,i]) for k in range(3) for j in range(3) for i in range(3)],
+            
+            'NodeJS': [Media(rnI[k,j,i]) for k in range(3) for j in range(3) for i in range(3)],
+            
+            'Tomcat': [Media(rtI[k,j,i]) for k in range(3) for j in range(3) for i in range(3)],
+            
+            'Jetty': [Media(rjI[k,j,i]) for k in range(3) for j in range(3) for i in range(3)]
+           }
+    df = pd.DataFrame(data,index)
+    return df.style.background_gradient(cmap="RdYlGn_r", axis = 1)
+    
+def heatMapStd():
+    index= ['Insertar_1', 'Insertar_2', 'Insertar_3']
+    data = {'Vertx_1000':[Std(rvIE1000_1),Std(rvIE1000_2),Std(rvIE1000_3)], 
+            'Tomcat_1000':[Std(rtIE1000_1),Std(rtIE1000_2),Std(rtIE1000_3)], 
+            'Jetty_1000':[Std(rjIE1000_1),Std(rjIE1000_2),Std(rjIE1000_3)], 
+            'Nodejs_1000':[Std(rnIE1000_1),Std(rnIE1000_2),Std(rnIE1000_3)],
+            'Vertx_2000':[Std(rvIE2000_1),Std(rvIE2000_2),Std(rvIE2000_3)], 
+            'Tomcat_2000':[Std(rtIE2000_1),Std(rtIE2000_2),Std(rtIE2000_3)], 
+            'Jetty_2000':[Std(rjIE2000_1),Std(rjIE2000_2),Std(rjIE2000_3)], 
+            'Nodejs_2000':[Std(rnIE2000_1),Std(rnIE2000_2),Std(rnIE2000_3)],
+            'Vertx_3000':[Std(rvIE3000_1),Std(rvIE3000_2),Std(rvIE3000_3)], 
+            'Tomcat_3000':[Std(rtIE3000_1),Std(rtIE3000_2),Std(rtIE3000_3)], 
+            'Jetty_3000':[Std(rjIE3000_1),Std(rjIE3000_2),Std(rjIE3000_3)], 
+            'Nodejs_3000':[Std(rnIE3000_1),Std(rnIE3000_2),Std(rnIE3000_3)]}
+    dfIE = pd.DataFrame(data, index)
+    index= ['Consulta_1', 'Consulta_2', 'Consulta_3']
+    data = {'Vertx_1000':[Std(rvC1000_1),Std(rvC1000_2),Std(rvC1000_3)], 
+            'Tomcat_1000':[Std(rtC1000_1),Std(rtC1000_2),Std(rtC1000_3)], 
+            'Jetty_1000':[Std(rjC1000_1),Std(rjC1000_2),Std(rjC1000_3)], 
+            'Nodejs_1000':[Std(rnC1000_1),Std(rnC1000_2),Std(rnC1000_3)],
+            'Vertx_2000':[Std(rvC2000_1),Std(rvC2000_2),Std(rvC2000_3)], 
+            'Tomcat_2000':[Std(rtC2000_1),Std(rtC2000_2),Std(rtC2000_3)], 
+            'Jetty_2000':[Std(rjC2000_1),Std(rjC2000_2),Std(rjC2000_3)], 
+            'Nodejs_2000':[Std(rnC2000_1),Std(rnC2000_2),Std(rnC2000_3)],
+            'Vertx_3000':[Std(rvC3000_1),Std(rvC3000_2),Std(rvC3000_3)], 
+            'Tomcat_3000':[Std(rtC3000_1),Std(rtC3000_2),Std(rtC3000_3)], 
+            'Jetty_3000':[Std(rjC3000_1),Std(rjC3000_2),Std(rjC3000_3)], 
+            'Nodejs_3000':[Std(rnC3000_1),Std(rnC3000_2),Std(rnC3000_3)]}
+    dfC = pd.DataFrame(data, index)
+    index= ['ContarPrimos_1', 'ContarPrimos_2', 'ContarPrimos_3']
+    data = {'Vertx_1000':[Std(rvCP1000_1),Std(rvCP1000_2),Std(rvCP1000_3)], 
+            'Tomcat_1000':[Std(rtCP1000_1),Std(rtCP1000_2),Std(rtCP1000_3)], 
+            'Jetty_1000':[Std(rjCP1000_1),Std(rjCP1000_2),Std(rjCP1000_3)], 
+            'Nodejs_1000':[Std(rnCP1000_1),Std(rnCP1000_2),Std(rnCP1000_3)],
+            'Vertx_2000':[Std(rvCP2000_1),Std(rvCP2000_2),Std(rvCP2000_3)], 
+            'Tomcat_2000':[Std(rtCP2000_1),Std(rtCP2000_2),Std(rtCP2000_3)], 
+            'Jetty_2000':[Std(rjCP2000_1),Std(rjCP2000_2),Std(rjCP2000_3)], 
+            'Nodejs_2000':[Std(rnCP2000_1),Std(rnCP2000_2),Std(rnCP2000_3)],
+            'Vertx_3000':[Std(rvCP3000_1),Std(rvCP3000_2),Std(rvCP3000_3)], 
+            'Tomcat_3000':[Std(rtCP3000_1),Std(rtCP3000_2),Std(rtCP3000_3)], 
+            'Jetty_3000':[Std(rjCP3000_1),Std(rjCP3000_2),Std(rjCP3000_3)], 
+            'Nodejs_3000':[Std(rnCP3000_1),Std(rnCP3000_2),Std(rnCP3000_3)]}
+    dfCP = pd.DataFrame(data, index,)
+    fig, ax = plt.subplots(3,1,figsize=(20,20),squeeze=False) 
+    sns.heatmap(dfIE, annot=True, ax = ax[0,0],linewidths=.5, cmap="RdYlGn_r")
+    sns.heatmap(dfC, annot=True, ax = ax[1,0],linewidths=.5, cmap="RdYlGn_r")
+    sns.heatmap(dfCP, annot=True, ax = ax[2,0],linewidths=.5, cmap="RdYlGn_r")
+    
+def plot_bar(N):
+    if N == 0:
+        index=["TG_1000_1", "TG_1000_2", "TG_1000_3"]
+    elif (N==1):
+        index=["TG_2000_1", "TG_2000_2", "TG_2000_3"]
+    else:
+        index=["TG_3000_1", "TG_3000_2", "TG_3000_3"]
+        
+    data = {"VertX_Periodo6":[Rendimiento(rvI[0,N,i]) for i in range(3)],
+            "VertX_Periodo8":[Rendimiento(rvI[1,N,i]) for i in range(3)],
+            "VertX_Periodo10":[Rendimiento(rvI[2,N,i]) for i in range(3)],
+            "Tomcat_Periodo6":[Rendimiento(rtI[0,N,i]) for i in range(3)],
+            "Tomcat_Periodo8":[Rendimiento(rtI[1,N,i]) for i in range(3)],
+            "Tomcat_Periodo10":[Rendimiento(rtI[2,N,i]) for i in range(3)],
+            "Jetty_Periodo6":[Rendimiento(rjI[0,N,i]) for i in range(3)],
+            "Jetty_Periodo8":[Rendimiento(rjI[1,N,i]) for i in range(3)],
+            "Jetty_Periodo10":[Rendimiento(rjI[2,N,i]) for i in range(3)],
+            "NodeJS_Periodo6":[Rendimiento(rnI[0,N,i]) for i in range(3)],
+            "NodeJS_Periodo8":[Rendimiento(rnI[1,N,i]) for i in range(3)],
+            "NodeJS_Periodo10":[Rendimiento(rnI[2,N,i]) for i in range(3)]
+    }
+    datafI = pd.DataFrame(data, index)
+
+    data = {"VertX_Periodo6":[Rendimiento(rvC[0,N,i]) for i in range(3)],
+            "VertX_Periodo8":[Rendimiento(rvC[1,N,i]) for i in range(3)],
+            "VertX_Periodo10":[Rendimiento(rvC[2,N,i]) for i in range(3)],
+            "Tomcat_Periodo6":[Rendimiento(rtC[0,N,i]) for i in range(3)],
+            "Tomcat_Periodo8":[Rendimiento(rtC[1,N,i]) for i in range(3)],
+            "Tomcat_Periodo10":[Rendimiento(rtC[2,N,i]) for i in range(3)],
+            "Jetty_Periodo6":[Rendimiento(rjC[0,N,i]) for i in range(3)],
+            "Jetty_Periodo8":[Rendimiento(rjC[1,N,i]) for i in range(3)],
+            "Jetty_Periodo10":[Rendimiento(rjC[2,N,i]) for i in range(3)],
+            "NodeJS_Periodo6":[Rendimiento(rnC[0,N,i]) for i in range(3)],
+            "NodeJS_Periodo8":[Rendimiento(rnC[1,N,i]) for i in range(3)],
+            "NodeJS_Periodo10":[Rendimiento(rnC[2,N,i]) for i in range(3)]
+    }
+    datafC = pd.DataFrame(data, index)
+    data = {"VertX_Periodo6":[Rendimiento(rvCP[0,N,i]) for i in range(3)],
+            "VertX_Periodo8":[Rendimiento(rvCP[1,N,i]) for i in range(3)],
+            "VertX_Periodo10":[Rendimiento(rvCP[2,N,i]) for i in range(3)],
+            "Tomcat_Periodo6":[Rendimiento(rtCP[0,N,i]) for i in range(3)],
+            "Tomcat_Periodo8":[Rendimiento(rtCP[1,N,i]) for i in range(3)],
+            "Tomcat_Periodo10":[Rendimiento(rtCP[2,N,i]) for i in range(3)],
+            "Jetty_Periodo6":[Rendimiento(rjCP[0,N,i]) for i in range(3)],
+            "Jetty_Periodo8":[Rendimiento(rjCP[1,N,i]) for i in range(3)],
+            "Jetty_Periodo10":[Rendimiento(rjCP[2,N,i]) for i in range(3)],
+            "NodeJS_Periodo6":[Rendimiento(rnCP[0,N,i]) for i in range(3)],
+            "NodeJS_Periodo8":[Rendimiento(rnCP[1,N,i]) for i in range(3)],
+            "NodeJS_Periodo10":[Rendimiento(rnCP[2,N,i]) for i in range(3)]
+    }
+    datafCP = pd.DataFrame(data, index)
+    clr = ['#3498DB', '#5DADE2', '#85C1E9', 
+             '#F39C12', '#F5B041', '#F8C471',
+             '#27AE60', '#52BE80', '#7DCEA0',
+             '#E74C3C', '#EC7063', '#F1948A']
+    fig, axes = plt.subplots(3,1,squeeze=False)
+    plt.subplots_adjust(top=0.95, bottom=0.05, left=0.05, right=0.95, hspace=0.35)
+    ax1=axes[0,0]
+    ax1.set_ylabel('request / segundos', fontsize=10)
+    ax2=axes[1,0]
+    ax2.set_ylabel('request / segundos', fontsize=10)
+    ax3=axes[2,0]
+    ax3.set_ylabel('request / segundos', fontsize=10)
+    axtemp = datafI.plot.bar( ax= ax1 , rot = 0, figsize = (15,15), width = 0.9, color = clr, title = "Insertar")
+    patches, labels = axtemp.get_legend_handles_labels()
+    axtemp.legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.15, 1), borderaxespad=0.)
+    for p in axtemp.patches: 
+        axtemp.annotate(np.round(p.get_height(),decimals=2), (p.get_x()+p.get_width()/2., p.get_height()*0.8), ha='center', va='center', xytext=(0, 0), textcoords='offset points', rotation=90)
+    axtemp = datafC.plot.bar( ax = ax2, rot = 0, figsize = (15,15), width = 0.9, color = clr, title = "Consultas")
+    patches, labels = axtemp.get_legend_handles_labels()
+    axtemp.legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.15, 1), borderaxespad=0.)
+    for p in axtemp.patches: 
+        axtemp.annotate(np.round(p.get_height(),decimals=2), (p.get_x()+p.get_width()/2., p.get_height()*0.8), ha='center', va='center', xytext=(0, 0), textcoords='offset points', rotation=90)
+    axtemp = datafCP.plot.bar( ax = ax3, rot = 0, figsize = (15,15), width = 0.9, color = clr, title = "ContarPrimos")
+    patches, labels = axtemp.get_legend_handles_labels()
+    axtemp.legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.15, 1), borderaxespad=0.)
+    for p in axtemp.patches: 
+        axtemp.annotate(np.round(p.get_height(),decimals=2), (p.get_x()+p.get_width()/2., p.get_height()*0.8), ha='center', va='center', xytext=(0, 0), textcoords='offset points', rotation=90)
+
+def plot_bar_Jmeter(N):
+    if N == 0:
+        index=["TG_1000_1", "TG_1000_2", "TG_1000_3"]
+    elif (N==1):
+        index=["TG_2000_1", "TG_2000_2", "TG_2000_3"]
+    else:
+        index=["TG_3000_1", "TG_3000_2", "TG_3000_3"]
+        
+    data = {"VertX_Periodo6":[RendimientoJmeter(svI[0,N,i]) for i in range(3)],
+            "VertX_Periodo8":[RendimientoJmeter(svI[1,N,i]) for i in range(3)],
+            "VertX_Periodo10":[RendimientoJmeter(svI[2,N,i]) for i in range(3)],
+            "Tomcat_Periodo6":[RendimientoJmeter(stI[0,N,i]) for i in range(3)],
+            "Tomcat_Periodo8":[RendimientoJmeter(stI[1,N,i]) for i in range(3)],
+            "Tomcat_Periodo10":[RendimientoJmeter(stI[2,N,i]) for i in range(3)],
+            "Jetty_Periodo6":[RendimientoJmeter(sjI[0,N,i]) for i in range(3)],
+            "Jetty_Periodo8":[RendimientoJmeter(sjI[1,N,i]) for i in range(3)],
+            "Jetty_Periodo10":[RendimientoJmeter(sjI[2,N,i]) for i in range(3)],
+            "NodeJS_Periodo6":[RendimientoJmeter(snI[0,N,i]) for i in range(3)],
+            "NodeJS_Periodo8":[RendimientoJmeter(snI[1,N,i]) for i in range(3)],
+            "NodeJS_Periodo10":[RendimientoJmeter(snI[2,N,i]) for i in range(3)]
+    }
+    datafI = pd.DataFrame(data, index)
+
+    data = {"VertX_Periodo6":[RendimientoJmeter(svC[0,N,i]) for i in range(3)],
+            "VertX_Periodo8":[RendimientoJmeter(svC[1,N,i]) for i in range(3)],
+            "VertX_Periodo10":[RendimientoJmeter(svC[2,N,i]) for i in range(3)],
+            "Tomcat_Periodo6":[RendimientoJmeter(stC[0,N,i]) for i in range(3)],
+            "Tomcat_Periodo8":[RendimientoJmeter(stC[1,N,i]) for i in range(3)],
+            "Tomcat_Periodo10":[RendimientoJmeter(stC[2,N,i]) for i in range(3)],
+            "Jetty_Periodo6":[RendimientoJmeter(sjC[0,N,i]) for i in range(3)],
+            "Jetty_Periodo8":[RendimientoJmeter(sjC[1,N,i]) for i in range(3)],
+            "Jetty_Periodo10":[RendimientoJmeter(sjC[2,N,i]) for i in range(3)],
+            "NodeJS_Periodo6":[RendimientoJmeter(snC[0,N,i]) for i in range(3)],
+            "NodeJS_Periodo8":[RendimientoJmeter(snC[1,N,i]) for i in range(3)],
+            "NodeJS_Periodo10":[RendimientoJmeter(snC[2,N,i]) for i in range(3)]
+    }
+    datafC = pd.DataFrame(data, index)
+    data = {"VertX_Periodo6":[RendimientoJmeter(svCP[0,N,i]) for i in range(3)],
+            "VertX_Periodo8":[RendimientoJmeter(svCP[1,N,i]) for i in range(3)],
+            "VertX_Periodo10":[RendimientoJmeter(svCP[2,N,i]) for i in range(3)],
+            "Tomcat_Periodo6":[RendimientoJmeter(stCP[0,N,i]) for i in range(3)],
+            "Tomcat_Periodo8":[RendimientoJmeter(stCP[1,N,i]) for i in range(3)],
+            "Tomcat_Periodo10":[RendimientoJmeter(stCP[2,N,i]) for i in range(3)],
+            "Jetty_Periodo6":[RendimientoJmeter(sjCP[0,N,i]) for i in range(3)],
+            "Jetty_Periodo8":[RendimientoJmeter(sjCP[1,N,i]) for i in range(3)],
+            "Jetty_Periodo10":[RendimientoJmeter(sjCP[2,N,i]) for i in range(3)],
+            "NodeJS_Periodo6":[RendimientoJmeter(snCP[0,N,i]) for i in range(3)],
+            "NodeJS_Periodo8":[RendimientoJmeter(snCP[1,N,i]) for i in range(3)],
+            "NodeJS_Periodo10":[RendimientoJmeter(snCP[2,N,i]) for i in range(3)]
+    }
+    datafCP = pd.DataFrame(data, index)
+    clr = ['#3498DB', '#5DADE2', '#85C1E9', 
+             '#F39C12', '#F5B041', '#F8C471',
+             '#27AE60', '#52BE80', '#7DCEA0',
+             '#E74C3C', '#EC7063', '#F1948A']
+    fig, axes = plt.subplots(3,1,squeeze=False)
+    plt.subplots_adjust(top=0.95, bottom=0.05, left=0.05, right=0.95, hspace=0.35)
+    ax1=axes[0,0]
+    ax1.set_ylabel('request / segundos', fontsize=10)
+    ax2=axes[1,0]
+    ax2.set_ylabel('request / segundos', fontsize=10)
+    ax3=axes[2,0]
+    ax3.set_ylabel('request / segundos', fontsize=10)
+    axtemp = datafI.plot.bar( ax= ax1 , rot = 0, figsize = (15,15), width = 0.9, color = clr, title = "Insertar")
+    patches, labels = axtemp.get_legend_handles_labels()
+    axtemp.legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.15, 1), borderaxespad=0.)
+    for p in axtemp.patches: 
+        axtemp.annotate(np.round(p.get_height(),decimals=2), (p.get_x()+p.get_width()/2., p.get_height()*0.8), ha='center', va='center', xytext=(0, 0), textcoords='offset points', rotation=90)
+    axtemp = datafC.plot.bar( ax = ax2, rot = 0, figsize = (15,15), width = 0.9, color = clr, title = "Consultas")
+    patches, labels = axtemp.get_legend_handles_labels()
+    axtemp.legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.15, 1), borderaxespad=0.)
+    for p in axtemp.patches: 
+        axtemp.annotate(np.round(p.get_height(),decimals=2), (p.get_x()+p.get_width()/2., p.get_height()*0.8), ha='center', va='center', xytext=(0, 0), textcoords='offset points', rotation=90)
+    axtemp = datafCP.plot.bar( ax = ax3, rot = 0, figsize = (15,15), width = 0.9, color = clr, title = "ContarPrimos")
+    patches, labels = axtemp.get_legend_handles_labels()
+    axtemp.legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.15, 1), borderaxespad=0.)
+    for p in axtemp.patches: 
+        axtemp.annotate(np.round(p.get_height(),decimals=2), (p.get_x()+p.get_width()/2., p.get_height()*0.8), ha='center', va='center', xytext=(0, 0), textcoords='offset points', rotation=90)
+     
+def plot_PerfMon_Consultas(N,z):
+    fig, axes = plt.subplots(3,2,squeeze=False)
+    plt.subplots_adjust(top=0.95, bottom=0.05, left=0.0, right=1, hspace=0.4)
+    CPU(mvC[0,N,z]).plot.line(ax=axes[0,0], figsize=(20,10))
+    CPU(mtC[0,N,z]).plot.line(ax=axes[0,0], figsize=(20,10))
+    CPU(mjC[0,N,z]).plot.line(ax=axes[0,0], figsize=(20,10))
+    CPU(mnC[0,N,z]).plot.line(ax=axes[0,0], figsize=(20,10))
+    CPU(mvC[1,N,z]).plot.line(ax=axes[1,0], figsize=(20,10))
+    CPU(mtC[1,N,z]).plot.line(ax=axes[1,0], figsize=(20,10))
+    CPU(mjC[1,N,z]).plot.line(ax=axes[1,0], figsize=(20,10))
+    CPU(mnC[1,N,z]).plot.line(ax=axes[1,0], figsize=(20,10))
+    CPU(mvC[2,N,z]).plot.line(ax=axes[2,0], figsize=(20,10))
+    CPU(mtC[2,N,z]).plot.line(ax=axes[2,0], figsize=(20,10))
+    CPU(mjC[2,N,z]).plot.line(ax=axes[2,0], figsize=(20,10))
+    CPU(mnC[2,N,z]).plot.line(ax=axes[2,0], figsize=(20,10))
+    RAM(mvC[0,N,z]).plot.line(ax=axes[0,1], figsize=(20,10))
+    RAM(mtC[0,N,z]).plot.line(ax=axes[0,1], figsize=(20,10))
+    RAM(mjC[0,N,z]).plot.line(ax=axes[0,1], figsize=(20,10))
+    RAM(mnC[0,N,z]).plot.line(ax=axes[0,1], figsize=(20,10))
+    RAM(mvC[1,N,z]).plot.line(ax=axes[1,1], figsize=(20,10))
+    RAM(mtC[1,N,z]).plot.line(ax=axes[1,1], figsize=(20,10))
+    RAM(mjC[1,N,z]).plot.line(ax=axes[1,1], figsize=(20,10))
+    RAM(mnC[1,N,z]).plot.line(ax=axes[1,1], figsize=(20,10))
+    RAM(mvC[2,N,z]).plot.line(ax=axes[2,1], figsize=(20,10))
+    RAM(mtC[2,N,z]).plot.line(ax=axes[2,1], figsize=(20,10))
+    RAM(mjC[2,N,z]).plot.line(ax=axes[2,1], figsize=(20,10))
+    RAM(mnC[2,N,z]).plot.line(ax=axes[2,1], figsize=(20,10))
+    axes[0,0].set_title("Consultas - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[0,0].set_ylabel('% CPU - Periodo 6', fontsize=12)
+    axes[0,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[1,0].set_title("Consultas - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[1,0].set_ylabel('% CPU - Periodo 8', fontsize=12)
+    axes[1,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[2,0].set_title("Consultas - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[2,0].set_ylabel('% CPU - Periodo 10', fontsize=12)
+    axes[2,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[0,1].set_title("Consultas - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[0,1].set_ylabel('Memory Metric - Periodo 6', fontsize=12)
+    axes[0,1].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[1,1].set_title("Consultas - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[1,1].set_ylabel('Memory Metric - Periodo 8', fontsize=12)
+    axes[1,1].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[2,1].set_title("Consultas - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[2,1].set_ylabel('Memory Metric - Periodo 10', fontsize=12)
+    axes[2,1].set_xlabel('timeStamp [seconds]', fontsize=12)
+    patches, labels = axes[0,0].get_legend_handles_labels()
+    labels = ["VertX", "Tomcat", "Jetty", "NodeJS"]
+    axes[0,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[1,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[2,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[0,1].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[1,1].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[2,1].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+
+def plot_PerfMon_ContarPrimos(N,z):
+    fig, axes = plt.subplots(3,2,squeeze=False)
+    plt.subplots_adjust(top=0.95, bottom=0.05, left=0.0, right=1, hspace=0.4)
+    CPU(mvCP[0,N,z]).plot.line(ax=axes[0,0], figsize=(20,10))
+    CPU(mtCP[0,N,z]).plot.line(ax=axes[0,0], figsize=(20,10))
+    CPU(mjCP[0,N,z]).plot.line(ax=axes[0,0], figsize=(20,10))
+    CPU(mnCP[0,N,z]).plot.line(ax=axes[0,0], figsize=(20,10))
+    CPU(mvCP[1,N,z]).plot.line(ax=axes[1,0], figsize=(20,10))
+    CPU(mtCP[1,N,z]).plot.line(ax=axes[1,0], figsize=(20,10))
+    CPU(mjCP[1,N,z]).plot.line(ax=axes[1,0], figsize=(20,10))
+    CPU(mnCP[1,N,z]).plot.line(ax=axes[1,0], figsize=(20,10))
+    CPU(mvCP[2,N,z]).plot.line(ax=axes[2,0], figsize=(20,10))
+    CPU(mtCP[2,N,z]).plot.line(ax=axes[2,0], figsize=(20,10))
+    CPU(mjCP[2,N,z]).plot.line(ax=axes[2,0], figsize=(20,10))
+    CPU(mnCP[2,N,z]).plot.line(ax=axes[2,0], figsize=(20,10))
+    RAM(mvCP[0,N,z]).plot.line(ax=axes[0,1], figsize=(20,10))
+    RAM(mtCP[0,N,z]).plot.line(ax=axes[0,1], figsize=(20,10))
+    RAM(mjCP[0,N,z]).plot.line(ax=axes[0,1], figsize=(20,10))
+    RAM(mnCP[0,N,z]).plot.line(ax=axes[0,1], figsize=(20,10))
+    RAM(mvCP[1,N,z]).plot.line(ax=axes[1,1], figsize=(20,10))
+    RAM(mtCP[1,N,z]).plot.line(ax=axes[1,1], figsize=(20,10))
+    RAM(mjCP[1,N,z]).plot.line(ax=axes[1,1], figsize=(20,10))
+    RAM(mnCP[1,N,z]).plot.line(ax=axes[1,1], figsize=(20,10))
+    RAM(mvCP[2,N,z]).plot.line(ax=axes[2,1], figsize=(20,10))
+    RAM(mtCP[2,N,z]).plot.line(ax=axes[2,1], figsize=(20,10))
+    RAM(mjCP[2,N,z]).plot.line(ax=axes[2,1], figsize=(20,10))
+    RAM(mnCP[2,N,z]).plot.line(ax=axes[2,1], figsize=(20,10))
+    axes[0,0].set_title("ContarPrimos - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[0,0].set_ylabel('% CPU - Periodo 6', fontsize=12)
+    axes[0,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[1,0].set_title("ContarPrimos - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[1,0].set_ylabel('% CPU - Periodo 8', fontsize=12)
+    axes[1,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[2,0].set_title("ContarPrimos - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[2,0].set_ylabel('% CPU - Periodo 10', fontsize=12)
+    axes[2,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[0,1].set_title("ContarPrimos - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[0,1].set_ylabel('Memory Metric - Periodo 6', fontsize=12)
+    axes[0,1].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[1,1].set_title("ContarPrimos - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[1,1].set_ylabel('Memory Metric - Periodo 8', fontsize=12)
+    axes[1,1].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[2,1].set_title("ContarPrimos - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[2,1].set_ylabel('Memory Metric - Periodo 10', fontsize=12)
+    axes[2,1].set_xlabel('timeStamp [seconds]', fontsize=12)
+    patches, labels = axes[0,0].get_legend_handles_labels()
+    labels = ["VertX", "Tomcat", "Jetty", "NodeJS"]
+    axes[0,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[1,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[2,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[0,1].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[1,1].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[2,1].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+ 
+def plot_PerfMon_Insertar(N,z):
+    fig, axes = plt.subplots(3,2,squeeze=False)
+    plt.subplots_adjust(top=0.95, bottom=0.05, left=0.0, right=1, hspace=0.4)
+    CPU(mvI[0,N,z]).plot.line(ax=axes[0,0], figsize=(20,10))
+    CPU(mtI[0,N,z]).plot.line(ax=axes[0,0], figsize=(20,10))
+    CPU(mjI[0,N,z]).plot.line(ax=axes[0,0], figsize=(20,10))
+    CPU(mnI[0,N,z]).plot.line(ax=axes[0,0], figsize=(20,10))
+    CPU(mvI[1,N,z]).plot.line(ax=axes[1,0], figsize=(20,10))
+    CPU(mtI[1,N,z]).plot.line(ax=axes[1,0], figsize=(20,10))
+    CPU(mjI[1,N,z]).plot.line(ax=axes[1,0], figsize=(20,10))
+    CPU(mnI[1,N,z]).plot.line(ax=axes[1,0], figsize=(20,10))
+    CPU(mvI[2,N,z]).plot.line(ax=axes[2,0], figsize=(20,10))
+    CPU(mtI[2,N,z]).plot.line(ax=axes[2,0], figsize=(20,10))
+    CPU(mjI[2,N,z]).plot.line(ax=axes[2,0], figsize=(20,10))
+    CPU(mnI[2,N,z]).plot.line(ax=axes[2,0], figsize=(20,10))
+    RAM(mvI[0,N,z]).plot.line(ax=axes[0,1], figsize=(20,10))
+    RAM(mtI[0,N,z]).plot.line(ax=axes[0,1], figsize=(20,10))
+    RAM(mjI[0,N,z]).plot.line(ax=axes[0,1], figsize=(20,10))
+    RAM(mnI[0,N,z]).plot.line(ax=axes[0,1], figsize=(20,10))
+    RAM(mvI[1,N,z]).plot.line(ax=axes[1,1], figsize=(20,10))
+    RAM(mtI[1,N,z]).plot.line(ax=axes[1,1], figsize=(20,10))
+    RAM(mjI[1,N,z]).plot.line(ax=axes[1,1], figsize=(20,10))
+    RAM(mnI[1,N,z]).plot.line(ax=axes[1,1], figsize=(20,10))
+    RAM(mvI[2,N,z]).plot.line(ax=axes[2,1], figsize=(20,10))
+    RAM(mtI[2,N,z]).plot.line(ax=axes[2,1], figsize=(20,10))
+    RAM(mjI[2,N,z]).plot.line(ax=axes[2,1], figsize=(20,10))
+    RAM(mnI[2,N,z]).plot.line(ax=axes[2,1], figsize=(20,10))
+    axes[0,0].set_title("Insertar - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[0,0].set_ylabel('% CPU - Periodo 6', fontsize=12)
+    axes[0,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[1,0].set_title("Insertar - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[1,0].set_ylabel('% CPU - Periodo 8', fontsize=12)
+    axes[1,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[2,0].set_title("Insertar - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[2,0].set_ylabel('% CPU - Periodo 10', fontsize=12)
+    axes[2,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[0,1].set_title("Insertar - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[0,1].set_ylabel('Memory Metric - Periodo 6', fontsize=12)
+    axes[0,1].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[1,1].set_title("Insertar - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[1,1].set_ylabel('Memory Metric - Periodo 8', fontsize=12)
+    axes[1,1].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[2,1].set_title("Insertar - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[2,1].set_ylabel('Memory Metric - Periodo 10', fontsize=12)
+    axes[2,1].set_xlabel('timeStamp [seconds]', fontsize=12)
+    patches, labels = axes[0,0].get_legend_handles_labels()
+    labels = ["VertX", "Tomcat", "Jetty", "NodeJS"]
+    axes[0,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[1,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[2,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[0,1].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[1,1].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    axes[2,1].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.11, 1), borderaxespad=0.)
+    
+def plot_ResponseTime_Insertar(N,z):
+    fig, axes = plt.subplots(3,1,squeeze=False)
+    plt.subplots_adjust(top=0.95, bottom=0.05, left=0.0, right=1, hspace=0.4)
+    elapsedTime(rvI[0,N,z]).plot.line(ax=axes[0,0], figsize=(6,10))
+    elapsedTime(rtI[0,N,z]).plot.line(ax=axes[0,0], figsize=(6,10))
+    elapsedTime(rnI[0,N,z]).plot.line(ax=axes[0,0], figsize=(6,10))
+    elapsedTime(rvI[1,N,z]).plot.line(ax=axes[1,0], figsize=(6,10))
+    elapsedTime(rtI[1,N,z]).plot.line(ax=axes[1,0], figsize=(6,10))
+    elapsedTime(rnI[1,N,z]).plot.line(ax=axes[1,0], figsize=(6,10))
+    elapsedTime(rvI[2,N,z]).plot.line(ax=axes[2,0], figsize=(6,10))
+    elapsedTime(rtI[2,N,z]).plot.line(ax=axes[2,0], figsize=(6,10))
+    elapsedTime(rnI[2,N,z]).plot.line(ax=axes[2,0], figsize=(6,10))
+    axes[0,0].set_title("Insertar - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[0,0].set_ylabel('Response Time - Periodo 6', fontsize=12)
+    axes[0,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[1,0].set_title("Insertar - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[1,0].set_ylabel('Response Time - Periodo 8', fontsize=12)
+    axes[1,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[2,0].set_title("Insertar - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[2,0].set_ylabel('Response Time - Periodo 10', fontsize=12)
+    axes[2,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    patches, labels = axes[0,0].get_legend_handles_labels()
+    labels = ["VertX", "Tomcat", "NodeJS"]
+    axes[0,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.18, 1), borderaxespad=0.)
+    axes[1,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.18, 1), borderaxespad=0.)
+    axes[2,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.18, 1), borderaxespad=0.)
+    
+def plot_ResponseTime_Consulta(N,z):
+    fig, axes = plt.subplots(3,1,squeeze=False)
+    plt.subplots_adjust(top=0.95, bottom=0.05, left=0.0, right=1, hspace=0.4)
+    elapsedTime(rvC[0,N,z]).plot.line(ax=axes[0,0], figsize=(6,10))
+    elapsedTime(rtC[0,N,z]).plot.line(ax=axes[0,0], figsize=(6,10))
+    elapsedTime(rnC[0,N,z]).plot.line(ax=axes[0,0], figsize=(6,10))
+    elapsedTime(rvC[1,N,z]).plot.line(ax=axes[1,0], figsize=(6,10))
+    elapsedTime(rtC[1,N,z]).plot.line(ax=axes[1,0], figsize=(6,10))
+    elapsedTime(rnC[1,N,z]).plot.line(ax=axes[1,0], figsize=(6,10))
+    elapsedTime(rvC[2,N,z]).plot.line(ax=axes[2,0], figsize=(6,10))
+    elapsedTime(rtC[2,N,z]).plot.line(ax=axes[2,0], figsize=(6,10))
+    elapsedTime(rnC[2,N,z]).plot.line(ax=axes[2,0], figsize=(6,10))
+    axes[0,0].set_title("Consulta - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[0,0].set_ylabel('Response Time - Periodo 6', fontsize=12)
+    axes[0,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[1,0].set_title("Consulta - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[1,0].set_ylabel('Response Time - Periodo 8', fontsize=12)
+    axes[1,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[2,0].set_title("Consulta - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[2,0].set_ylabel('Response Time - Periodo 10', fontsize=12)
+    axes[2,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    patches, labels = axes[0,0].get_legend_handles_labels()
+    labels = ["VertX", "Tomcat", "NodeJS"]
+    axes[0,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.18, 1), borderaxespad=0.)
+    axes[1,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.18, 1), borderaxespad=0.)
+    axes[2,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.18, 1), borderaxespad=0.)
+    
+def plot_ResponseTime_ContarPrimos(N,z):
+    fig, axes = plt.subplots(3,1,squeeze=False)
+    plt.subplots_adjust(top=0.95, bottom=0.05, left=0.0, right=1, hspace=0.4)
+    elapsedTime(rvCP[0,N,z]).plot.line(ax=axes[0,0], figsize=(6,10))
+    elapsedTime(rtCP[0,N,z]).plot.line(ax=axes[0,0], figsize=(6,10))
+    elapsedTime(rnCP[0,N,z]).plot.line(ax=axes[0,0], figsize=(6,10))
+    elapsedTime(rvCP[1,N,z]).plot.line(ax=axes[1,0], figsize=(6,10))
+    elapsedTime(rtCP[1,N,z]).plot.line(ax=axes[1,0], figsize=(6,10))
+    elapsedTime(rnCP[1,N,z]).plot.line(ax=axes[1,0], figsize=(6,10))
+    elapsedTime(rvCP[2,N,z]).plot.line(ax=axes[2,0], figsize=(6,10))
+    elapsedTime(rtCP[2,N,z]).plot.line(ax=axes[2,0], figsize=(6,10))
+    elapsedTime(rnCP[2,N,z]).plot.line(ax=axes[2,0], figsize=(6,10))
+    axes[0,0].set_title("ContarPrimos - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[0,0].set_ylabel('Response Time - Periodo 6', fontsize=12)
+    axes[0,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[1,0].set_title("ContarPrimos - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[1,0].set_ylabel('Response Time - Periodo 8', fontsize=12)
+    axes[1,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    axes[2,0].set_title("ContarPrimos - "+str((N+1)*1000)+" Request - "+ str(z+1)+"er Escenario")
+    axes[2,0].set_ylabel('Response Time - Periodo 10', fontsize=12)
+    axes[2,0].set_xlabel('timeStamp [seconds]', fontsize=12)
+    patches, labels = axes[0,0].get_legend_handles_labels()
+    labels = ["VertX", "Tomcat", "NodeJS"]
+    axes[0,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.18, 1), borderaxespad=0.)
+    axes[1,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.18, 1), borderaxespad=0.)
+    axes[2,0].legend(patches, labels, loc='upper right', frameon = False, ncol= 1, bbox_to_anchor=(1.18, 1), borderaxespad=0.)
+    

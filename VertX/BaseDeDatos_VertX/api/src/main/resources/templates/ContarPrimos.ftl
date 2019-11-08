@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>${title}</title>
+</head>
+<body>
+<h1>Imprime la cantidad de primos entre 0 y ${limite}.</h1>
+<font color="blue">
+<h1>${size}</h1>
+</font>
+</body>
+</html>

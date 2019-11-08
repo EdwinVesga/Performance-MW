@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" version="2.4"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http:/java.sun.com/dtd/web-app_2_3.dtd">
+
+         <welcome-file-list>
+               <welcome-file>index.html</welcome-file>
+               <welcome-file>index.htm</welcome-file>
+               <welcome-file>index.jsp</welcome-file>
+         </welcome-file-list>
+
+  <servlet>
+    <servlet-name>ConsultaEstudiante</servlet-name>
+    <servlet-class>controller.ConsultaEstudiante</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ConsultaEstudiante</servlet-name>
+    <url-pattern>/ConsultaEstudiante</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ConsultaProfesor</servlet-name>
+    <servlet-class>controller.ConsultaProfesor</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ConsultaProfesor</servlet-name>
+    <url-pattern>/ConsultaProfesor</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ConsultaMateria</servlet-name>
+    <servlet-class>controller.ConsultaMateria</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ConsultaMateria</servlet-name>
+    <url-pattern>/ConsultaMateria</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ConsultaEstudianteSemestreA</servlet-name>
+    <servlet-class>controller.ConsultaEstudianteSemestreA</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ConsultaEstudianteSemestreA</servlet-name>
+    <url-pattern>/ConsultaEstudianteSemestreA</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ConsultaEstudianteSemestreB</servlet-name>
+    <servlet-class>controller.ConsultaEstudianteSemestreB</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ConsultaEstudianteSemestreB</servlet-name>
+    <url-pattern>/ConsultaEstudianteSemestreB</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ConsultaEstudianteSemestreC</servlet-name>
+    <servlet-class>controller.ConsultaEstudianteSemestreC</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ConsultaEstudianteSemestreC</servlet-name>
+    <url-pattern>/ConsultaEstudianteSemestreC</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ConsultaProfesorEscuela</servlet-name>
+    <servlet-class>controller.ConsultaProfesorEscuela</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ConsultaProfesorEscuela</servlet-name>
+    <url-pattern>/ConsultaProfesorEscuela</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>Insertar1</servlet-name>
+    <servlet-class>controller.Insertar1</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Insertar1</servlet-name>
+    <url-pattern>/Insertar1</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>Insertar3</servlet-name>
+    <servlet-class>controller.Insertar3</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Insertar3</servlet-name>
+    <url-pattern>/Insertar3</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>Insertar6</servlet-name>
+    <servlet-class>controller.Insertar6</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Insertar6</servlet-name>
+    <url-pattern>/Insertar6</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ContarPrimos1000</servlet-name>
+    <servlet-class>controller.ContarPrimos1000</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ContarPrimos1000</servlet-name>
+    <url-pattern>/ContarPrimos1000</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ContarPrimos2000</servlet-name>
+    <servlet-class>controller.ContarPrimos2000</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ContarPrimos2000</servlet-name>
+    <url-pattern>/ContarPrimos2000</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ContarPrimos3000</servlet-name>
+    <servlet-class>controller.ContarPrimos3000</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ContarPrimos3000</servlet-name>
+    <url-pattern>/ContarPrimos3000</url-pattern>
+  </servlet-mapping>
+
+  <resource-ref>
+    <description>Database Jetty</description>
+    <res-ref-name>jdbc/ConexionDB</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <res-auth>Container</res-auth>
+    <res-maxActive>100000</res-maxActive>
+    <res-maxTotal>100000</res-maxTotal>
+    <res-maxIdle>300</res-maxIdle>
+  </resource-ref>
+
+</web-app>

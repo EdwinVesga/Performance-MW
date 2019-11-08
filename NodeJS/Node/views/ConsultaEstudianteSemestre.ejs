@@ -4,12 +4,20 @@
         <title><%=title%></title>
     </head>
 <body>
-<h1>La cantidad de estudiantes que pertenecen al semestre <%=semestre%> son: </h1>
-<h1>
-  <font color="blue">
-      <%=rows[0]['count(*)']%>
-  </font>
-</h1>
+<h1>Tabla de Cantidad de Estudiantes en el semestre <%=semestre%>:</h1>
+
+<table border="1">
+  <tr>
+    <th>Semestre</th>
+    <th>Cantidad Estudiantes</th>
+  </tr>
+
+    <tr>
+      <td><%=semestre%></td>
+      <td><%=cantidad%></td>
+    </tr>
+
+</table>
 
 </body>
 </html>

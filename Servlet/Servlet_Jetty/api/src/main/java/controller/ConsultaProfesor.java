@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import dao.ProfesorDAO;
 import model.Profesor;
 
+
 public class ConsultaProfesor extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ProfesorDAO profesorDAO;

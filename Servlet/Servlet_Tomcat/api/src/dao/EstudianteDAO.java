@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
 import model.Estudiante;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -23,70 +25,13 @@ public class EstudianteDAO {
 		}catch(NamingException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	public void insertar(Estudiante estudiante) throws SQLException {
 
 		try(Connection conn = ds.getConnection()) {
 			String query = "INSERT INTO estudiante (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
-			try(PreparedStatement statement = conn.prepareStatement(query)){
-				statement.setString(1, estudiante.getId());
-				statement.setString(2, estudiante.getPrimerNombre());
-				statement.setString(3, estudiante.getSegundoNombre());
-				statement.setString(4, estudiante.getPrimerApellido());
-				statement.setString(5, estudiante.getSegundoApellido());
-				statement.setInt(6, estudiante.getSemestre());
-				statement.setString(7, estudiante.getFechaIngreso());
-				statement.executeUpdate();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void insertarA(Estudiante estudiante) throws SQLException {
-
-		try(Connection conn = ds.getConnection()) {
-			String query = "INSERT INTO estudianteA (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
-			try(PreparedStatement statement = conn.prepareStatement(query)){
-				statement.setString(1, estudiante.getId());
-				statement.setString(2, estudiante.getPrimerNombre());
-				statement.setString(3, estudiante.getSegundoNombre());
-				statement.setString(4, estudiante.getPrimerApellido());
-				statement.setString(5, estudiante.getSegundoApellido());
-				statement.setInt(6, estudiante.getSemestre());
-				statement.setString(7, estudiante.getFechaIngreso());
-				statement.executeUpdate();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void insertarB(Estudiante estudiante) throws SQLException {
-
-		try(Connection conn = ds.getConnection()) {
-			String query = "INSERT INTO estudianteB (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
-			try(PreparedStatement statement = conn.prepareStatement(query)){
-				statement.setString(1, estudiante.getId());
-				statement.setString(2, estudiante.getPrimerNombre());
-				statement.setString(3, estudiante.getSegundoNombre());
-				statement.setString(4, estudiante.getPrimerApellido());
-				statement.setString(5, estudiante.getSegundoApellido());
-				statement.setInt(6, estudiante.getSemestre());
-				statement.setString(7, estudiante.getFechaIngreso());
-				statement.executeUpdate();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void insertarC(Estudiante estudiante) throws SQLException {
-
-		try(Connection conn = ds.getConnection()) {
-			String query = "INSERT INTO estudianteC (id_est, primer_nombre_est, segundo_nombre_est, primer_apellido_est, segundo_apellido_est, semestre_est, fecha_ingreso_est) VALUES (?,?,?,?,?,?,?)";
 			try(PreparedStatement statement = conn.prepareStatement(query)){
 				statement.setString(1, estudiante.getId());
 				statement.setString(2, estudiante.getPrimerNombre());
@@ -120,91 +65,99 @@ public class EstudianteDAO {
 						segundo_apellido_est, semestre_est, fecha_ingreso_est);
 				listaEstudiantes.add(estudiante);
 			}
-			
+
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}
 		return listaEstudiantes;
 	}
 
-	public Integer eliminar(String id) throws SQLException {
-		int result=0;
+	public void eliminar(String id) throws SQLException {
+		int result  = 0;
 		try(Connection conn = ds.getConnection()) {
 			String sql = "DELETE FROM estudiante WHERE id_est = ?";
 			try(PreparedStatement statement = conn.prepareStatement(sql)){
 				statement.setString(1, id);
-				result = statement.executeUpdate();
+			    result = statement.executeUpdate();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return result;
 	}
 
-	public int contarSemestreA(String semestre) throws SQLException {
-		int numberOfRows=0;
-			try(Connection conn = ds.getConnection()){
-				String sql = "SELECT COUNT(*)  FROM estudianteA WHERE semestre_est = ?";
-				try(PreparedStatement statement = conn.prepareStatement(sql)){
-					statement.setInt(1, Integer.parseInt(semestre));
-					try {
-						ResultSet rs = statement.executeQuery();
-						if (rs.next()) {
-							numberOfRows = rs.getInt(1);
-					      } else {
-					        System.out.println("error: could not get the record counts");
-					      }
-					} catch (SQLException e) {
-						e.printStackTrace();
+	public List<Integer> contarSemestreA() throws SQLException {
+		Random aleatorio = new Random();
+		int intAleatorio = aleatorio.nextInt(10)+1;
+		List<Integer> arr = new ArrayList<>();
+		arr.add(intAleatorio);
+		try(Connection conn = ds.getConnection()){
+			String sql = "SELECT * FROM estudianteA WHERE semestre_est = ?";
+			try(PreparedStatement statement = conn.prepareStatement(sql)){
+				statement.setInt(1, intAleatorio);
+				try {
+					ResultSet rs = statement.executeQuery();
+					int count = 0;
+					while(rs.next()) {
+					count = count +1;
 					}
+					arr.add(count);
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
-			}catch(SQLException e) {
-				e.printStackTrace();
 			}
-			return numberOfRows;
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+	return arr;
 	}
-	public int contarSemestreB(String semestre) throws SQLException {
-		int numberOfRows=0;
-			try(Connection conn = ds.getConnection()){
-				String sql = "SELECT COUNT(*)  FROM estudianteB WHERE semestre_est = ?";
-				try(PreparedStatement statement = conn.prepareStatement(sql)){
-					statement.setInt(1, Integer.parseInt(semestre));
-					try {
-						ResultSet rs = statement.executeQuery();
-						if (rs.next()) {
-							numberOfRows = rs.getInt(1);
-					      } else {
-					        System.out.println("error: could not get the record counts");
-					      }
-					} catch (SQLException e) {
-						e.printStackTrace();
+	public List<Integer> contarSemestreB() throws SQLException {
+		Random aleatorio = new Random();
+		int intAleatorio = aleatorio.nextInt(10)+1;
+		List<Integer> arr = new ArrayList<>();
+		arr.add(intAleatorio);
+		try(Connection conn = ds.getConnection()){
+			String sql = "SELECT * FROM estudianteB WHERE semestre_est = ?";
+			try(PreparedStatement statement = conn.prepareStatement(sql)){
+				statement.setInt(1, intAleatorio);
+				try {
+					ResultSet rs = statement.executeQuery();
+					int count = 0;
+					while(rs.next()) {
+					count = count +1;
 					}
+					arr.add(count);
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
-			}catch(SQLException e) {
-				e.printStackTrace();
 			}
-			return numberOfRows;
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+	return arr;
 	}
-	public int contarSemestreC(String semestre) throws SQLException {
-		int numberOfRows=0;
-			try(Connection conn = ds.getConnection()){
-				String sql = "SELECT COUNT(*)  FROM estudianteC WHERE semestre_est = ?";
-				try(PreparedStatement statement = conn.prepareStatement(sql)){
-					statement.setInt(1, Integer.parseInt(semestre));
-					try {
-						ResultSet rs = statement.executeQuery();
-						if (rs.next()) {
-							numberOfRows = rs.getInt(1);
-					      } else {
-					        System.out.println("error: could not get the record counts");
-					      }
-					} catch (SQLException e) {
-						e.printStackTrace();
+	public List<Integer> contarSemestreC() throws SQLException {
+		Random aleatorio = new Random();
+		int intAleatorio = aleatorio.nextInt(10)+1;
+		List<Integer> arr = new ArrayList<>();
+		arr.add(intAleatorio);
+		try(Connection conn = ds.getConnection()){
+			String sql = "SELECT * FROM estudianteC WHERE semestre_est = ?";
+			try(PreparedStatement statement = conn.prepareStatement(sql)){
+				statement.setInt(1, intAleatorio);
+				try {
+					ResultSet rs = statement.executeQuery();
+					int count = 0;
+					while(rs.next()) {
+					count = count +1;
 					}
+					arr.add(count);
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
-			}catch(SQLException e) {
-				e.printStackTrace();
 			}
-			return numberOfRows;
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+	return arr;
 	}
 }

@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import dao.MateriaDAO;
 import model.Materia;
 
+
 public class ConsultaMateria extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private MateriaDAO materiaDAO;

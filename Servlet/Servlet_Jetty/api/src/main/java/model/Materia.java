@@ -5,7 +5,7 @@ public class Materia {
 	String nombre_materia;
 	String salon_materia;
 	String horario_materia;
-
+	
 	public Materia(String id_materia, String nombre_materia, String salon_materia, String horario_materia) {
 		super();
 		this.id_materia = id_materia;
@@ -13,7 +13,7 @@ public class Materia {
 		this.salon_materia = salon_materia;
 		this.horario_materia = horario_materia;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "Materia [id_materia=" + id_materia + ", nombre_materia=" + nombre_materia + ", salon_materia="
@@ -45,5 +45,5 @@ public class Materia {
 	public void setHorario_materia(String horario_materia) {
 		this.horario_materia = horario_materia;
 	}
-
+	
 }
